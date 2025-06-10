@@ -1,0 +1,13 @@
+{
+  // Use Ruff as the default Python formatter and linter
+  "python.formatting.provider": "ruff",
+  "editor.formatOnSave": true,
+  "ruff.linting.enabled": true,
+  "ruff.formatting.enabled": true,
+  // Disable Black, isort, and flake8 if present
+  "python.linting.enabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.linting.pylintEnabled": false,
+  "python.linting.pycodestyleEnabled": false,
+  "python.sortImports.args": [], // isort is not needed
+}
