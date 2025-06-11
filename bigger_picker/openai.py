@@ -56,10 +56,11 @@ Article-Level Fields
   - "Experimental": Involves manipulation of variables (e.g., randomized controlled trials).
   - "Other": If the design does not fit the above categories, specify the design.
 - "Country of Data": A list of countries where the data was collected. This is often found in the Methods section or in the author affiliations. Note that it could be different to the affiliation of the authors.
+- "Total Sample Size": The total number of participants in the study, which is often reported in the Methods or Results sections, or in Table 1.
 
 Populations (list of population groups, under "populations")
 For each distinct population or participant group described in the study, extract:
-- "Age: Lower Range": The minimum reported age of participants (e.g., “participants aged 8-12”).
+- "Age: Lower Range": The minimum reported age of participants (e.g., “participants aged 8-12” would mean that the lower range is 8).
 - "Age: Upper Range": The maximum reported age of participants.
 - "Age: Mean": The average (mean) age, if provided.
 - "Sample Size: Total N": The total number of participants in the group.
@@ -73,9 +74,9 @@ For each distinct way that screen time was measured or operationalized, extract:
   - "Survey": A questionnaire or self-report instrument.
   - "Time Use Diary": Participants kept a record or log of their activities, and these included screen time.
   - "Other": Any other type of measure (specify the method in the “Name” field).
-- "Screen Time Measure: Name": The specific name of the measure or instrument (e.g., "ScreenQ", "custom survey"), if reported.
-- "Types of Screen Time Measured": A list of all types of screen use captured by the measure (e.g., "TV", "computer", "smartphone", "video games"), if specified.
-- "Locations of Screen Time Measured": A list of physical locations (e.g., "school", "home") where screen time was assessed, if reported.
+- "Screen Time Measure: Name": The specific name of the measure or instrument (e.g., "ScreenQ", "Custom Survey"), if reported. If they used a custom survey they may not give it a specific name, so you can use 'Custom Survey'.
+- "Types of Screen Time Measured": A list of all types of screen use captured by the measure (e.g., "TV", "Computer", "Smartphone", "Video Games"), if specified.
+- "Locations of Screen Time Measured": A list of physical locations (e.g., "School", "Home") where screen time was assessed, if reported. If it seems as though they just measured overall screen time without specifiying locations, you can use "General".
 Tip: This information is typically in the Methods section, Measures subsection, or in tables describing data collection.
 
 Outcomes (list, under "outcomes")
@@ -84,8 +85,8 @@ For each outcome or endpoint reported in relation to screen time, extract:
   "Learning", "Cognition", "Mental Health", "Behaviour", "wellbeing", "Other".
   - Select the category that best fits the outcome described in the study.
   - Use "Other" only if none of the main categories are appropriate.
-- "Outcome": The name that would be given to the outcome measured (e.g., "academic achievement", "anxiety", "physical aggression").
-- "Outcome Measure": The name of the tool or scale used to assess the outcome (e.g., "WISC-IV", "CBCL Anxiety Subscale", "teacher report").
+- "Outcome": The name that would be given to the outcome measured (e.g., "Academic Achievement", "Anxiety", "Physical Aggression").
+- "Outcome Measure": The name of the tool or scale used to assess the outcome (e.g., "WISC-IV", "CBCL Anxiety Subscale", "Teacher Report").
 Tip: Look for these in the Methods, Results, or Supplementary sections, or in tables summarizing outcome variables.
 
 General Instructions

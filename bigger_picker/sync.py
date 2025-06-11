@@ -3,6 +3,7 @@ from pyairtable.api.types import RecordDict
 import bigger_picker.config as config
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
+from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
 
@@ -153,3 +154,50 @@ class IntegrationManager:
                 status = status_map[dataset_bpipd]
                 payload = {"Status": status}
                 self.airtable.update_record("Datasets", dataset["id"], payload)
+
+    def convert_extraction_to_airtable(
+        self,
+        llm_extraction: ArticleLLMExtract,
+        rayyan_article: dict,
+        pdf_path: str | None = None,
+    ):
+        article_info = self.rayyan.extract_article_metadata(rayyan_article)
+        extraction_dict = ArticleLLMExtract.model_dump(
+            llm_extraction, by_alias=True, exclude_unset=True
+        )
+
+        article = Article(
+            **article_info,
+            **extraction_dict,
+        )
+
+        article_dict = article.model_dump(by_alias=True, exclude_unset=True)
+
+        populations = article_dict.pop("populations", [])
+        screen_time_measures = article_dict.pop("screen_time_measures", [])
+        outcomes = article_dict.pop("outcomes", [])
+
+        article_record = self.airtable.create_record("Articles", article_dict)
+        article_record_id = article_record["id"]
+
+        if pdf_path is not None:
+            self.airtable.upload_attachment(
+                "Articles", "article_record_id", "Fulltext", pdf_path
+            )
+
+        for population in populations:
+            population["Rayyan ID"] = [article_record_id]
+            self.airtable.create_record("Populations", population)
+
+        # TODO: Some of the fields should be changed to Title Case
+        for screen_time_measure in screen_time_measures:
+            screen_time_measure["Rayyan ID"] = [article_record_id]
+            self.airtable.create_record("Screen Time Measures", screen_time_measure)
+
+        for outcome in outcomes:
+            outcome["Rayyan ID"] = [article_record_id]
+            self.airtable.create_record("Outcomes", outcome)
+
+        # Create the dataset and sync to Airtable
+
+        pass

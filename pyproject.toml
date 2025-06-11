@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["ruff"]
+dev = ["jupyter", "ruff"]
 
 [tool.setuptools.packages.find]
 where = ["bigger_picker"]

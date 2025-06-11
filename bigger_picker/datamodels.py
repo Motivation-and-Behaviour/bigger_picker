@@ -46,6 +46,7 @@ class ArticleLLMExtract(BaseModel):
         Literal["Cross-sectional", "Longitudinal", "Experimental", "Other"] | None
     ) = Field(None, alias="Study Design")
     country_of_data: list[str] | None = Field(None, alias="Country of Data")
+    total_sample_size: int | None = Field(None, alias="Total Sample Size")
     # Relationships:
     populations: list[Population] = Field(default_factory=list)
     screen_time_measures: list[ScreenTimeMeasure] = Field(default_factory=list)
@@ -59,4 +60,3 @@ class Article(ArticleLLMExtract):
     journal: str | None = Field(None, alias="Journal")
     doi: str | None = Field(None, alias="DOI")
     year: int | None = Field(None, alias="Year")
-    fulltext: list[str] | None = Field(None, alias="Fulltext")

@@ -29,7 +29,7 @@ class AirtableManager:
     ) -> str:
         return (
             f"https://airtable.com/{base_id}/{table_id}/{view_id}/{record_id}"
-            "?copyLinkToCellOrRecordOrigin=gridView&blocks=hide"
+            "?blocks=hide"
         )
 
     def update_record(
@@ -41,7 +41,13 @@ class AirtableManager:
     def create_record(self, table_name: str, payload: dict) -> RecordDict:
         table = self.get_table(table_name)
 
-        return table.create(payload)
+        return table.create(payload, typecast=True)
+
+    def upload_attachment(
+        self, table_name: str, record_id: str, field_name: str, file_path: str
+    ) -> RecordDict:
+        table = self.get_table(table_name)
+        return table.upload_attachment(record_id, field_name, file_path)
 
     def get_table(self, table_name: str) -> Table:
         table = self.tables.get(table_name, None)
