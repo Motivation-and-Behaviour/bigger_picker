@@ -192,3 +192,10 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Rayyan
+rayyan_tokens.json
+
+# Development
+#  Scratch files are temporary files used during development. They are not meant to be committed
+scratch*

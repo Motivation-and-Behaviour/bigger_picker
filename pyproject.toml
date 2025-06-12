@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bigger_picker"
+version = "0.1.0"
+description = "A simple set of tools to link Rayyan, AirTable, Asana, and OpenAI for supporting the Bigger Picture project."
+authors = [{ name = "Taren Sanders", email = "taren.sanders@acu.edu.au" }]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asana",
+    "dotenv",
+    "openai",
+    "pyairtable",
+    "pydantic",
+    "rayyan-sdk",
+    "typer",
+]
+
+[project.optional-dependencies]
+dev = ["jupyter", "ruff"]
+
+[project.scripts]
+bigger-picker = "bigger_picker.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = [".venv", "__pycache__"]
+
+[tool.ruff.lint]
+extend-select = [
+    "E",  # pycodestyle errors 
+    "F",  # pyflakes 
+    "I",  # isort 
+    "B",  # flake8-bugbear 
+    "UP", # pyupgrade 
+
+]
