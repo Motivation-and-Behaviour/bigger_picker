@@ -40,5 +40,5 @@ extend-select = [
     "I",  # isort 
     "B",  # flake8-bugbear 
     "UP", # pyupgrade 
-    # "D",  # pydocstyle
+
 ]
