@@ -5,7 +5,6 @@ import tempfile
 import requests
 from rayyan import Rayyan
 from rayyan.review import Review
-from rayyan.user import User
 
 import bigger_picker.config as config
 from bigger_picker.credentials import load_rayyan_credentials
