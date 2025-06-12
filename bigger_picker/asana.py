@@ -49,7 +49,7 @@ class AsanaManager:
     def create_task(self, payload: dict) -> dict:
         return self.tasks_api_instance.create_task(payload, {})  # type: ignore
 
-    def update_task(self, task_id: str, update_payload: dict) -> dict:
+    def update_task(self, update_payload: dict, task_id: str) -> dict:
         return self.tasks_api_instance.update_task(update_payload, task_id, {})  # type: ignore
 
     def fetch_task_with_custom_field(

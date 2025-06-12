@@ -42,7 +42,8 @@ class IntegrationManager:
             if dataset_bpipd in task_ids.keys():
                 # If the dataset has a matching task, update it
                 updated_task = self.update_task_from_dataset(
-                    task_ids[dataset_bpipd], dataset
+                    task_ids[dataset_bpipd],
+                    dataset,
                 )
             else:
                 # If the dataset does not have a matching task, create one
@@ -54,7 +55,7 @@ class IntegrationManager:
             )
             payload = {"Dataset ID": task_bpipd}
             self.airtable.update_record("Datasets", dataset["id"], payload)
-            self.update_airtable_statuses()
+        self.update_airtable_statuses()
 
     def update_task_from_dataset(self, task_id: str, dataset: RecordDict) -> dict:
         update_payload = {
@@ -71,7 +72,7 @@ class IntegrationManager:
             }
         }
 
-        return self.asana.update_task(task_id, update_payload)
+        return self.asana.update_task(update_payload, task_id)
 
     def create_task_from_dataset(self, dataset: RecordDict) -> dict:
         dataset_status = dataset["fields"].get("Status", None)
