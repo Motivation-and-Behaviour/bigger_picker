@@ -248,7 +248,7 @@ class IntegrationManager:
         self.rayyan.update_article_labels(article["id"])
 
     def sync(self):
-        self.update_airtable_statuses()
+        self.sync_airtable_and_asana()
         # TODO: Calculate revised dataset value
         # TODO: Update dataset value in AirTable
         # TODO: Update the dataset value in Asana
