@@ -55,8 +55,9 @@ Article-Level Fields
   - "Longitudinal": Data collected over multiple time points.
   - "Experimental": Involves manipulation of variables (e.g., randomized controlled trials).
   - "Other": If the design does not fit the above categories, specify the design.
-- "Country of Data": A list of countries where the data was collected. This is often found in the Methods section or in the author affiliations. Note that it could be different to the affiliation of the authors.
+- "Countries of Data": A list of countries where the data was collected. This is often found in the Methods section or in the author affiliations. Note that it could be different to the affiliation of the authors.
 - "Total Sample Size": The total number of participants in the study, which is often reported in the Methods or Results sections, or in Table 1.
+- "Dataset Name": The name of the dataset used in the study, if specified. This may be mentioned in the Methods section or in the data availability statement.
 
 Populations (list of population groups, under "populations")
 For each distinct population or participant group described in the study, extract:
@@ -65,7 +66,7 @@ For each distinct population or participant group described in the study, extrac
 - "Age: Mean": The average (mean) age, if provided.
 - "Sample Size: Total N": The total number of participants in the group.
 - "Sample Size: N Girls": The number of female participants, if reported.
-- "Sample Size: % Girls": The percentage of female participants, if reported.
+- "Sample Size: % Girls": The percentage of female participants, if reported. Enter the percentage of female participants as a number between 0 and 100 (e.g., 47.1 for 47.1%). Do **not** enter raw counts or numbers greater than 100. If only a proportion is reported (e.g., 0.471), multiply by 100 and round to one decimal place.
 Tip: This information is often in the “Participants” or “Sample” section, or in Table 1.
 
 Screen Time Measures (list of measures, under "screen_time_measures")

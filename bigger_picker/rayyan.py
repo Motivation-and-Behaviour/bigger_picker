@@ -1,9 +1,11 @@
+import json
 import os
 import tempfile
 
 import requests
 from rayyan import Rayyan
 from rayyan.review import Review
+from rayyan.user import User
 
 import bigger_picker.config as config
 from bigger_picker.credentials import load_rayyan_credentials
@@ -20,6 +22,7 @@ class RayyanManager:
         if rayyan_creds_path is None:
             rayyan_creds_path = load_rayyan_credentials()
 
+        self._rayyan_creds_path = rayyan_creds_path
         self.rayyan_instance = Rayyan(rayyan_creds_path)
         self.review = Review(self.rayyan_instance)
         self.review_id = review_id
@@ -31,10 +34,17 @@ class RayyanManager:
     ) -> list[dict]:
         results_params = {"extra[user_labels][]": self.unextracted_label}
 
-        included_results = self.review.results(self.review_id, results_params)  # type: ignore
-
-        # TODO: If 401 error, I think we are meant to call 'user_info' to refresh token.
-        return included_results["data"]  # type: ignore
+        try:
+            included_results = self.review.results(self.review_id, results_params)  # type: ignore
+            return included_results["data"]  # type: ignore
+        except requests.HTTPError as e:
+            if e.response.status_code == 401:
+                # If we get a 401 error, refresh the tokens and retry
+                self._refresh_tokens()
+                included_results = self.review.results(self.review_id, results_params)  # type: ignore
+                return included_results["data"]  # type: ignore
+            else:
+                raise e
 
     def update_article_labels(
         self,
@@ -44,7 +54,15 @@ class RayyanManager:
             self.unextracted_label: -1,
             self.extracted_label: 1,
         }
-        self.review.customize(self.review_id, article_id, plan)
+        try:
+            self.review.customize(self.review_id, article_id, plan)
+        except requests.HTTPError as e:
+            if e.response.status_code == 401:
+                # If we get a 401 error, refresh the tokens and retry
+                self._refresh_tokens()
+                self.review.customize(self.review_id, article_id, plan)
+            else:
+                raise e
 
     @staticmethod
     def download_pdf(article: dict) -> str:
@@ -71,6 +89,37 @@ class RayyanManager:
             f.write(response.content)
 
         return file_path
+
+    def _refresh_tokens(self, update_local: bool = True):
+        with open(self._rayyan_creds_path) as f:
+            api_tokens = json.load(f)
+
+        url = "https://rayyan.ai/oauth/token"
+        payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": api_tokens["refresh_token"],
+            "client_id": "rayyan.ai",
+        }
+
+        response = requests.post(url, data=payload)
+        if not response.ok:
+            raise Exception(f"Token refresh failed: {response.text}")
+
+        api_tokens_fresh = response.json()
+
+        if update_local:
+            with open(self._rayyan_creds_path, "w") as f:
+                json.dump(api_tokens_fresh, f, indent=2)
+            self.rayyan_instance = Rayyan(self._rayyan_creds_path)
+        else:
+            temp_creds_path = tempfile.NamedTemporaryFile(
+                mode="w+", delete=False, suffix=".json"
+            )
+            with open(temp_creds_path.name, "w") as f:
+                json.dump(api_tokens_fresh, f, indent=2)
+            self.rayyan_instance = Rayyan(temp_creds_path.name)
+
+        self.review = Review(self.rayyan_instance)
 
     @staticmethod
     def extract_article_metadata(rayyan_article: dict) -> dict:

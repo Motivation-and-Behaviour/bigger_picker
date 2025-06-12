@@ -22,7 +22,9 @@ class AsanaManager:
         ]
     )
 
-    def __init__(self, asana_token: str | None = None, project_id: str | None = None):
+    def __init__(
+        self, asana_token: str | None = None, project_id: str = config.ASANA_PROJECT_ID
+    ):
         if asana_token is None:
             asana_token = load_token("ASANA_TOKEN")
 
@@ -30,7 +32,7 @@ class AsanaManager:
         configuration.access_token = asana_token
         self.client = asana.ApiClient(configuration)
         self.tasks_api_instance = asana.TasksApi(self.client)
-        self.project_id = project_id if project_id else config.ASANA_PROJECT_ID
+        self.project_id = project_id
         self.tasks: list[dict] = []
 
     def fetch_tasks(self):

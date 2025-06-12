@@ -16,13 +16,17 @@ dependencies = [
     "pyairtable",
     "pydantic",
     "rayyan-sdk",
+    "typer",
 ]
 
 [project.optional-dependencies]
 dev = ["jupyter", "ruff"]
 
+[project.scripts]
+bigger-picker = "bigger_picker.cli:app"
+
 [tool.setuptools.packages.find]
-where = ["bigger_picker"]
+where = ["."]
 
 [tool.ruff]
 line-length = 88

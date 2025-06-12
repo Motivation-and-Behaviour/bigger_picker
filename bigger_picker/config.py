@@ -27,6 +27,7 @@ ASANA_CUSTOM_FIELD_IDS = {
 }
 ASANA_STATUS_ENUM_VALUES = {
     "Awaiting Triage": "1210433819516836",
+    "Validated": "1210528062577747",
     "Non-priority": "1210433819516837",
     "Contacting Authors": "1210433819516838",
     "Agreed & Awaiting Data": "1210468704477552",
