@@ -58,16 +58,15 @@ class IntegrationManager:
         self.update_airtable_statuses()
 
     def update_task_from_dataset(self, task_id: str, dataset: RecordDict) -> dict:
+        dataset_value = dataset["fields"].get("Dataset Value", None)
+        airtable_url = self.airtable.make_url(dataset["id"])
+
         update_payload = {
             "data": {
                 "name": dataset["fields"]["Dataset Name"],
                 "custom_fields": {
-                    config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset["fields"][
-                        "Dataset Value"
-                    ],
-                    config.ASANA_CUSTOM_FIELD_IDS[
-                        "AirTable Data"
-                    ]: self.airtable.make_url(dataset["id"]),
+                    config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset_value,
+                    config.ASANA_CUSTOM_FIELD_IDS["AirTable Data"]: airtable_url,
                 },
             }
         }

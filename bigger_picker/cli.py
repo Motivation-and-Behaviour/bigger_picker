@@ -63,7 +63,6 @@ def process(
 def sync(
     dotenv_path: str = typer.Option(None, help="Path to .env file with credentials"),
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
-    airtable_base_id: str = typer.Option(None, help="Airtable base ID"),
     asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
     openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
@@ -79,7 +78,7 @@ def sync(
 
     console = Console()
 
-    airtable = AirtableManager(airtable_api_key, airtable_base_id)
+    airtable = AirtableManager(airtable_api_key)
     asana = AsanaManager(asana_token)
     openai = OpenAIManager(openai_api_key, openai_model)
     rayyan = RayyanManager(rayyan_creds_path)
@@ -89,6 +88,7 @@ def sync(
         openai_manager=openai,
         rayyan_manager=rayyan,
     )
+
     with console.status("Updating AirTable statuses"):
         integration.sync()
 
