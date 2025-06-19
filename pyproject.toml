@@ -20,7 +20,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["jupyter", "ruff"]
+dev = [
+    "jupyter",
+    "ruff",
+    "mkdocs",
+    "mkdocs-click",
+    "mkdocs-material",
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-git-authors",
+]
 
 [project.scripts]
 bigger-picker = "bigger_picker.cli:app"

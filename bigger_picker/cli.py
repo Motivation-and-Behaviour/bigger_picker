@@ -93,5 +93,7 @@ def sync(
         integration.sync()
 
 
+click_app = typer.main.get_command(app)
+
 if __name__ == "__main__":
     app()
