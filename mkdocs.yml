@@ -24,8 +24,9 @@ theme:
     - toc.integrate
     - toc.follow
 markdown_extensions:
-  - attr_list
+  - abbr
   - admonition
+  - attr_list
   - def_list
   - footnotes
   - md_in_html
@@ -38,6 +39,7 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.inlinehilite
   - pymdownx.snippets:
+      check_paths: true
       auto_append:
         - assets/glossary.md
   - pymdownx.superfences:
@@ -48,8 +50,13 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
       clickable_checkbox: true
+  - toc:
+      permalink: true
   - tables
+watch:
+  - assets
 nav:
+  - Home: index.md
   - Screening and Extraction:
       - manual/index.md
       - Screening: manual/screening.md
