@@ -25,6 +25,7 @@
   "cSpell.words": [
     "Rayyan",
     "mkdocs",
+    "Taren",
     "typer",
     "wellbeing",
   ],
@@ -35,4 +36,7 @@
   "[markdown]": {
     "editor.formatOnSave": true,
   },
+  "markdownlint.config": {
+    "MD033": false // Disable MD033 (no inline HTML)
+  }
 }

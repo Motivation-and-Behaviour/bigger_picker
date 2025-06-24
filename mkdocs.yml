@@ -17,7 +17,6 @@ theme:
     - navigation.footer
     - navigation.tracking
     - content.code.copy
-    - content.tabs.link
     - content.tooltips
     - search.suggest
     - search.highlight
@@ -47,6 +46,8 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
       clickable_checkbox: true
@@ -55,6 +56,8 @@ markdown_extensions:
   - tables
 watch:
   - assets
+extra_css:
+  - stylesheets/extra.css
 nav:
   - Home: index.md
   - Screening and Extraction:
