@@ -87,14 +87,23 @@ There are two main differences between the full text screening and the title and
 
 <div class="annotate" markdown>
 
-1. When you exclude an article, you need to provide a reason.
+1. When you **exclude** an article, you need to provide a reason.
    You do this using the 'Exclude with Reasons' box at the bottom of the screen.
 
     ???+ tip
         You can quickly access the exclusion reasons by pressing the ++r++ key.
 
-2. When you include an article, you need to add a label that tells our software that it is ready to be extracted. (1)
-   When you have included an article,
+2. When you **include** an article, you need to add a label that tells our software that it is ready to be extracted. (1)
+   When you have included an article, please add the label `Included: Not Yet Extracted` to the article.
+   Note that this label is case-sensitive, so you need to type it exactly as shown (or better yet, copy and paste it).
+   You can add a label by clicking in the labels box at the bottom of the screen.
+   If you have already added the label to another article, it should appear in the list of options.
+
+    ???+ warning
+        A common issue is that clicking 'Include' automatically moves you to the next article.
+        That means that if you then add the label, it will not be applied to the article you just included.
+        To avoid this, add the label first, then click 'Include'.
+        Adding the label doesn't change the article that you are currently viewing.
 
 </div>
 
@@ -105,6 +114,12 @@ There are two main differences between the full text screening and the title and
 
 ### Rayyan Ratings
 
+Rayyan provides a function that rates how likely an article is the be relevant to the review.
+This can be useful for deciding which articles to screen first (those likely to be relevant, or most likely to be irrelevant).
+The method for using rating is described in the [Rayyan documentation](https://help.rayyan.ai/hc/en-us/articles/17461088734353-How-to-use-Rayyan-s-Predictions-Classifier-for-Relevance-Ranking).
+It only works at the title and abstract stage.
+
 ### Potentially Relevant Systematic Reviews
 
-### Rayyan Tips and Tricks
+If you find a systematic review that is potentially relevant (i.e., it looks like it might have studies in it that could be included), please add the `Potentially Relevant Systematic Review` label to the article.
+Eventually, we will go through these and check if we have missed any articles that should be included.
