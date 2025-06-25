@@ -23,6 +23,7 @@
     "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
   ],
   "cSpell.words": [
+    "airtable",
     "Rayyan",
     "mkdocs",
     "Taren",
@@ -32,6 +33,16 @@
   "cSpell.ignorePaths": [
     "mkdocs.yml",
     ".vscode/settings.json"
+  ],
+  "cSpell.languageSettings": [
+    {
+      // use with Python files
+      "languageId": "python",
+      // Exclude code.
+      "ignoreRegExpList": [
+        "/^\\s*from.*import/gm"
+      ]
+    }
   ],
   "[markdown]": {
     "editor.formatOnSave": true,
