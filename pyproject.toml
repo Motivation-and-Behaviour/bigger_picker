@@ -27,7 +27,7 @@ dev = [
     "mkdocs-click",
     "mkdocs-material",
     "mkdocs-git-revision-date-localized-plugin",
-    "mkdocs-git-authors",
+    "mkdocs-git-authors-plugin",
 ]
 
 [project.scripts]
