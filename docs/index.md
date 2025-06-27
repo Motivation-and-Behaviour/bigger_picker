@@ -5,5 +5,5 @@ They cover:
 
 - Screening articles to identify relevant datasets in Rayyan.
 - Extracting data about those datasets (both manually, and using the Bigger Picker tool).
-- Dataset management in AirTable and Asana.
+- Dataset management in Airtable and Asana.
 - Contacting authors.

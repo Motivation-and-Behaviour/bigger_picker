@@ -23,7 +23,7 @@ ASANA_CUSTOM_FIELD_IDS = {
     "Status": "1210433819516835",
     "Dataset Value": "1210433819516841",
     "Data Sharing Method": "1210468704477537",
-    "AirTable Data": "1210433819516843",
+    "Airtable Data": "1210433819516843",
 }
 ASANA_STATUS_ENUM_VALUES = {
     "Awaiting Triage": "1210433819516836",

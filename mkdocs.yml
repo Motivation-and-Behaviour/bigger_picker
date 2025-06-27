@@ -62,7 +62,11 @@ nav:
   - Home: index.md
   - Screening and Extraction:
       - manual/index.md
-      - Screening: manual/screening.md
-      - Extraction: manual/extraction.md
+      - Screening:
+          - Overview and Setup: manual/screening_overview.md
+          - Screening Process: manual/screening_process.md
+      - Extraction and Validation:
+          - Overview and Setup: manual/extraction_overview.md
+          - Validation Process: manual/extraction_process.md
       - Data Management: manual/data_management.md
   - CLI: cli.md

@@ -20,14 +20,14 @@ We have used two methods to identify datasets:
 
 We need to screen the articles we have identified to determine which ones contain datasets that we want to access.
 We do this using [Rayyan](https://www.rayyan.ai/), a web-based tool for screening articles.
-Full details of the screening process are in the [Screening](screening.md) section of the documentation.
+Full details of the screening process are in the [Screening](screening_overview.md) section of the documentation.
 
 ### Extracting Data
 
 In order to evaluate which datasets to access, we need to extract data from the articles we have screened.
-We use two tools for this: [AirTable](https://airtable.com/) for storing the data, and [Asana](https://asana.com/) for tracking the datasets.
+We use two tools for this: [Airtable](https://airtable.com/) for storing the data, and [Asana](https://asana.com/) for tracking the datasets.
 We use a combination of automated extraction using the [Bigger Picker tool](../cli.md) and manual checking to confirm the data.
-Full details of the extraction process are in the [Extraction](extraction.md) section of the documentation.
+Full details of the extraction process are in the [Extraction](extraction_overview.md) section of the documentation.
 
 ### Dataset Management
 
