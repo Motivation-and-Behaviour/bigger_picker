@@ -71,9 +71,9 @@ Tip: This information is often in the “Participants” or “Sample” section
 
 Screen Time Measures (list of measures, under "screen_time_measures")
 For each distinct way that screen time was measured or operationalized, extract:
-- "Screen Time Measure: Type": Select only one of "Survey", "Time Use Diary", or "Other".
+- "Screen Time Measure: Type": Select only one of "Survey", "Diary", or "Other".
   - "Survey": A questionnaire or self-report instrument.
-  - "Time Use Diary": Participants kept a record or log of their activities, and these included screen time.
+  - "Diary": Participants kept a record or log of their activities, and these included screen time. Will sometimes be called a 'Time Use Diary'.
   - "Other": Any other type of measure (specify the method in the “Name” field).
 - "Screen Time Measure: Name": The specific name of the measure or instrument (e.g., "ScreenQ", "Custom Survey"), if reported. If they used a custom survey they may not give it a specific name, so you can use 'Custom Survey'.
 - "Types of Screen Time Measured": A list of all types of screen use captured by the measure (e.g., "TV", "Computer", "Smartphone", "Video Games"), if specified.

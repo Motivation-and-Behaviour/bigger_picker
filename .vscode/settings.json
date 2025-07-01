@@ -29,6 +29,7 @@
     "mkdocs",
     "Taren",
     "typer",
+    "Fulltext",
     "wellbeing",
   ],
   "cSpell.ignorePaths": [
@@ -49,6 +50,7 @@
     "editor.formatOnSave": true,
   },
   "markdownlint.config": {
-    "MD033": false // Disable MD033 (no inline HTML)
+    "MD033": false, // Disable MD033 (no inline HTML)
+    "MD053": false // Disable MD053 (link validation)
   }
 }

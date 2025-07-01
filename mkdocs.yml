@@ -30,6 +30,7 @@ markdown_extensions:
   - footnotes
   - md_in_html
   - mkdocs-click
+  - pymdownx.blocks.caption
   - pymdownx.caret
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -48,6 +49,9 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
       clickable_checkbox: true
@@ -68,5 +72,6 @@ nav:
       - Extraction and Validation:
           - Overview and Setup: manual/extraction_overview.md
           - Validation Process: manual/extraction_process.md
+          - Other Tasks: manual/extraction_other.md
       - Data Management: manual/data_management.md
   - CLI: cli.md
