@@ -57,6 +57,7 @@ markdown_extensions:
       clickable_checkbox: true
   - toc:
       permalink: true
+      toc_depth: 4
   - tables
 watch:
   - assets
@@ -72,6 +73,9 @@ nav:
       - Extraction and Validation:
           - Overview and Setup: manual/extraction_overview.md
           - Validation Process: manual/extraction_process.md
-          - Other Tasks: manual/extraction_other.md
+          - Other Tasks:
+              - Adding or Removing Populations, Screen Time Measures, and Outcomes: manual/extraction_addremove.md
+              - Adding New Validated Outcomes: manual/extraction_addvalidated.md
+              - Deduplicating Datasets: manual/extraction_dedupe.md
       - Data Management: manual/data_management.md
   - CLI: cli.md

@@ -33,8 +33,6 @@ To validate data, you will need access to the following tools:
 
 Before we describe the process, it is worth discussing the way that the data are structured in Airtable.
 
-<div class="grid" markdown>
-
 - Each **dataset** will have one or more **articles** associated with it.
   That is, a dataset might have been used for more than one study, and so it has been reported in more than one article.
 - Each **article** can have one or more **populations**.
@@ -65,8 +63,6 @@ flowchart TD
     Article -->|can have many| Outcome
     Outcome -->|can have one| ValidatedOutcome
 ```
-
-</div>
 
 ### Airtable Tables
 
@@ -152,13 +148,13 @@ Below is what is stored in each table, as reference.
 
 === "Outcome Options"
 
-    | Column             | Description                                                                                                                            | Example       | Editable[^*]    |
-    |--------------------|----------------------------------------------------------------------------------------------------------------------------------------|---------------|-----------------|
-    | **Outcome**        | The ID for the outcome                                                                                                                 | Anxiety       | :material-check |
-    | **Outcome Groups** | The broad group of the outcome. Should only be one of [`Behaviour`, `Cognition`, `Learning`, `Mental Health`, `Wellbeing`, or `Other`] | Mental Health | :material-check |
+    | Column             | Description                                                                                                                            | Example       | Editable[^*]     |
+    |--------------------|----------------------------------------------------------------------------------------------------------------------------------------|---------------|------------------|
+    | **Outcome**        | The name of the outcome                                                                                                                | Anxiety       | :material-check: |
+    | **Outcome Groups** | The broad group of the outcome. Should only be one of [`Behaviour`, `Cognition`, `Learning`, `Mental Health`, `Wellbeing`, or `Other`] | Mental Health | :material-check: |
 
 [^*]: Some fields are not intended to be edited directly.
       Hover over the :material-close: icon to see why.
 
-[dedupe]: extraction_process.md#deduplicating-datasets
-[newoutcomes]: extraction_other.md#adding-new-outcomes
+[dedupe]: extraction_dedupe.md/#deduplicating-datasets
+[newoutcomes]: extraction_addvalidated.md

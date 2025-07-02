@@ -5,6 +5,20 @@
     We are working on improving it, and feedback is valuable.
     If you find a way something can be done better, don't keep it to yourself!
 
+## Overview of Steps
+
+The processing of validating extracted data is a multi-step process.
+As a quick overview, the steps are:
+
+1. Pick a dataset to validate.
+2. Check the details of the article attached to the dataset.
+   In particular, you need to check:
+      1. The population details
+      2. The screen time measure details
+      3. The outcomes details (including adding a 'validated' outcome to each outcome)
+3. Check the overall dataset details, including confirming that the dataset is not a duplicate.
+4. Mark the dataset as 'validated' in Asana.
+
 ## Checking the Extracted Data
 
 ### Choosing a Dataset to Validate
@@ -60,7 +74,8 @@ The next steps are to work through each of the populations, screen time measures
 #### 6. Check the population fields
 
 In particular, check the sample size and proportion of girls.
-Remember that you can add multiple populations if needed, but each one needs it's own record.
+Remember that you can [add][addrecord] or [remove][removerecord] populations as needed.
+Each one needs it's own record.
 
 When you are done, close the population form.
 
@@ -74,6 +89,8 @@ If there are multiple populations, repeat for each one.
 
 #### 8. Check the screen time measure fields
 
+Remember that you can [add][addrecord] or [remove][removerecord] screen time measures if the AI has made a mistake.
+
 When finished, click the close button.
 
 ![Step 8 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/48b55046-5c84-4158-ac6d-c5ce98fc159b/d652fc48-1c2e-4abe-b302-eab06e6e4fec.png?crop=focalpoint&fit=crop&fp-x=0.5461&fp-y=0.2785&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=1118&mark-y=74&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
@@ -86,19 +103,28 @@ If there are multiple screen time measures, repeat for each one.
 
 #### 10. Check the outcome fields and add the validated outcome
 
-Click the 'Add option' button.
-You will need to either search for an existing outcome, or create a new one.
-See [Adding New Outcomes](extraction_other.md#adding-new-outcomes) for additional instructions.
-
-![Step 19 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&fit=crop&fp-x=0.3987&fp-y=0.4718&fp-z=2.8538&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=514&mark-y=332&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+Start by checking the already extracted outcome fields are correct.
 
 ???+ tip
-    You do not need to edit the 'Outcome' field.
+    You do not need to edit the **Outcome** field.
     Use this to guide you in selecting the correct validated outcome, but because of the way the AI extraction works, it is too time-consuming to fix this field.
+    You should update the **Outcome Group** and the **Outcome Measure** fields, however.
+
+Then, for each outcome you will need to add a 'validated' outcome.
+
+You can read the full instructions for [adding a validated outcome][addvalidated] in the next section.
+Briefly, the steps are:
+
+1. Click the 'Add option' button.
+   ![Step 19 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&fit=crop&fp-x=0.3987&fp-y=0.4718&fp-z=2.8538&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=514&mark-y=332&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+2. Search for an existing matching outcome.
+   If you fine one, select it and you are done.
+3. If there isn't an existing one, add a new one and complete the required fields.
 
 When finished, click the close button.
 
 If there are multiple outcomes, repeat for each one.
+Remember that you can [add][addrecord] or [remove][removerecord] outcomes if the AI has made a mistake.
 
 #### 11. Check the dataset fields
 
@@ -107,17 +133,23 @@ In particular, if you changed the sample size or the corresponding author, you s
 
 ![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200)
 
-### Update the record in Asana
+## Updating the record in Asana
+
+### Checklist
 
 When you are satisfied that the data in Airtable is correct, you can update the record in [Asana][asana] to indicate that the dataset has been validated.
 Before doing this, check that you have:
 
 - [x] Checked the dataset and article details are correct
-- [x] [Removed any incorrect populations, screen time measures, or outcomes](extraction_other.md#removing-incorrect-populations-screen-time-measures-outcomes)
-- [x] [Added any additional populations, screen time measures, or outcomes](extraction_other.md#adding-an-additional-populations-screen-time-measure-outcome) that were not extracted by the AI
-- [x] [Checked that the dataset is not a duplicate](extraction_other.md#deduplicating-datasets)
+- [x] [Removed any incorrect populations, screen time measures, or outcomes][removerecord]
+- [x] [Added any additional populations, screen time measures, or outcomes][addrecord] that were not extracted by the AI
+- [x] [Checked that the dataset is not a duplicate][dedupe]
 
 #### 1. Find the dataset in Asana
+
+???+ tip
+    Make sure you use the 'Dataset ID' (e.g., `BPIPD-01`) to find the dataset in Asana.
+    Don't rely on the name - it may not be unique!
 
 ![Step 11 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/d4d4e6a6-0271-4e60-b7b2-8e5b23febf32/9430a9c4-5498-4972-ab3b-5ec765683c29.png?crop=focalpoint&fit=crop&fp-x=0.1577&fp-y=0.5939&fp-z=1.6351&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=4&mark-y=364&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD00MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
@@ -133,3 +165,7 @@ That's it!
 You have successfully validated a dataset.
 
 [asana]: https://app.asana.com/1/653672074038961/project/1210433819516828/list/1210434509883894
+[addrecord]: extraction_addremove.md/#adding-an-additional-populationscreen-time-measureoutcome
+[removerecord]: extraction_addremove.md/#removing-incorrect-populationsscreen-time-measuresoutcomes
+[addvalidated]: extraction_addvalidated.md/#adding-a-new-validated-outcome
+[dedupe]: extraction_dedupe.md/#deduplicating-datasets
