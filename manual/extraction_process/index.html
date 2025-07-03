@@ -1,0 +1,1306 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://motivation-and-behaviour.github.io/bigger_picker/manual/extraction_process/">
+      
+      
+        <link rel="prev" href="../extraction_overview/">
+      
+      
+        <link rel="next" href="../extraction_addremove/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
+    
+    
+      
+        <title>Validation Process - Bigger Picker Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#validating-extracted-data" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Bigger Picker Documentation" class="md-header__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Bigger Picker Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Validation Process
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Motivation-and-behaviour/bigger_picker" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  Screening and Extraction
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Bigger Picker Documentation" class="md-nav__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Bigger Picker Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Motivation-and-behaviour/bigger_picker" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Screening and Extraction
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Screening and Extraction
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Screening
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Screening
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../screening_overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview and Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../screening_process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Screening Process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Extraction and Validation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Extraction and Validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extraction_overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview and Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Validation Process
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Validation Process
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview-of-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview of Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checking-the-extracted-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checking the Extracted Data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Checking the Extracted Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-a-dataset-to-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choosing a Dataset to Validate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checking the Data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Checking the Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#open-the-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Open the forms
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-article-form" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check the article form
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-population-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check the population form(s)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-screen-time-measures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check the screen time measure(s)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-outcome-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check the outcome form(s)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-dataset-form" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check the dataset form
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-the-record-in-asana" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the record in Asana
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Updating the record in Asana">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checklist
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-the-asana-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update the Asana task
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_3" id="__nav_2_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Other Tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Other Tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extraction_addremove/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding or Removing Populations, Screen Time Measures, and Outcomes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extraction_addvalidated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding New Validated Outcomes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extraction_dedupe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Deduplicating Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CLI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="validating-extracted-data">Validating Extracted Data<a class="headerlink" href="#validating-extracted-data" title="Permanent link">&para;</a></h1>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>This is a somewhat convoluted process at the moment.
+We are working on improving it, and feedback is valuable.
+If you find a way something can be done better, don't keep it to yourself!</p>
+</details>
+<h2 id="overview-of-steps">Overview of Steps<a class="headerlink" href="#overview-of-steps" title="Permanent link">&para;</a></h2>
+<p>The processing of validating extracted data is a multi-step process.
+As a quick overview, the steps are:</p>
+<ol>
+<li>Pick a dataset to validate.</li>
+<li>Check the details of the article attached to the dataset.
+   In particular, you need to check:<ol>
+<li>The population details</li>
+<li>The screen time measure details</li>
+<li>The outcomes details (including adding a 'validated' outcome to each outcome)</li>
+</ol>
+</li>
+<li>Check the overall dataset details, including confirming that the dataset is not a duplicate.</li>
+<li>Mark the dataset as 'validated' in Asana.</li>
+</ol>
+<h2 id="checking-the-extracted-data">Checking the Extracted Data<a class="headerlink" href="#checking-the-extracted-data" title="Permanent link">&para;</a></h2>
+<h3 id="choosing-a-dataset-to-validate">Choosing a Dataset to Validate<a class="headerlink" href="#choosing-a-dataset-to-validate" title="Permanent link">&para;</a></h3>
+<p>Start by picking a dataset from the 'Awaiting Triage' set in <a href="https://app.asana.com/1/653672074038961/project/1210433819516828/list/1210434509883894">Asana</a>.
+Even though this is also shown in Airtable, we use Asana as the 'source of truth' for the stage that a dataset is at.
+Any dataset that is in the 'Awaiting Triage' set in Asana is ready to be validated.</p>
+<p><a class="glightbox" href="../../imgs/asana_awaitingtriage_r.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Asana Awaiting Triage" src="../../imgs/asana_awaitingtriage_r.png" width="80%" /></a></p>
+<p>In the 'Airtable Data' column, there is a link to the Airtable record for the dataset (highlighted in red above).
+Clicking the link is the easiest way to open the Airtable record for the dataset.</p>
+<h3 id="checking-the-data">Checking the Data<a class="headerlink" href="#checking-the-data" title="Permanent link">&para;</a></h3>
+<p>There are two main ways to check the data: using the 'form' view, or using the filters.
+Either is fine, but for generally checking the data I find the 'form' view easier to use.</p>
+<h4 id="open-the-forms">Open the forms<a class="headerlink" href="#open-the-forms" title="Permanent link">&para;</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-open-the-dataset-form">1. Open the dataset form<a class="headerlink" href="#1-open-the-dataset-form" title="Permanent link">&para;</a></h5>
+<hr />
+<p>If you haven't followed the link from Asana, you can open the form view by clicking the two-arrow icon that appears when you hover over a record.</p>
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/c7cb012f-1296-4a6e-be46-fd7ae4382dd8/81a2dae3-426c-4abe-9d82-b18130583e96.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.1673&amp;fp-y=0.1830&amp;fp-z=3.0377&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=571&amp;mark-y=351&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01OCZoPTY4JmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 1 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/c7cb012f-1296-4a6e-be46-fd7ae4382dd8/81a2dae3-426c-4abe-9d82-b18130583e96.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.1673&amp;fp-y=0.1830&amp;fp-z=3.0377&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=571&amp;mark-y=351&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01OCZoPTY4JmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" /></a></p>
+</li>
+<li>
+<h5 id="2-open-the-article-form">2. Open the article form<a class="headerlink" href="#2-open-the-article-form" title="Permanent link">&para;</a></h5>
+<hr />
+<p>Airtable will 'stack' forms on top of each other, which makes it quite convenient to work down through the layers of data.
+Before you can validate the dataset fields, you need to check the article.
+Clicking on the linked article (under 'Articles: IDs') will open the form for the article.</p>
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4787&amp;fp-y=0.3824&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=306&amp;mark-y=542&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01NDQmaD0xMDEmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 2 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4787&amp;fp-y=0.3824&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=306&amp;mark-y=542&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01NDQmaD0xMDEmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" /></a></p>
+</li>
+<li>
+<h5 id="3-download-the-full-text">3. Download the full text<a class="headerlink" href="#3-download-the-full-text" title="Permanent link">&para;</a></h5>
+<hr />
+<p>You'll likely want to download the full text (or open it in a new tab) so that you can view it while validating the data.</p>
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ce1935c9-c83a-499b-bf89-d678e39731b0/0d230073-5215-430d-af9c-79d01d22a88b.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4751&amp;fp-y=0.5612&amp;fp-z=2.1234&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=498&amp;mark-y=562&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yOSZoPTMzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 3 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ce1935c9-c83a-499b-bf89-d678e39731b0/0d230073-5215-430d-af9c-79d01d22a88b.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4751&amp;fp-y=0.5612&amp;fp-z=2.1234&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=498&amp;mark-y=562&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yOSZoPTMzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" /></a></p>
+</li>
+</ul>
+</div>
+<h4 id="check-the-article-form">Check the article form<a class="headerlink" href="#check-the-article-form" title="Permanent link">&para;</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-check-the-fields-on-the-article-form">1. Check the fields on the article form<a class="headerlink" href="#1-check-the-fields-on-the-article-form" title="Permanent link">&para;</a></h5>
+<hr />
+<p>Check the fields on the article form, such as the author details, the year of data collection, the study design, countries of data, and the total sample size.</p>
+</li>
+<li>
+<h5 id="2-open-the-hidden-fields">2. Open the hidden fields<a class="headerlink" href="#2-open-the-hidden-fields" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/6507bd26-bd74-4749-b752-e1bd2e3f5fe2/3419c354-2ec6-439f-ad4f-fc9b5dc08b30.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4330&amp;fp-y=0.9102&amp;fp-z=1.6364&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=295&amp;mark-y=630&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 4 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/6507bd26-bd74-4749-b752-e1bd2e3f5fe2/3419c354-2ec6-439f-ad4f-fc9b5dc08b30.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4330&amp;fp-y=0.9102&amp;fp-z=1.6364&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=295&amp;mark-y=630&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+</ul>
+</div>
+<p>The next steps are to work through each of the populations, screen time measures, and outcomes in the article.</p>
+<h4 id="check-the-population-forms">Check the population form(s)<a class="headerlink" href="#check-the-population-forms" title="Permanent link">&para;</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-open-the-population-forms">1. Open the population form(s)<a class="headerlink" href="#1-open-the-population-forms" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9129e8cb-44c8-4c58-b8ea-41703d4064c2/cc6f7431-74e2-44de-9c15-7b9b7c254ba6.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.2612&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=334&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 5 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9129e8cb-44c8-4c58-b8ea-41703d4064c2/cc6f7431-74e2-44de-9c15-7b9b7c254ba6.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.2612&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=334&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+<li>
+<h5 id="2-check-the-population-fields">2. Check the population fields<a class="headerlink" href="#2-check-the-population-fields" title="Permanent link">&para;</a></h5>
+<hr />
+<p>In particular, check the sample size and proportion of girls.
+Remember that you can <a href="../extraction_addremove/#adding-an-additional-populationscreen-time-measureoutcome">add</a> or <a href="../extraction_addremove/#removing-incorrect-populationsscreen-time-measuresoutcomes">remove</a> populations as needed.
+Each one needs it's own record.</p>
+</li>
+<li>
+<h5 id="3-when-you-are-done-close-the-population-form">3. When you are done, close the population form<a class="headerlink" href="#3-when-you-are-done-close-the-population-form" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/69b75d4d-1c36-4583-80c6-57b01c9695a3/28f81358-aea9-49dc-ac9f-d2a6da2fc0c8.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5409&amp;fp-y=0.3253&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=1128&amp;mark-y=3&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 6 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/69b75d4d-1c36-4583-80c6-57b01c9695a3/28f81358-aea9-49dc-ac9f-d2a6da2fc0c8.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5409&amp;fp-y=0.3253&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=1128&amp;mark-y=3&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" /></a></p>
+</li>
+</ul>
+</div>
+<p>If there are multiple populations, repeat for each one.</p>
+<h4 id="check-the-screen-time-measures">Check the screen time measure(s)<a class="headerlink" href="#check-the-screen-time-measures" title="Permanent link">&para;</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-open-the-screen-time-measures">1. Open the screen time measure(s)<a class="headerlink" href="#1-open-the-screen-time-measures" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/1a4d28e9-11a7-4700-afdc-d5be7b9ad095/db460a50-eab4-4cb3-bf0c-8e3b549c6ddd.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.3383&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=337&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 7 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/1a4d28e9-11a7-4700-afdc-d5be7b9ad095/db460a50-eab4-4cb3-bf0c-8e3b549c6ddd.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.3383&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=337&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+<li>
+<h5 id="2-check-the-screen-time-measure-fields">2. Check the screen time measure fields<a class="headerlink" href="#2-check-the-screen-time-measure-fields" title="Permanent link">&para;</a></h5>
+<hr />
+<p>Remember that you can <a href="../extraction_addremove/#adding-an-additional-populationscreen-time-measureoutcome">add</a> or <a href="../extraction_addremove/#removing-incorrect-populationsscreen-time-measuresoutcomes">remove</a> screen time measures if the AI has made a mistake.</p>
+</li>
+<li>
+<h5 id="3-when-finished-click-the-close-button">3. When finished, click the close button<a class="headerlink" href="#3-when-finished-click-the-close-button" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/48b55046-5c84-4158-ac6d-c5ce98fc159b/d652fc48-1c2e-4abe-b302-eab06e6e4fec.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5461&amp;fp-y=0.2785&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=1118&amp;mark-y=74&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 8 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/48b55046-5c84-4158-ac6d-c5ce98fc159b/d652fc48-1c2e-4abe-b302-eab06e6e4fec.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5461&amp;fp-y=0.2785&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=1118&amp;mark-y=74&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" /></a></p>
+</li>
+</ul>
+</div>
+<p>If there are multiple screen time measures, repeat for each one.</p>
+<h4 id="check-the-outcome-forms">Check the outcome form(s)<a class="headerlink" href="#check-the-outcome-forms" title="Permanent link">&para;</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-open-the-outcomes">1. Open the outcome(s)<a class="headerlink" href="#1-open-the-outcomes" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/fb397d4a-4ad2-40a8-9559-d5bb47601ef3/4cee8f4d-bfec-4769-9a87-41e5dfa888e8.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.5749&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=337&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 9 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/fb397d4a-4ad2-40a8-9559-d5bb47601ef3/4cee8f4d-bfec-4769-9a87-41e5dfa888e8.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4753&amp;fp-y=0.5749&amp;fp-z=1.8990&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=342&amp;mark-y=337&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+<li>
+<h5 id="2-check-the-outcome-fields-and-add-the-validated-outcome">2. Check the outcome fields and add the validated outcome<a class="headerlink" href="#2-check-the-outcome-fields-and-add-the-validated-outcome" title="Permanent link">&para;</a></h5>
+<hr />
+<p>Start by checking the already extracted outcome fields are correct.</p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>You do not need to edit the <strong>Outcome</strong> field.
+Use this to guide you in selecting the correct validated outcome, but because of the way the AI extraction works, it is too time-consuming to fix this field.
+You should update the <strong>Outcome Group</strong> and the <strong>Outcome Measure</strong> fields, however.</p>
+</details>
+</li>
+<li>
+<h5 id="3-for-each-outcome-add-a-validated-outcome">3. For each outcome add a 'validated' outcome<a class="headerlink" href="#3-for-each-outcome-add-a-validated-outcome" title="Permanent link">&para;</a></h5>
+<hr />
+<p>You can read the full instructions for <a href="../extraction_addvalidated/#adding-a-new-validated-outcome">adding a validated outcome</a> in the next section.
+Briefly, the steps are:</p>
+<ol>
+<li>Click the 'Add option' button.
+   <a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.3987&amp;fp-y=0.4718&amp;fp-z=2.8538&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=514&amp;mark-y=332&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 19 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.3987&amp;fp-y=0.4718&amp;fp-z=2.8538&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=514&amp;mark-y=332&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></li>
+<li>Search for an existing matching outcome.
+   If you fine one, select it and you are done.</li>
+<li>If there isn't an existing one, add a new one and complete the required fields.</li>
+</ol>
+</li>
+<li>
+<h5 id="4-when-finished-click-the-close-button">4. When finished, click the close button<a class="headerlink" href="#4-when-finished-click-the-close-button" title="Permanent link">&para;</a></h5>
+</li>
+</ul>
+</div>
+<p>If there are multiple outcomes, repeat for each one.
+Remember that you can <a href="../extraction_addremove/#adding-an-additional-populationscreen-time-measureoutcome">add</a> or <a href="../extraction_addremove/#removing-incorrect-populationsscreen-time-measuresoutcomes">remove</a> outcomes if the AI has made a mistake.</p>
+<h4 id="check-the-dataset-form">Check the dataset form<a class="headerlink" href="#check-the-dataset-form" title="Permanent link">&para;</a></h4>
+<div class="grid">
+<p>Once all of the data for the article has been checked, you can check the dataset fields.
+In particular, if you changed the sample size or the corresponding author, you should also update these fields in the dataset form.</p>
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4787&amp;fp-y=0.3824&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 2 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4787&amp;fp-y=0.3824&amp;fp-z=2.0000&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200" /></a></p>
+</div>
+<h3 id="updating-the-record-in-asana">Updating the record in Asana<a class="headerlink" href="#updating-the-record-in-asana" title="Permanent link">&para;</a></h3>
+<h4 id="checklist">Checklist<a class="headerlink" href="#checklist" title="Permanent link">&para;</a></h4>
+<p>When you are satisfied that the data in Airtable is correct, you can update the record in <a href="https://app.asana.com/1/653672074038961/project/1210433819516828/list/1210434509883894">Asana</a> to indicate that the dataset has been validated.
+Before doing this, check that you have:</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" checked/><span class="task-list-indicator"></span></label> Checked the dataset and article details are correct</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" checked/><span class="task-list-indicator"></span></label> <a href="../extraction_addremove/#removing-incorrect-populationsscreen-time-measuresoutcomes">Removed any incorrect populations, screen time measures, or outcomes</a></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" checked/><span class="task-list-indicator"></span></label> <a href="../extraction_addremove/#adding-an-additional-populationscreen-time-measureoutcome">Added any additional populations, screen time measures, or outcomes</a> that were not extracted by the AI</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" checked/><span class="task-list-indicator"></span></label> <a href="../extraction_dedupe/#deduplicating-datasets">Checked that the dataset is not a duplicate</a></li>
+</ul>
+<h4 id="update-the-asana-task">Update the Asana task<a class="headerlink" href="#update-the-asana-task" title="Permanent link">&para;</a></h4>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>Make sure you use the 'Dataset ID' (e.g., <code>BPIPD-01</code>) to find the dataset in Asana.
+Don't rely on the name - it may not be unique!</p>
+</details>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-find-the-dataset-in-asana">1. Find the dataset in Asana<a class="headerlink" href="#1-find-the-dataset-in-asana" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/d4d4e6a6-0271-4e60-b7b2-8e5b23febf32/9430a9c4-5498-4972-ab3b-5ec765683c29.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.1577&amp;fp-y=0.5939&amp;fp-z=1.6351&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=4&amp;mark-y=364&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD00MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 11 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/d4d4e6a6-0271-4e60-b7b2-8e5b23febf32/9430a9c4-5498-4972-ab3b-5ec765683c29.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.1577&amp;fp-y=0.5939&amp;fp-z=1.6351&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=4&amp;mark-y=364&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD00MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+<li>
+<h5 id="2-click-on-awaiting-triage">2. Click on Awaiting Triage<a class="headerlink" href="#2-click-on-awaiting-triage" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/4aa2bd4e-fcfa-431c-a7b3-b30f265da1ef/3a7195c3-c2a4-4943-8e33-7f1064808d5a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5074&amp;fp-y=0.5943&amp;fp-z=2.7740&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=499&amp;mark-y=350&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yMDEmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 12 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/4aa2bd4e-fcfa-431c-a7b3-b30f265da1ef/3a7195c3-c2a4-4943-8e33-7f1064808d5a.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5074&amp;fp-y=0.5943&amp;fp-z=2.7740&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=499&amp;mark-y=350&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yMDEmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+<li>
+<h5 id="3-click-on-validated">3. Click on Validated<a class="headerlink" href="#3-click-on-validated" title="Permanent link">&para;</a></h5>
+<hr />
+<p><a class="glightbox" href="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5329&amp;fp-y=0.6602&amp;fp-z=2.4712&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=445&amp;mark-y=354&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="Step 13 screenshot" src="https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5329&amp;fp-y=0.6602&amp;fp-z=2.4712&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=445&amp;mark-y=354&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" /></a></p>
+</li>
+</ul>
+</div>
+<p>That's it!
+You have successfully validated a dataset.</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 3, 2025 00:16:18 UTC">July 3, 2025</span>
+  </span>
+
+    
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:taren.sanders@acu.edu.au">Taren Sanders</a>
+    </nav>
+  </span>
+
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../extraction_overview/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview and Setup">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Overview and Setup
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../extraction_addremove/" class="md-footer__link md-footer__link--next" aria-label="Next: Adding or Removing Populations, Screen Time Measures, and Outcomes">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Adding or Removing Populations, Screen Time Measures, and Outcomes
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "navigation.tracking", "content.code.copy", "content.tooltips", "search.suggest", "search.highlight", "toc.integrate", "toc.follow"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      
+    
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
+</html>
