@@ -64,6 +64,7 @@ For each distinct population or participant group described in the study, extrac
 - "Age: Lower Range": The minimum reported age of participants (e.g., “participants aged 8-12” would mean that the lower range is 8).
 - "Age: Upper Range": The maximum reported age of participants.
 - "Age: Mean": The average (mean) age, if provided.
+- "Age: Standard Deviation": The standard deviation of the age, if provided.
 - "Sample Size: Total N": The total number of participants in the group.
 - "Sample Size: N Girls": The number of female participants, if reported.
 - "Sample Size: % Girls": The percentage of female participants, if reported. Enter the percentage of female participants as a decimal between 0 and 1 (e.g., 0.471 for 47.1%). Do **not** enter raw counts or numbers greater than 1. If a percentage is reported (e.g., 47.1%), divide by 100.

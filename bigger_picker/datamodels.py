@@ -7,6 +7,7 @@ class Population(BaseModel):
     age_lower_range: float | None = Field(None, alias="Age: Lower Range")
     age_upper_range: float | None = Field(None, alias="Age: Upper Range")
     age_mean: float | None = Field(None, alias="Age: Mean")
+    age_sd: float | None = Field(None, alias="Age: Standard Deviation")
     sample_size_total: int | None = Field(None, alias="Sample Size: Total N")
     sample_size_girls: int | None = Field(None, alias="Sample Size: N Girls")
     percent_girls: float | None = Field(None, alias="Sample Size: % Girls")
