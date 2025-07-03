@@ -184,7 +184,7 @@ class IntegrationManager:
                 # We are out of sync, so we skip this dataset.
                 continue
 
-            if dataset_bpipd in status_map.keys():
+            if dataset_bpipd in status_map:
                 # If the dataset has a matching task, update it
                 task_status = status_map[dataset_bpipd]
                 dataset_status = dataset["fields"].get("Status", None)
@@ -195,9 +195,7 @@ class IntegrationManager:
                     self.airtable.update_record("Datasets", dataset["id"], payload)
 
                 else:
-                    self._log(
-                        f"No status change for dataset {dataset_bpipd}, skipping update."
-                    )
+                    self._log(f"No status change for dataset {dataset_bpipd}.")
 
     def upload_extraction_to_airtable(
         self,
