@@ -77,7 +77,7 @@ Below is what is stored in each table, as reference.
     |-------------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|-------------------------------------------------------|
     | **Dataset ID**                            | The ID of the dataset. Set by Asana automatically                                               | BPIPD-1                                   | :material-close:{ title="Set automatically" }         |
     | **Dataset Name**                          | The 'name' of the dataset, or the author name and year of the article the dataset was found in. | Longitudinal Study of Australian Children | :material-check:                                      |
-    | **Dataset Value**                         | The value [0,1] of the dataset. Set automatically.                                              | 0.03                                      | :material-close:{ title="Calculated automatically" }  |
+    | **Dataset Value**                         | The value of the dataset. Set automatically.                                                    | 11.1                                      | :material-close:{ title="Calculated automatically" }  |
     | **Total Sample Size**                     | The total number of participants in the dataset                                                 | 1,000                                     | :material-check:                                      |
     | **Dataset Contact Name**                  | The name of the person to contact for access to the data                                        | John Doe                                  | :material-check:                                      |
     | **Dataset Contact Email**                 | The email of the person to contact for access to the data                                       | john.doe@university.com                   | :material-check:                                      |
@@ -90,38 +90,43 @@ Below is what is stored in each table, as reference.
 
 === "Articles"
 
-    | Column                         | Description                                                               | Example                      | Editable[^*]                                                                  |
-    |--------------------------------|---------------------------------------------------------------------------|------------------------------|-------------------------------------------------------------------------------|
-    | **Rayyan ID**                  | The ID of the article in Rayyan                                           | 215786174                    | :material-close:{ title="Set automatically" }                                 |
-    | **Article Title**              | Title of the article                                                      | Screens and teens            | :material-check:                                                              |
-    | **Authors**                    | The names of the authors                                                  | Doe, J.                      | :material-check:                                                              |
-    | **Journal**                    | The journal the article is published in                                   | Science                      | :material-check:                                                              |
-    | **DOI**                        | The DOI of the article                                                    | 10.1016/j.chb.2010.10.019    | :material-check:                                                              |
-    | **Year**                       | Year the article was published                                            | 2025                         | :material-check:                                                              |
-    | **Fulltext**                   | An attachment with the full-text of the article                           |                              | :material-check:                                                              |
-    | **Corresponding Author**       | The corresponding author of the article                                   | John Doe                     | :material-check:                                                              |
-    | **Corresponding Author Email** | The corresponding authors' emails                                         | john.doe@university.com      | :material-check:                                                              |
-    | **Year of Last Data Point**    | Year that the data were collected (or last year for longitudinal studies) | 2023                         | :material-check:                                                              |
-    | **Study Design**               | One of [`Cross-section`, `Longitudinal`, `Experimental`, or `Other`]      | Cross-sectional              | :material-check:                                                              |
-    | **Countries of Data**          | A list of the countries the data were collected in.                       | Australia, New Zealand       | :material-check:                                                              |
-    | **Total Sample Size**          | The total number of participants in the study                             | 1,000                        | :material-check:                                                              |
-    | **Screen Time Measure Name**   | A list of measures or instruments                                         | "ScreenQ", "Custom Survey"   | :material-close:{ title="Set when linking screen time measures to articles" } |
-    | **Outcome Groups**             | The broad groups of outcomes in the study                                 | "Mental Health", "Wellbeing" | :material-close:{ title="Set when linking outcomes to articles" }             |
-    | **Outcomes**                   | The specific outcomes that were measured                                  | Anxiety, Depression          | :material-close:{ title="Set when linking outcomes to articles" }             |
+    | Column                         | Description                                                                        | Example                      | Editable[^*]                                                                  |
+    |--------------------------------|------------------------------------------------------------------------------------|------------------------------|-------------------------------------------------------------------------------|
+    | **Rayyan ID**                  | The ID of the article in Rayyan                                                    | 215786174                    | :material-close:{ title="Set automatically" }                                 |
+    | **Article Title**              | Title of the article                                                               | Screens and teens            | :material-check:                                                              |
+    | **Authors**                    | The names of the authors                                                           | Doe, J.                      | :material-check:                                                              |
+    | **Journal**                    | The journal the article is published in                                            | Science                      | :material-check:                                                              |
+    | **DOI**                        | The DOI of the article                                                             | 10.1016/j.chb.2010.10.019    | :material-check:                                                              |
+    | **Year**                       | Year the article was published                                                     | 2025                         | :material-check:                                                              |
+    | **Fulltext**                   | An attachment with the full-text of the article                                    |                              | :material-check:                                                              |
+    | **Corresponding Author**       | The corresponding author of the article                                            | John Doe                     | :material-check:                                                              |
+    | **Corresponding Author Email** | The corresponding authors' emails                                                  | john.doe@university.com      | :material-check:                                                              |
+    | **Year of Last Data Point**    | Year that the data were collected (or last year for longitudinal studies)          | 2023                         | :material-check:                                                              |
+    | **Study Design**               | One of [`Cross-section`, `Longitudinal`, `Experimental`, or `Other`]               | Cross-sectional              | :material-check:                                                              |
+    | **Countries of Data**          | A list of the countries the data were collected in.                                | Australia, New Zealand       | :material-check:                                                              |
+    | **Total Sample Size**          | The total number of participants in the study                                      | 1,000                        | :material-check:                                                              |
+    | **Screen Time Measure Name**   | A list of measures or instruments                                                  | "ScreenQ", "Custom Survey"   | :material-close:{ title="Set when linking screen time measures to articles" } |
+    | **Outcome Groups**             | The broad groups of outcomes in the study                                          | "Mental Health", "Wellbeing" | :material-close:{ title="Set when linking outcomes to articles" }             |
+    | **Outcomes**                   | The specific outcomes that were measured                                           | Anxiety, Depression          | :material-close:{ title="Set when linking outcomes to articles" }             |
+    | **Min Ages**                   | The minimum age across the populations                                             | 8                            | :material-close:{ title="Set when linking populations to articles" }          |
+    | **Max Ages**                   | The maximum age across the populations                                             | 12                           | :material-close:{ title="Set when linking populations to articles" }          |
+    | **Mean Ages**                  | The mean age across the populations, taken from the largest group                  | 10.5                         | :material-close:{ title="Set when linking populations to articles" }          |
+    | **SD Ages**                    | The standard deviation of age across the populations, taken from the largest group | 1.5                          | :material-close:{ title="Set when linking populations to articles" }          |
 
 === "Populations"
 
-    | Column                   | Description                                                           | Example           | Editable[^*]                                              |
-    |--------------------------|-----------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
-    | **Population ID**        | The ID for the population                                             | 17                | :material-close:{ title="Numbered automatically" }        |
-    | **Rayyan ID**            | The ID number to link to an article (same as the article's Rayyan ID) | 215786174         | :material-check:                                          |
-    | **Article Title**        | Title of the article                                                  | Screens and teens | :material-close:{ title="Set when linked to an article" } |
-    | **Age: Lower Range**     | The lower bound of the population age range                           | 8                 | :material-check:                                          |
-    | **Age: Upper Range**     | The upper bound of the population age range                           | 12                | :material-check:                                          |
-    | **Age: Mean**            | The mean age of the population                                        | 10.8              | :material-check:                                          |
-    | **Sample Size: Total N** | The total number of participants in the study                         | 1,000             | :material-check:                                          |
-    | **Sample Size: N Girls** | The total number of girls in the study                                | 645               | :material-check:                                          |
-    | **Sample Size: % Girls** | The percentage of girls in the study                                  | 64.5%             | :material-check:                                          |
+    | Column                      | Description                                                           | Example           | Editable[^*]                                              |
+    |-----------------------------|-----------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
+    | **Population ID**           | The ID for the population                                             | 17                | :material-close:{ title="Numbered automatically" }        |
+    | **Rayyan ID**               | The ID number to link to an article (same as the article's Rayyan ID) | 215786174         | :material-check:                                          |
+    | **Article Title**           | Title of the article                                                  | Screens and teens | :material-close:{ title="Set when linked to an article" } |
+    | **Age: Lower Range**        | The lower bound of the population age range (in years)                | 8                 | :material-check:                                          |
+    | **Age: Upper Range**        | The upper bound of the population age range (in years)                | 12                | :material-check:                                          |
+    | **Age: Mean**               | The mean age of the population (in years)                             | 10.8              | :material-check:                                          |
+    | **Age: Standard Deviation** | The standard deviation of the age (in years)                          | 1.5               | :material-check:                                          |
+    | **Sample Size: Total N**    | The total number of participants in the study                         | 1,000             | :material-check:                                          |
+    | **Sample Size: N Girls**    | The total number of girls in the study                                | 645               | :material-check:                                          |
+    | **Sample Size: % Girls**    | The percentage of girls in the study                                  | 64.5%             | :material-check:                                          |
 
 === "Screen Time Measures"
 

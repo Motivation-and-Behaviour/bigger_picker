@@ -7,6 +7,7 @@ from bigger_picker.asana import AsanaManager
 from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
+from bigger_picker.utils import compute_dataset_value, fix_dataset
 
 
 class IntegrationManager:
@@ -290,11 +291,37 @@ class IntegrationManager:
         self.create_task_from_dataset(dataset)
         self.rayyan.update_article_labels(article["id"])
 
+    def score_datasets(self):
+        self._log("Scoring datasets...")
+
+        datasets_included_statuses = ["Included", "Agreed & Awaiting Data"]
+        datasets_potential_statuses = [
+            "Validated",
+            "Non-Priority",
+            "Contacting Authors",
+        ]
+        self._log("Fetching datasets from Airtable")
+        datasets = self.airtable.tables["Datasets"].all()
+
+        datasets_included = []
+        datasets_potential = []
+        for dataset in datasets:
+            if dataset["fields"].get("Status") in datasets_included_statuses:
+                datasets_included.append(fix_dataset(dataset))
+
+            elif dataset["fields"].get("Status") in datasets_potential_statuses:
+                datasets_potential.append(fix_dataset(dataset))
+
+        for dataset in datasets_potential:
+            dataset_value = compute_dataset_value(
+                dataset, datasets_included, datasets_potential
+            )
+            payload = {"Dataset Value": dataset_value}
+            self.airtable.update_record("Datasets", dataset["id"], payload)
+
     def sync(self):
+        self.score_datasets()
         self.sync_airtable_and_asana()
-        # TODO: Calculate revised dataset value
-        # TODO: Update dataset value in Airtable
-        # TODO: Update the dataset value in Asana
 
     def _log(self, *args, **kwargs):
         if self.debug:
