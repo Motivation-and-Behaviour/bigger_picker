@@ -33,6 +33,11 @@ It is easiest to do this from the form view.
 If you find that the AI has added an incorrect population, screen time measure, or outcome, you can remove it.
 This is especially common for outcomes, where the AI may mistake a covariate for an outcome.
 
+???+ warning
+    Don't use the small 'x' button on the top right of the record, shown on the article form.
+    This only unlinks the record from the article, but does not delete it.
+    We want to avoid having orphaned records in the database, so always use the "Delete record" option.
+
 #### From the Form View
 
 <div class="grid cards" markdown>
