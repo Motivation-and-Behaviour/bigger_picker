@@ -1,4 +1,5 @@
 from pyairtable.api.types import RecordDict
+from rich.console import Console
 
 import bigger_picker.config as config
 from bigger_picker.airtable import AirtableManager
@@ -15,63 +16,97 @@ class IntegrationManager:
         rayyan_manager: RayyanManager,
         airtable_manager: AirtableManager,
         openai_manager: OpenAIManager,
+        console: Console | None = None,
+        debug: bool = False,
     ):
         self.asana = asana_manager
         self.rayyan = rayyan_manager
         self.airtable = airtable_manager
         self.openai = openai_manager
+        self.console = console or Console()
+        self.debug = debug
 
     def sync_airtable_and_asana(
         self,
     ) -> None:
+        self._log("Getting Asana tasks")
         self.asana.get_tasks(refresh=True)
 
-        task_ids = {}
+        tasks = {}
+
+        self._log("Getting Asana task IDs")
         for task in self.asana.tasks:
-            task_ids[
+            tasks[
                 self.asana.get_custom_field_value(
                     task, config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]
                 )
-            ] = task.get("gid")
+            ] = task
 
+        self._log("Getting Airtable records")
         datasets = self.airtable.tables["Datasets"].all()
 
         for dataset in datasets:
             dataset_bpipd = dataset["fields"].get("Dataset ID", None)
 
-            if dataset_bpipd in task_ids.keys():
+            if dataset_bpipd in tasks:
                 # If the dataset has a matching task, update it
+                self._log(f"Updating task {dataset_bpipd}...")
                 updated_task = self.update_task_from_dataset(
-                    task_ids[dataset_bpipd],
+                    tasks[dataset_bpipd],
                     dataset,
                 )
             else:
                 # If the dataset does not have a matching task, create one
+                self._log("Creating task for dataset")
                 updated_task = self.create_task_from_dataset(dataset)
 
-            # Update the Airtable records with the Asana task IDs
-            task_bpipd = self.asana.get_custom_field_value(
-                updated_task, config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]
-            )
-            payload = {"Dataset ID": task_bpipd}
-            self.airtable.update_record("Datasets", dataset["id"], payload)
+                # Update the Airtable records with the Asana task IDs
+                task_bpipd = self.asana.get_custom_field_value(
+                    updated_task, config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]
+                )
+                payload = {"Dataset ID": task_bpipd}
+                self._log(f"Updating Airtable record for {task_bpipd}")
+                self.airtable.update_record("Datasets", dataset["id"], payload)
+        self._log("Starting status sync")
         self.update_airtable_statuses()
 
-    def update_task_from_dataset(self, task_id: str, dataset: RecordDict) -> dict:
-        dataset_value = dataset["fields"].get("Dataset Value", None)
-        airtable_url = self.airtable.make_url(dataset["id"])
+    def update_task_from_dataset(self, task: dict, dataset: RecordDict) -> dict:
+        dataset_vals = {
+            "name": dataset["fields"].get("Dataset Name", None),
+            "value": dataset["fields"].get("Dataset Value", None),
+            "url": self.airtable.make_url(dataset["id"]),
+        }
+        task_vals = {
+            "name": task.get("name", None),
+            "value": self.asana.get_custom_field_value(
+                task, config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]
+            ),
+            "url": self.asana.get_custom_field_value(
+                task, config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]
+            ),
+        }
+
+        if dataset_vals == task_vals:
+            self._log("No changes detected in the task, skipping update.")
+            return task
 
         update_payload = {
             "data": {
-                "name": dataset["fields"]["Dataset Name"],
+                "name": dataset_vals["name"],
                 "custom_fields": {
-                    config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset_value,
-                    config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: airtable_url,
+                    config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset_vals[
+                        "value"
+                    ],
+                    config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: dataset_vals["url"],
                 },
             }
         }
 
-        return self.asana.update_task(update_payload, task_id)
+        task_gid = task.get("gid", None)
+        if task_gid is None:
+            raise ValueError("Task GID is missing in the provided task dictionary.")
+
+        return self.asana.update_task(update_payload, task_gid)
 
     def create_task_from_dataset(self, dataset: RecordDict) -> dict:
         dataset_status = dataset["fields"].get("Status", None)
@@ -116,6 +151,7 @@ class IntegrationManager:
         return updated_created_task
 
     def update_airtable_statuses(self) -> None:
+        self._log("Getting Asana tasks")
         # Always force refresh since we need up-to-date statuses from Asana
         tasks = self.asana.get_tasks(refresh=True)
         status_map = {}
@@ -138,6 +174,7 @@ class IntegrationManager:
                 )
             ] = status_name
 
+        self._log("Getting Airtable records")
         datasets = self.airtable.tables["Datasets"].all()
 
         for dataset in datasets:
@@ -149,9 +186,18 @@ class IntegrationManager:
 
             if dataset_bpipd in status_map.keys():
                 # If the dataset has a matching task, update it
-                status = status_map[dataset_bpipd]
-                payload = {"Status": status}
-                self.airtable.update_record("Datasets", dataset["id"], payload)
+                task_status = status_map[dataset_bpipd]
+                dataset_status = dataset["fields"].get("Status", None)
+
+                if task_status != dataset_status:
+                    payload = {"Status": task_status}
+                    self._log(f"Updating Airtable record {dataset['id']}")
+                    self.airtable.update_record("Datasets", dataset["id"], payload)
+
+                else:
+                    self._log(
+                        f"No status change for dataset {dataset_bpipd}, skipping update."
+                    )
 
     def upload_extraction_to_airtable(
         self,
@@ -251,3 +297,7 @@ class IntegrationManager:
         # TODO: Calculate revised dataset value
         # TODO: Update dataset value in Airtable
         # TODO: Update the dataset value in Asana
+
+    def _log(self, *args, **kwargs):
+        if self.debug:
+            self.console.log(*args, **kwargs)

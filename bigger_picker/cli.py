@@ -24,50 +24,8 @@ def process(
     rayyan_creds_path: str = typer.Option(
         None, help="Path to Rayyan credentials JSON file"
     ),
-):
-    if dotenv_path:
-        load_dotenv(dotenv_path)
-    else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        load_dotenv(os.path.join(BASE_DIR, ".env"))
-
-    console = Console()
-
-    airtable = AirtableManager(airtable_api_key)
-    asana = AsanaManager(asana_token)
-    openai = OpenAIManager(openai_api_key, openai_model)
-    rayyan = RayyanManager(rayyan_creds_path)
-    integration = IntegrationManager(
-        asana_manager=asana,
-        airtable_manager=airtable,
-        openai_manager=openai,
-        rayyan_manager=rayyan,
-    )
-
-    with console.status("Getting unextracted articles..."):
-        articles = integration.rayyan.get_unextracted_articles()
-        console.log(f"Found {len(articles)} unextracted articles.")
-
-    with Progress(console=console) as progress:
-        task = progress.add_task("Extracting articles...", total=len(articles))
-        for article in articles:
-            integration.process_article(article)
-            progress.advance(task, advance=1)
-    console.log("Extraction complete.")
-
-    with console.status("Updating Airtable statuses"):
-        integration.sync()
-
-
-@app.command()
-def sync(
-    dotenv_path: str = typer.Option(None, help="Path to .env file with credentials"),
-    airtable_api_key: str = typer.Option(None, help="Airtable API key"),
-    asana_token: str = typer.Option(None, help="Asana API token"),
-    openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
-    rayyan_creds_path: str = typer.Option(
-        None, help="Path to Rayyan credentials JSON file"
+    debug: bool = typer.Option(
+        False, "--debug", help="Enable debug logging to console"
     ),
 ):
     if dotenv_path:
@@ -87,10 +45,66 @@ def sync(
         airtable_manager=airtable,
         openai_manager=openai,
         rayyan_manager=rayyan,
+        console=console,
+        debug=debug,
+    )
+
+    with console.status("Getting unextracted articles..."):
+        articles = integration.rayyan.get_unextracted_articles()
+        console.log(f"Found {len(articles)} unextracted articles.")
+
+    with Progress(console=console) as progress:
+        task = progress.add_task("Extracting articles...", total=len(articles))
+        for article in articles:
+            integration.process_article(article)
+            progress.advance(task, advance=1)
+    console.log("Extraction complete.")
+
+    with console.status("Updating Airtable statuses"):
+        console.log("Starting sync...")
+        integration.sync()
+        console.log("Sync complete")
+
+
+@app.command()
+def sync(
+    dotenv_path: str = typer.Option(None, help="Path to .env file with credentials"),
+    airtable_api_key: str = typer.Option(None, help="Airtable API key"),
+    asana_token: str = typer.Option(None, help="Asana API token"),
+    openai_api_key: str = typer.Option(None, help="OpenAI API key"),
+    openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
+    rayyan_creds_path: str = typer.Option(
+        None, help="Path to Rayyan credentials JSON file"
+    ),
+    debug: bool = typer.Option(
+        False, "--debug", help="Enable debug logging to console"
+    ),
+):
+    if dotenv_path:
+        load_dotenv(dotenv_path)
+    else:
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+    console = Console()
+
+    airtable = AirtableManager(airtable_api_key)
+    asana = AsanaManager(asana_token)
+    openai = OpenAIManager(openai_api_key, openai_model)
+    rayyan = RayyanManager(rayyan_creds_path)
+    integration = IntegrationManager(
+        asana_manager=asana,
+        airtable_manager=airtable,
+        openai_manager=openai,
+        rayyan_manager=rayyan,
+        console=console,
+        debug=debug,
     )
 
     with console.status("Updating Airtable statuses"):
+        console.log("Starting sync...")
         integration.sync()
+        console.log("Sync complete")
 
 
 click_app = typer.main.get_command(app)
