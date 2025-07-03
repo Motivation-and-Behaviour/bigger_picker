@@ -24,17 +24,34 @@
   ],
   "cSpell.words": [
     "airtable",
-    "bpipd",
+    "BPIPD",
     "Rayyan",
     "mkdocs",
+    "Taren",
     "typer",
+    "Fulltext",
     "wellbeing",
+    "dialog"
   ],
   "cSpell.ignorePaths": [
     "mkdocs.yml",
     ".vscode/settings.json"
   ],
+  "cSpell.languageSettings": [
+    {
+      // use with Python files
+      "languageId": "python",
+      // Exclude code.
+      "ignoreRegExpList": [
+        "/^\\s*from.*import/gm"
+      ]
+    }
+  ],
   "[markdown]": {
     "editor.formatOnSave": true,
   },
+  "markdownlint.config": {
+    "MD033": false, // Disable MD033 (no inline HTML)
+    "MD053": false // Disable MD053 (link validation)
+  }
 }

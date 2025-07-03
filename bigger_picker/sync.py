@@ -66,7 +66,7 @@ class IntegrationManager:
                 "name": dataset["fields"]["Dataset Name"],
                 "custom_fields": {
                     config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset_value,
-                    config.ASANA_CUSTOM_FIELD_IDS["AirTable Data"]: airtable_url,
+                    config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: airtable_url,
                 },
             }
         }
@@ -88,7 +88,7 @@ class IntegrationManager:
                 "projects": self.asana.project_id,
                 "custom_fields": {
                     config.ASANA_CUSTOM_FIELD_IDS["Dataset Value"]: dataset_value,
-                    config.ASANA_CUSTOM_FIELD_IDS["AirTable Data"]: airtable_url,
+                    config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: airtable_url,
                     config.ASANA_CUSTOM_FIELD_IDS["Status"]: dataset_status_id,
                 },
             }
@@ -249,5 +249,5 @@ class IntegrationManager:
     def sync(self):
         self.sync_airtable_and_asana()
         # TODO: Calculate revised dataset value
-        # TODO: Update dataset value in AirTable
+        # TODO: Update dataset value in Airtable
         # TODO: Update the dataset value in Asana

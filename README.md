@@ -33,7 +33,7 @@ Most settings for the project are set in the [bigger_picker/config.py](bigger_pi
 If you are using this package for a project other than the Bigger Picture, you will need to adjust the settings there.
 Some other components are also hardcoded.
 
-You will need API keys for AirTable, Asana, and OpenAI.
+You will need API keys for Airtable, Asana, and OpenAI.
 You will also need a `rayyan_tokens.json` file for Rayyan API authentication.
 
 ## Usage

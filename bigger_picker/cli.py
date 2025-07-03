@@ -55,7 +55,7 @@ def process(
             progress.advance(task, advance=1)
     console.log("Extraction complete.")
 
-    with console.status("Updating AirTable statuses"):
+    with console.status("Updating Airtable statuses"):
         integration.sync()
 
 
@@ -89,9 +89,11 @@ def sync(
         rayyan_manager=rayyan,
     )
 
-    with console.status("Updating AirTable statuses"):
+    with console.status("Updating Airtable statuses"):
         integration.sync()
 
+
+click_app = typer.main.get_command(app)
 
 if __name__ == "__main__":
     app()
