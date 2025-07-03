@@ -37,105 +37,167 @@ Clicking the link is the easiest way to open the Airtable record for the dataset
 There are two main ways to check the data: using the 'form' view, or using the filters.
 Either is fine, but for generally checking the data I find the 'form' view easier to use.
 
-#### 1. Open the dataset form
+#### Open the forms
 
-If you haven't followed the link from Asana, you can open the form view by clicking the two-arrow icon that appears when you hover over a record.
+<div class="grid cards" markdown>
 
-![Step 1 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/c7cb012f-1296-4a6e-be46-fd7ae4382dd8/81a2dae3-426c-4abe-9d82-b18130583e96.png?crop=focalpoint&fit=crop&fp-x=0.1673&fp-y=0.1830&fp-z=3.0377&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=571&mark-y=351&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01OCZoPTY4JmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+- ##### 1. Open the dataset form
 
-#### 2. Open the article form
+    ---
 
-Airtable will 'stack' forms on top of each other, which makes it quite convenient to work down through the layers of data.
-Before you can validate the dataset fields, you need to check the article.
-Clicking on the linked article (under 'Articles: IDs') will open the form for the article.
+    If you haven't followed the link from Asana, you can open the form view by clicking the two-arrow icon that appears when you hover over a record.
 
-![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=306&mark-y=542&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01NDQmaD0xMDEmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D)
+    ![Step 1 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/c7cb012f-1296-4a6e-be46-fd7ae4382dd8/81a2dae3-426c-4abe-9d82-b18130583e96.png?crop=focalpoint&fit=crop&fp-x=0.1673&fp-y=0.1830&fp-z=3.0377&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=571&mark-y=351&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01OCZoPTY4JmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
 
-#### 3. Download the full text
+- ##### 2. Open the article form
 
-You'll likely want to download the full text (or open it in a new tab) so that you can view it while validating the data.
+    ---
 
-![Step 3 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ce1935c9-c83a-499b-bf89-d678e39731b0/0d230073-5215-430d-af9c-79d01d22a88b.png?crop=focalpoint&fit=crop&fp-x=0.4751&fp-y=0.5612&fp-z=2.1234&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=498&mark-y=562&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yOSZoPTMzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+    Airtable will 'stack' forms on top of each other, which makes it quite convenient to work down through the layers of data.
+    Before you can validate the dataset fields, you need to check the article.
+    Clicking on the linked article (under 'Articles: IDs') will open the form for the article.
 
-#### 4. Check the fields on the article form
+    ![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=306&mark-y=542&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01NDQmaD0xMDEmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D)
 
-Check the fields on the article form, such as the author details, the year of data collection, the study design, countries of data, and the total sample size.
+- ##### 3. Download the full text
 
-When you're done, open the hidden fields.
+    ---
 
-![Step 4 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/6507bd26-bd74-4749-b752-e1bd2e3f5fe2/3419c354-2ec6-439f-ad4f-fc9b5dc08b30.png?crop=focalpoint&fit=crop&fp-x=0.4330&fp-y=0.9102&fp-z=1.6364&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=295&mark-y=630&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+    You'll likely want to download the full text (or open it in a new tab) so that you can view it while validating the data.
+
+    ![Step 3 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ce1935c9-c83a-499b-bf89-d678e39731b0/0d230073-5215-430d-af9c-79d01d22a88b.png?crop=focalpoint&fit=crop&fp-x=0.4751&fp-y=0.5612&fp-z=2.1234&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=498&mark-y=562&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yOSZoPTMzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+
+</div>
+
+#### Check the article form
+
+<div class="grid cards" markdown>
+
+- ##### 1. Check the fields on the article form
+
+    ---
+
+    Check the fields on the article form, such as the author details, the year of data collection, the study design, countries of data, and the total sample size.
+
+- ##### 2. Open the hidden fields
+
+    ---
+
+    ![Step 4 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/6507bd26-bd74-4749-b752-e1bd2e3f5fe2/3419c354-2ec6-439f-ad4f-fc9b5dc08b30.png?crop=focalpoint&fit=crop&fp-x=0.4330&fp-y=0.9102&fp-z=1.6364&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=295&mark-y=630&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+</div>
 
 The next steps are to work through each of the populations, screen time measures, and outcomes in the article.
 
-#### 5. Open the population form(s)
+#### Check the population form(s)
 
-![Step 5 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9129e8cb-44c8-4c58-b8ea-41703d4064c2/cc6f7431-74e2-44de-9c15-7b9b7c254ba6.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.2612&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=334&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+<div class="grid cards" markdown>
 
-#### 6. Check the population fields
+- ##### 1. Open the population form(s)
 
-In particular, check the sample size and proportion of girls.
-Remember that you can [add][addrecord] or [remove][removerecord] populations as needed.
-Each one needs it's own record.
+    ---
 
-When you are done, close the population form.
+    ![Step 5 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9129e8cb-44c8-4c58-b8ea-41703d4064c2/cc6f7431-74e2-44de-9c15-7b9b7c254ba6.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.2612&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=334&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
-![Step 6 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/69b75d4d-1c36-4583-80c6-57b01c9695a3/28f81358-aea9-49dc-ac9f-d2a6da2fc0c8.png?crop=focalpoint&fit=crop&fp-x=0.5409&fp-y=0.3253&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=1128&mark-y=3&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+- ##### 2. Check the population fields
+
+    ---
+
+    In particular, check the sample size and proportion of girls.
+    Remember that you can [add][addrecord] or [remove][removerecord] populations as needed.
+    Each one needs it's own record.
+
+- ##### 3. When you are done, close the population form
+
+    ---
+
+    ![Step 6 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/69b75d4d-1c36-4583-80c6-57b01c9695a3/28f81358-aea9-49dc-ac9f-d2a6da2fc0c8.png?crop=focalpoint&fit=crop&fp-x=0.5409&fp-y=0.3253&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=1128&mark-y=3&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+
+</div>
 
 If there are multiple populations, repeat for each one.
 
-#### 7. Open the screen time measure(s)
+#### Check the screen time measure(s)
 
-![Step 7 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/1a4d28e9-11a7-4700-afdc-d5be7b9ad095/db460a50-eab4-4cb3-bf0c-8e3b549c6ddd.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.3383&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=337&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+<div class="grid cards" markdown>
 
-#### 8. Check the screen time measure fields
+- ##### 1. Open the screen time measure(s)
 
-Remember that you can [add][addrecord] or [remove][removerecord] screen time measures if the AI has made a mistake.
+    ---
 
-When finished, click the close button.
+    ![Step 7 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/1a4d28e9-11a7-4700-afdc-d5be7b9ad095/db460a50-eab4-4cb3-bf0c-8e3b549c6ddd.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.3383&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=337&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
-![Step 8 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/48b55046-5c84-4158-ac6d-c5ce98fc159b/d652fc48-1c2e-4abe-b302-eab06e6e4fec.png?crop=focalpoint&fit=crop&fp-x=0.5461&fp-y=0.2785&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=1118&mark-y=74&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+- ##### 2. Check the screen time measure fields
+
+    ---
+
+    Remember that you can [add][addrecord] or [remove][removerecord] screen time measures if the AI has made a mistake.
+
+- ##### 3. When finished, click the close button
+
+    ---
+
+    ![Step 8 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/48b55046-5c84-4158-ac6d-c5ce98fc159b/d652fc48-1c2e-4abe-b302-eab06e6e4fec.png?crop=focalpoint&fit=crop&fp-x=0.5461&fp-y=0.2785&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=1118&mark-y=74&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNyZoPTYzJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D)
+
+</div>
 
 If there are multiple screen time measures, repeat for each one.
 
-#### 9. Open the outcome(s)
+#### Check the outcome form(s)
 
-![Step 9 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/fb397d4a-4ad2-40a8-9559-d5bb47601ef3/4cee8f4d-bfec-4769-9a87-41e5dfa888e8.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.5749&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=337&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+<div class="grid cards" markdown>
 
-#### 10. Check the outcome fields and add the validated outcome
+- ##### 1. Open the outcome(s)
 
-Start by checking the already extracted outcome fields are correct.
+    ---
 
-???+ tip
-    You do not need to edit the **Outcome** field.
-    Use this to guide you in selecting the correct validated outcome, but because of the way the AI extraction works, it is too time-consuming to fix this field.
-    You should update the **Outcome Group** and the **Outcome Measure** fields, however.
+    ![Step 9 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/fb397d4a-4ad2-40a8-9559-d5bb47601ef3/4cee8f4d-bfec-4769-9a87-41e5dfa888e8.png?crop=focalpoint&fit=crop&fp-x=0.4753&fp-y=0.5749&fp-z=1.8990&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=342&mark-y=337&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01MTYmaD05NiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
-Then, for each outcome you will need to add a 'validated' outcome.
+- ##### 2. Check the outcome fields and add the validated outcome
 
-You can read the full instructions for [adding a validated outcome][addvalidated] in the next section.
-Briefly, the steps are:
+    ---
 
-1. Click the 'Add option' button.
-   ![Step 19 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&fit=crop&fp-x=0.3987&fp-y=0.4718&fp-z=2.8538&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=514&mark-y=332&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
-2. Search for an existing matching outcome.
-   If you fine one, select it and you are done.
-3. If there isn't an existing one, add a new one and complete the required fields.
+    Start by checking the already extracted outcome fields are correct.
 
-When finished, click the close button.
+    ???+ tip
+        You do not need to edit the **Outcome** field.
+        Use this to guide you in selecting the correct validated outcome, but because of the way the AI extraction works, it is too time-consuming to fix this field.
+        You should update the **Outcome Group** and the **Outcome Measure** fields, however.
+
+- ##### 3. For each outcome add a 'validated' outcome
+
+    ---
+
+    You can read the full instructions for [adding a validated outcome][addvalidated] in the next section.
+    Briefly, the steps are:
+
+    1. Click the 'Add option' button.
+       ![Step 19 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ca346339-484e-4d3a-9f1e-ff41337b31de/6488691b-0962-4e52-8bf0-56bc71fe6477.png?crop=focalpoint&fit=crop&fp-x=0.3987&fp-y=0.4718&fp-z=2.8538&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=514&mark-y=332&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0xNzMmaD01OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+    2. Search for an existing matching outcome.
+       If you fine one, select it and you are done.
+    3. If there isn't an existing one, add a new one and complete the required fields.
+
+- ##### 4. When finished, click the close button
+
+</div>
 
 If there are multiple outcomes, repeat for each one.
 Remember that you can [add][addrecord] or [remove][removerecord] outcomes if the AI has made a mistake.
 
-#### 11. Check the dataset fields
+#### Check the dataset form
+
+<div class="grid" markdown>
 
 Once all of the data for the article has been checked, you can check the dataset fields.
 In particular, if you changed the sample size or the corresponding author, you should also update these fields in the dataset form.
 
 ![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200)
 
-## Updating the record in Asana
+</div>
 
-### Checklist
+### Updating the record in Asana
+
+#### Checklist
 
 When you are satisfied that the data in Airtable is correct, you can update the record in [Asana][asana] to indicate that the dataset has been validated.
 Before doing this, check that you have:
@@ -145,21 +207,33 @@ Before doing this, check that you have:
 - [x] [Added any additional populations, screen time measures, or outcomes][addrecord] that were not extracted by the AI
 - [x] [Checked that the dataset is not a duplicate][dedupe]
 
-#### 1. Find the dataset in Asana
+#### Update the Asana task
 
 ???+ tip
     Make sure you use the 'Dataset ID' (e.g., `BPIPD-01`) to find the dataset in Asana.
     Don't rely on the name - it may not be unique!
 
-![Step 11 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/d4d4e6a6-0271-4e60-b7b2-8e5b23febf32/9430a9c4-5498-4972-ab3b-5ec765683c29.png?crop=focalpoint&fit=crop&fp-x=0.1577&fp-y=0.5939&fp-z=1.6351&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=4&mark-y=364&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD00MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+<div class="grid cards" markdown>
 
-#### 2. Click on Awaiting Triage
+- ##### 1. Find the dataset in Asana
 
-![Step 12 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/4aa2bd4e-fcfa-431c-a7b3-b30f265da1ef/3a7195c3-c2a4-4943-8e33-7f1064808d5a.png?crop=focalpoint&fit=crop&fp-x=0.5074&fp-y=0.5943&fp-z=2.7740&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=499&mark-y=350&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yMDEmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+    ---
 
-#### 3. Click on Validated
+    ![Step 11 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/d4d4e6a6-0271-4e60-b7b2-8e5b23febf32/9430a9c4-5498-4972-ab3b-5ec765683c29.png?crop=focalpoint&fit=crop&fp-x=0.1577&fp-y=0.5939&fp-z=1.6351&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=4&mark-y=364&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02MTEmaD00MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
-![Step 13 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&fit=crop&fp-x=0.5329&fp-y=0.6602&fp-z=2.4712&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=445&mark-y=354&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+- ##### 2. Click on Awaiting Triage
+
+    ---
+
+    ![Step 12 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/4aa2bd4e-fcfa-431c-a7b3-b30f265da1ef/3a7195c3-c2a4-4943-8e33-7f1064808d5a.png?crop=focalpoint&fit=crop&fp-x=0.5074&fp-y=0.5943&fp-z=2.7740&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=499&mark-y=350&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yMDEmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+- ##### 3. Click on Validated
+
+    ---
+
+    ![Step 13 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&fit=crop&fp-x=0.5329&fp-y=0.6602&fp-z=2.4712&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=445&mark-y=354&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+</div>
 
 That's it!
 You have successfully validated a dataset.

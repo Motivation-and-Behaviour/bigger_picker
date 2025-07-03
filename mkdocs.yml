@@ -5,6 +5,7 @@ plugins:
   - search
   - git-revision-date-localized
   - git-authors
+  - glightbox
 theme:
   name: material
   features:
