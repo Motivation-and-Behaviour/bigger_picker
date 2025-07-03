@@ -25,13 +25,15 @@
   "cSpell.words": [
     "airtable",
     "BPIPD",
-    "Rayyan",
+    "creds",
+    "dialog",
+    "dotenv",
+    "Fulltext",
     "mkdocs",
+    "Rayyan",
     "Taren",
     "typer",
-    "Fulltext",
-    "wellbeing",
-    "dialog"
+    "wellbeing"
   ],
   "cSpell.ignorePaths": [
     "mkdocs.yml",
