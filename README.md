@@ -1,5 +1,10 @@
 # Bigger Picker
 
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+![GitHub License](https://img.shields.io/github/license/Motivation-and-Behaviour/bigger_picker)
+[![Actions status](https://github.com/Motivation-and-Behaviour/bigger_picker/workflows/Tests/badge.svg)](https://github.com/Motivation-and-Behaviour/bigger_picker/actions)
+[![codecov](https://codecov.io/gh/Motivation-and-Behaviour/bigger_picker/graph/badge.svg?token=QvpFlLP1JD)](https://codecov.io/gh/Motivation-and-Behaviour/bigger_picker)
+
 Bigger Picker is a a simple set of tools to support the [Bigger Picture](https://github.com/Motivation-and-Behaviour/bigger_picture) project.
 It is meant to streamline the process of extracting, managing, and syncing research article metadata and datasets across multiple platforms, including Airtable, Asana, Rayyan, and OpenAI.
 
