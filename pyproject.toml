@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["jupyter", "ruff"]
+dev = ["jupyter", "pytest", "pytest-cov", "ruff"]
 
 docs = [
     "mkdocs",

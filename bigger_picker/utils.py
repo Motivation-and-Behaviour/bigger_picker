@@ -4,30 +4,25 @@ from pyairtable.api.types import RecordDict
 
 
 def fix_age(dataset: RecordDict) -> RecordDict:
-    if dataset["fields"]["Mean Ages"]:
-        dataset["fields"]["Mean Ages"] = float(dataset["fields"]["Mean Ages"][0])
-    else:
-        dataset["fields"]["Mean Ages"] = None
+    fields = dataset["fields"]
 
-    if dataset["fields"]["SD Ages"]:
-        dataset["fields"]["SD Ages"] = float(dataset["fields"]["SD Ages"][0])
-    else:
-        dataset["fields"]["SD Ages"] = None
+    fields["Mean Ages"] = float(fields["Mean Ages"][0]) if fields["Mean Ages"] else None
+    fields["SD Ages"] = float(fields["SD Ages"][0]) if fields["SD Ages"] else None
 
-    if dataset["fields"]["Min Ages"] and dataset["fields"]["Max Ages"]:
+    fields["Min Ages"] = None if fields["Min Ages"] == 0 else fields["Min Ages"]
+    fields["Max Ages"] = None if fields["Max Ages"] == 0 else fields["Max Ages"]
+
+    if fields["Min Ages"] and fields["Max Ages"]:
         # If we have both the min and max, we can estimate missing means and SDs
-        if not dataset["fields"]["Mean Ages"]:
+        if not fields["Mean Ages"]:
             # Just use the mid point
-            dataset["fields"]["Mean Ages"] = (
-                dataset["fields"]["Min Ages"] + dataset["fields"]["Max Ages"]
-            ) / 2
+            fields["Mean Ages"] = (fields["Min Ages"] + fields["Max Ages"]) / 2
 
-        if not dataset["fields"]["SD Ages"]:
+        if not fields["SD Ages"]:
             # Estimate the SD as a quarter of the range
-            dataset["fields"]["SD Ages"] = (
-                dataset["fields"]["Max Ages"] - dataset["fields"]["Min Ages"]
-            ) / 4
+            fields["SD Ages"] = (fields["Max Ages"] - fields["Min Ages"]) / 4
 
+    dataset["fields"] = fields
     return dataset
 
 
@@ -49,11 +44,7 @@ def compute_dataset_value(
     dataset: RecordDict,
     datasets_included: list[RecordDict],
     datasets_potential: list[RecordDict],
-    alpha: float = 1 / math.log(1000),
-    beta: float = 1,
-    gamma: float = 1,
-    delta: float = 2,
-    epsilon: float = 1,
+    weights: dict[str, float] | None = None,
 ) -> float:
     """
     Compute the prioritisation value for `dataset` given:
@@ -65,6 +56,13 @@ def compute_dataset_value(
     float
       Value_i = alpha·ln(N_i+1) + beta·O_i + gamma·A_i + delta·(O_i·A_i) + epsilon·R_i
     """
+    # Default weights
+    alpha = weights["alpha"] if weights and "alpha" in weights else 1 / math.log(1000)
+    beta = weights["beta"] if weights and "beta" in weights else 1
+    gamma = weights["gamma"] if weights and "gamma" in weights else 1
+    delta = weights["delta"] if weights and "delta" in weights else 2
+    epsilon = weights["epsilon"] if weights and "epsilon" in weights else 1
+
     # Sample size term
     N_i = dataset["fields"].get("Total Sample Size", 0)
     size_term = alpha * math.log(N_i + 1)
@@ -76,7 +74,7 @@ def compute_dataset_value(
         if dset["fields"].get("Year of Last Data Point") is not None
     ]
     if years:
-        y_min, y_max = min(years), max(years)
+        y_min, y_max = min(years), max(years)  # type: ignore
         if y_max > y_min:
             R_i = (dataset["fields"]["Year of Last Data Point"] - y_min) / (
                 y_max - y_min
