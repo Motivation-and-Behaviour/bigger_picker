@@ -49,7 +49,7 @@ def compute_dataset_value(
     dataset: RecordDict,
     datasets_included: list[RecordDict],
     datasets_potential: list[RecordDict],
-    alpha: float = 2,
+    alpha: float = 1 / math.log(1000),
     beta: float = 1,
     gamma: float = 1,
     delta: float = 2,
