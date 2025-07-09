@@ -320,6 +320,7 @@ class IntegrationManager:
             self.airtable.update_record("Datasets", dataset["id"], payload)
 
     def sync(self):
+        self.sync_airtable_and_asana()  # HACK: need to update status first
         self.score_datasets()
         self.sync_airtable_and_asana()
 
