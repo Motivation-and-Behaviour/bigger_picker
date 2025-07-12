@@ -44,6 +44,9 @@ Throughout the process, I will refer to the dataset with the ID `BPIPD-92` as th
 
 ![Step 1 screenshot](https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/4550060f-93c6-44b1-87f8-458f9e772847/eb9a5c43-36c5-4530-9b1c-49d47b4257b3.png?crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=50&mark-y=513&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTMlMkNGRjc0NDImdz0xMTA5Jmg9NTYmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D)
 
+Before doing the deduplication process, **validate both articles**.
+It's common for one article to have different outcomes, populations, or screen time measures than the other, and we want to make sure that the "main" dataset has all the information from both articles.
+
 ### [Airtable](https://airtable.com/appYuP4DjRt023FK1) Steps
 
 #### Get the Article ID of the ^^duplicate^^ dataset
