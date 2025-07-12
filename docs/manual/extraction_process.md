@@ -107,6 +107,15 @@ The next steps are to work through each of the populations, screen time measures
     Remember that you can [add][addrecord] or [remove][removerecord] populations as needed.
     Each one needs it's own record.
 
+    ???+ tip
+        Most studies will only have one population.
+        Examples where you might need to have multiple populations are:
+
+        - Studies that have split their sample by age group or gender and **not reported an 'overall' sample**.
+            In this case, use a population for each group.
+        - Cohort studies where there are two distinct cohorts.
+            Again, if they report one overall description which covers all the participants than you can just use one population form.
+
 - ##### 3. When you are done, close the population form
 
     ---
@@ -132,6 +141,13 @@ If there are multiple populations, repeat for each one.
     ---
 
     Remember that you can [add][addrecord] or [remove][removerecord] screen time measures if the AI has made a mistake.
+
+    ???+ tip
+        The AI tends to be quite literal when extracting here.
+        For example, it might extract 'interacting on social media' because that is the term used in the article, rather than something simpler like 'social media'.
+        This doesn't matter too much because we will combine these later.
+        But, it can be helpful to add a simpler screen time term (like 'social media').
+        Don't feel you need to spend time trying to fix the AI's extraction, though, just add an additional term if you think it will be useful.
 
 - ##### 3. When finished, click the close button
 
