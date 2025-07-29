@@ -199,3 +199,10 @@ rayyan_tokens.json
 # Development
 #  Scratch files are temporary files used during development. They are not meant to be committed
 scratch*
+
+# Data
+# Prevent accidentally committing any data
+*.csv
+
+# MacOS
+.DS_Store
