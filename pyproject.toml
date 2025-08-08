@@ -31,6 +31,8 @@ docs = [
     "mkdocs-material",
 ]
 
+web = ["flask", "gunicorn"]
+
 [project.scripts]
 bigger-picker = "bigger_picker.cli:app"
 

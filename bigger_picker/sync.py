@@ -74,7 +74,9 @@ class IntegrationManager:
     def update_task_from_dataset(self, task: dict, dataset: RecordDict) -> dict:
         dataset_vals = {
             "name": dataset["fields"].get("Dataset Name", None),
-            "value": dataset["fields"].get("Dataset Value", None),
+            "value": round(dataset["fields"]["Dataset Value"], 3)
+            if dataset["fields"].get("Dataset Value", None) is not None
+            else None,
             "url": self.airtable.make_url(dataset["id"]),
         }
         task_vals = {
@@ -88,7 +90,9 @@ class IntegrationManager:
         }
 
         if dataset_vals == task_vals:
-            self._log("No changes detected in the task, skipping update.")
+            self._log(
+                f"No changes detected in {dataset['fields']['Dataset ID']}, skipping update."  # noqa: E501
+            )
             return task
 
         update_payload = {
@@ -291,7 +295,7 @@ class IntegrationManager:
         self.create_task_from_dataset(dataset)
         self.rayyan.update_article_labels(article["id"])
 
-    def score_datasets(self):
+    def updated_datasets_scores(self) -> bool:
         self._log("Scoring datasets...")
 
         datasets_included_statuses = ["Included", "Agreed & Awaiting Data"]
@@ -312,17 +316,27 @@ class IntegrationManager:
             elif dataset["fields"].get("Status") in datasets_potential_statuses:
                 datasets_potential.append(fix_dataset(dataset))
 
+        updated_any_datasets = False
+
         for dataset in datasets_potential:
-            dataset_value = compute_dataset_value(
-                dataset, datasets_included, datasets_potential
+            dataset_value = round(
+                compute_dataset_value(dataset, datasets_included, datasets_potential), 3
             )
             payload = {"Dataset Value": dataset_value}
-            self.airtable.update_record("Datasets", dataset["id"], payload)
+            if dataset["fields"].get("Dataset Value") != dataset_value:
+                updated_any_datasets = True
+                self.airtable.update_record("Datasets", dataset["id"], payload)
+
+        return updated_any_datasets
 
     def sync(self):
         self.sync_airtable_and_asana()  # HACK: need to update status first
-        self.score_datasets()
-        self.sync_airtable_and_asana()
+        any_datasets_updated = self.updated_datasets_scores()
+        if any_datasets_updated:
+            self._log("Datasets updated, syncing Airtable and Asana again.")
+            self.sync_airtable_and_asana()
+        else:
+            self._log("No datasets updated, skipping second sync.")
 
     def _log(self, *args, **kwargs):
         if self.debug:
