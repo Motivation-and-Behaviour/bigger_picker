@@ -335,7 +335,7 @@ class IntegrationManager:
                 for duplicate in duplicates[dataset_id]:
                     if duplicate not in dataset_duplicates:
                         dataset_duplicates.append(duplicate)
-                payload = {"Duplicates": dataset_duplicates}
+                payload = {"Possible Duplicates": dataset_duplicates}
                 self.airtable.update_record("Datasets", dataset_id, payload)
 
     def sync(self):
