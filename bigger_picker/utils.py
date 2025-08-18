@@ -1,3 +1,4 @@
+import logging
 import math
 from collections import defaultdict
 
@@ -159,6 +160,7 @@ def compute_dataset_value(
 def identify_duplicate_datasets(
     datasets: list[RecordDict], threshold: float = 0.5
 ) -> dict[str, list[str]]:
+    logging.getLogger("recordlinkage").setLevel(logging.ERROR)
     df = pd.json_normalize(datasets)  # type: ignore
 
     df_clean = df.copy()
@@ -166,10 +168,10 @@ def identify_duplicate_datasets(
         df_clean["fields.Dataset Name"].fillna("").str.strip()
     )
     df_clean["fields.Dataset Contact Name"] = (
-        df_clean["fields.Dataset Contact Name"].str.strip().replace("", np.nan)
+        df_clean["fields.Dataset Contact Name"].str.strip().mask(lambda x: x == "")
     )
     df_clean["fields.Dataset Contact Email"] = (
-        df_clean["fields.Dataset Contact Email"].str.strip().replace("", np.nan)
+        df_clean["fields.Dataset Contact Email"].str.strip().mask(lambda x: x == "")
     )
     # Choose indexing strategy based on size
     indexer = recordlinkage.Index()

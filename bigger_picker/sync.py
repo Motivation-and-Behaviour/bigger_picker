@@ -342,6 +342,11 @@ class IntegrationManager:
             dataset_id = dataset["id"]
             if dataset_id in duplicates:
                 dataset_duplicates = dataset["fields"].get("Duplicates", [])
+
+                if set(dataset_duplicates) == set(duplicates[dataset_id]):
+                    # All the duplicates are already on airtable
+                    continue
+
                 for duplicate in duplicates[dataset_id]:
                     if duplicate not in dataset_duplicates:
                         dataset_duplicates.append(duplicate)
