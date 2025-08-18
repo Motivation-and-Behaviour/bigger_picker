@@ -7,7 +7,11 @@ from bigger_picker.asana import AsanaManager
 from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
-from bigger_picker.utils import compute_dataset_value, fix_dataset
+from bigger_picker.utils import (
+    compute_dataset_value,
+    fix_dataset,
+    identify_duplicate_datasets,
+)
 
 
 class IntegrationManager:
@@ -318,6 +322,21 @@ class IntegrationManager:
             )
             payload = {"Dataset Value": dataset_value}
             self.airtable.update_record("Datasets", dataset["id"], payload)
+
+    def mark_duplicates(self, thereshold=0.51):
+        self._log("Marking duplicates...")
+        datasets = self.airtable.tables["Datasets"].all()
+        duplicates = identify_duplicate_datasets(datasets, threshold=thereshold)
+
+        for dataset in datasets:
+            dataset_id = dataset["id"]
+            if dataset_id in duplicates:
+                dataset_duplicates = dataset["fields"].get("Duplicates", [])
+                for duplicate in duplicates[dataset_id]:
+                    if duplicate not in dataset_duplicates:
+                        dataset_duplicates.append(duplicate)
+                payload = {"Duplicates": dataset_duplicates}
+                self.airtable.update_record("Datasets", dataset_id, payload)
 
     def sync(self):
         self.sync_airtable_and_asana()  # HACK: need to update status first

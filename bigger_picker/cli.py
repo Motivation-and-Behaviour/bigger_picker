@@ -65,6 +65,11 @@ def process(
         integration.sync()
         console.log("Sync complete")
 
+    with console.status("Marking duplicates"):
+        console.log("Identifying duplicates...")
+        integration.mark_duplicates()
+        console.log("Duplicates marked.")
+
 
 @app.command()
 def sync(

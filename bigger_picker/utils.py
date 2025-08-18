@@ -1,5 +1,7 @@
 import math
+from collections import defaultdict
 
+import numpy as np
 import pandas as pd
 import recordlinkage
 from pyairtable.api.types import RecordDict
@@ -156,35 +158,34 @@ def compute_dataset_value(
 
 def identify_duplicate_datasets(
     datasets: list[RecordDict], threshold: float = 0.5
-) -> list[tuple[str, str]]:
+) -> dict[str, list[str]]:
     df = pd.json_normalize(datasets)  # type: ignore
 
-    # Clean the data
     df_clean = df.copy()
     df_clean["fields.Dataset Name"] = (
         df_clean["fields.Dataset Name"].fillna("").str.strip()
     )
     df_clean["fields.Dataset Contact Name"] = (
-        df_clean["fields.Dataset Contact Name"].fillna("").str.strip()
+        df_clean["fields.Dataset Contact Name"].str.strip().replace("", np.nan)
     )
     df_clean["fields.Dataset Contact Email"] = (
-        df_clean["fields.Dataset Contact Email"].fillna("").str.strip()
+        df_clean["fields.Dataset Contact Email"].str.strip().replace("", np.nan)
     )
-    df_clean["fields.Total Sample Size"] = pd.to_numeric(
-        df_clean["fields.Total Sample Size"], errors="coerce"
-    )
-
     # Choose indexing strategy based on size
     indexer = recordlinkage.Index()
 
-    if len(df_clean) < 1000:
+    n_rows = len(df_clean)
+
+    window_size = 10 if n_rows < 3000 else 5
+
+    if n_rows < 1000:
         # Small dataset: compare everything
         indexer.full()
         candidate_pairs = indexer.index(df_clean)
 
-    elif len(df_clean) < 3000:
+    else:
         # Medium dataset: multiple loose blocking
-        indexer.sortedneighbourhood("fields.Dataset Name", window=10)
+        indexer.sortedneighbourhood("fields.Dataset Name", window=window_size)
 
         # Add email blocking
         indexer_email = recordlinkage.Index()
@@ -193,30 +194,28 @@ def identify_duplicate_datasets(
         # Combine pairs
         pairs1 = indexer.index(df_clean)
         pairs2 = indexer_email.index(df_clean)
-        candidate_pairs = pairs1.union(pairs2)
+        if pairs1 is not None and pairs2 is not None:
+            candidate_pairs = pairs1.union(pairs2)
+        elif pairs1 is not None:
+            candidate_pairs = pairs1
+        elif pairs2 is not None:
+            candidate_pairs = pairs2
+        else:
+            candidate_pairs = pd.MultiIndex.from_tuples(
+                [], names=["rec_id_1", "rec_id_2"]
+            )
 
-    else:
-        # Larger dataset: tighter blocking
-        indexer.sortedneighbourhood("fields.Dataset Name", window=5)
-
-        indexer_contact = recordlinkage.Index()
-        indexer_contact.block("fields.Dataset Contact Name")
-
-        pairs1 = indexer.index(df_clean)
-        pairs2 = indexer_contact.index(df_clean)
-        candidate_pairs = pairs1.union(pairs2)
-
-    if len(candidate_pairs) == 0:
-        return []
-
-    # Set up comparisons
     compare = recordlinkage.Compare()
+
+    # String comparisons - adjust thresholds based on dataset size
+    name_threshold = 0.6 if n_rows < 1000 else 0.7
+    contact_threshold = 0.7 if n_rows < 1000 else 0.75
 
     compare.string(
         "fields.Dataset Name",
         "fields.Dataset Name",
         method="jarowinkler",
-        threshold=0.6,
+        threshold=name_threshold,
         label="dataset_name_sim",
     )
 
@@ -224,7 +223,7 @@ def identify_duplicate_datasets(
         "fields.Dataset Contact Name",
         "fields.Dataset Contact Name",
         method="jarowinkler",
-        threshold=0.7,
+        threshold=contact_threshold,
         label="contact_name_sim",
     )
 
@@ -234,70 +233,20 @@ def identify_duplicate_datasets(
         label="email_exact",
     )
 
-    # Numeric comparison for sample size
-    compare.numeric(
-        "fields.Total Sample Size",
-        "fields.Total Sample Size",
-        method="gauss",
-        offset=0,
-        scale=100,
-        label="sample_size_sim",
-    )
-
-    # Compute comparison vectors
     comparison_vectors = compare.compute(candidate_pairs, df_clean)
 
-    # Calculate composite scores
     scores = (
-        comparison_vectors["dataset_name_sim"] * 0.4
-        + comparison_vectors["contact_name_sim"] * 0.1
-        + comparison_vectors["email_exact"] * 0.3
-        + comparison_vectors["sample_size_sim"] * 0.1
+        comparison_vectors["dataset_name_sim"] * 0.5  # Increased weight
+        + comparison_vectors["contact_name_sim"] * 0.3  # Same weight
+        + comparison_vectors["email_exact"] * 0.2  # Same weight
     )
 
-    # Build results DataFrame
-    results = []
-    for (idx1, idx2), row in comparison_vectors.iterrows():
+    results = defaultdict(list)
+    for idx1, idx2 in comparison_vectors.index:
         score = scores.loc[(idx1, idx2)]
 
-        # Only include pairs above a minimum threshold to reduce noise
-        if score >= 0.2:  # Very low threshold to catch most potential matches
-            result = {
-                "record_1_id": df_clean.loc[idx1, "id"],
-                "record_2_id": df_clean.loc[idx2, "id"],
-                "dataset_name_1": df_clean.loc[idx1, "fields.Dataset Name"],
-                "dataset_name_2": df_clean.loc[idx2, "fields.Dataset Name"],
-                "contact_name_1": df_clean.loc[idx1, "fields.Dataset Contact Name"],
-                "contact_name_2": df_clean.loc[idx2, "fields.Dataset Contact Name"],
-                "email_1": df_clean.loc[idx1, "fields.Dataset Contact Email"],
-                "email_2": df_clean.loc[idx2, "fields.Dataset Contact Email"],
-                "sample_size_1": df_clean.loc[idx1, "fields.Total Sample Size"],
-                "sample_size_2": df_clean.loc[idx2, "fields.Total Sample Size"],
-                "dataset_name_similarity": row["dataset_name_sim"],
-                "contact_name_similarity": row["contact_name_sim"],
-                "email_match": row["email_exact"],
-                "sample_size_similarity": row["sample_size_sim"],
-                "composite_score": score,
-                "likely_duplicate": score >= threshold,
-            }
-            results.append(result)
+        if score >= threshold:
+            results[df_clean.loc[idx1, "id"]].append(df_clean.loc[idx2, "id"])
+            results[df_clean.loc[idx2, "id"]].append(df_clean.loc[idx1, "id"])
 
-    if not results:
-        print("No potential duplicates found above minimum threshold!")
-        return pd.DataFrame()
-
-    # Convert to DataFrame and sort
-    results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values("composite_score", ascending=False)
-
-    # Print summary
-    total_matches = len(results_df[results_df["likely_duplicate"]])
-    high_conf = len(results_df[results_df["composite_score"] > 0.8])
-    medium_conf = len(
-        results_df[
-            (results_df["composite_score"] > threshold)
-            & (results_df["composite_score"] <= 0.8)
-        ]
-    )
-
-    return results_df
+    return results
