@@ -2,7 +2,6 @@ import logging
 import math
 from collections import defaultdict
 
-import numpy as np
 import pandas as pd
 import recordlinkage
 from pyairtable.api.types import RecordDict
