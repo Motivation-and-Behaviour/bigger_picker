@@ -1,5 +1,9 @@
+import logging
 import math
+from collections import defaultdict
 
+import pandas as pd
+import recordlinkage
 from pyairtable.api.types import RecordDict
 
 
@@ -150,3 +154,100 @@ def compute_dataset_value(
 
     # Sum everything
     return size_term + outcome_term + age_term + synergy_term + recency_term
+
+
+def identify_duplicate_datasets(
+    datasets: list[RecordDict], threshold: float = 0.5
+) -> dict[str, list[str]]:
+    logging.getLogger("recordlinkage").setLevel(logging.ERROR)
+    df = pd.json_normalize(datasets)  # type: ignore
+
+    df_clean = df.copy()
+    df_clean["fields.Dataset Name"] = (
+        df_clean["fields.Dataset Name"].fillna("").str.strip()
+    )
+    df_clean["fields.Dataset Contact Name"] = (
+        df_clean["fields.Dataset Contact Name"].str.strip().mask(lambda x: x == "")
+    )
+    df_clean["fields.Dataset Contact Email"] = (
+        df_clean["fields.Dataset Contact Email"].str.strip().mask(lambda x: x == "")
+    )
+    # Choose indexing strategy based on size
+    indexer = recordlinkage.Index()
+
+    n_rows = len(df_clean)
+
+    window_size = 10 if n_rows < 3000 else 5
+
+    if n_rows < 1000:
+        # Small dataset: compare everything
+        indexer.full()
+        candidate_pairs = indexer.index(df_clean)
+
+    else:
+        # Medium dataset: multiple loose blocking
+        indexer.sortedneighbourhood("fields.Dataset Name", window=window_size)
+
+        # Add email blocking
+        indexer_email = recordlinkage.Index()
+        indexer_email.block("fields.Dataset Contact Email")
+
+        # Combine pairs
+        pairs1 = indexer.index(df_clean)
+        pairs2 = indexer_email.index(df_clean)
+        if pairs1 is not None and pairs2 is not None:
+            candidate_pairs = pairs1.union(pairs2)
+        elif pairs1 is not None:
+            candidate_pairs = pairs1
+        elif pairs2 is not None:
+            candidate_pairs = pairs2
+        else:
+            candidate_pairs = pd.MultiIndex.from_tuples(
+                [], names=["rec_id_1", "rec_id_2"]
+            )
+
+    compare = recordlinkage.Compare()
+
+    # String comparisons - adjust thresholds based on dataset size
+    name_threshold = 0.6 if n_rows < 1000 else 0.7
+    contact_threshold = 0.7 if n_rows < 1000 else 0.75
+
+    compare.string(
+        "fields.Dataset Name",
+        "fields.Dataset Name",
+        method="jarowinkler",
+        threshold=name_threshold,
+        label="dataset_name_sim",
+    )
+
+    compare.string(
+        "fields.Dataset Contact Name",
+        "fields.Dataset Contact Name",
+        method="jarowinkler",
+        threshold=contact_threshold,
+        label="contact_name_sim",
+    )
+
+    compare.exact(
+        "fields.Dataset Contact Email",
+        "fields.Dataset Contact Email",
+        label="email_exact",
+    )
+
+    comparison_vectors = compare.compute(candidate_pairs, df_clean)
+
+    scores = (
+        comparison_vectors["dataset_name_sim"] * 0.5  # Increased weight
+        + comparison_vectors["contact_name_sim"] * 0.3  # Same weight
+        + comparison_vectors["email_exact"] * 0.2  # Same weight
+    )
+
+    results = defaultdict(list)
+    for idx1, idx2 in comparison_vectors.index:
+        score = scores.loc[(idx1, idx2)]
+
+        if score >= threshold:
+            results[df_clean.loc[idx1, "id"]].append(df_clean.loc[idx2, "id"])
+            results[df_clean.loc[idx2, "id"]].append(df_clean.loc[idx1, "id"])
+
+    return results

@@ -101,9 +101,7 @@ def test_compute_dataset_value_recency_scaling():
 
 
 def test_compute_dataset_value_outcome_term():
-    # One included dataset with outcome 'X' and sample size 50
     included = [fake_record({"Total Sample Size": 50, "Articles: Outcomes": ["X"]})]
-    # Candidate with outcomes 'X' and 'Y'
     candidate = fake_record(
         {
             "Total Sample Size": 0,
@@ -113,7 +111,6 @@ def test_compute_dataset_value_outcome_term():
             "SD Ages": None,
         }
     )
-    # Weights to isolate outcome term
     weights = {"alpha": 0.0, "beta": 1.0, "gamma": 0.0, "delta": 0.0, "epsilon": 0.0}
     potential = [candidate]
 
@@ -153,3 +150,185 @@ def test_compute_dataset_value_age_term():
     expected_A = 1 / (1 + 100)
     val = utils.compute_dataset_value(candidate, included, potential, weights=weights)
     assert pytest.approx(val, rel=1e-6) == expected_A
+
+
+def test_identify_duplicate_datasets_exact_match():
+    # Test with exact duplicates
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Study A",
+            "Dataset Contact Name": "John Doe",
+            "Dataset Contact Email": "john@example.com",
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Study A",
+            "Dataset Contact Name": "John Doe",
+            "Dataset Contact Email": "john@example.com",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.9)
+
+    assert dataset1["id"] in duplicates
+    assert dataset2["id"] in duplicates
+    assert dataset2["id"] in duplicates[dataset1["id"]]
+    assert dataset1["id"] in duplicates[dataset2["id"]]
+
+
+def test_identify_duplicate_datasets_similar_names():
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Study ABC",
+            "Dataset Contact Name": "Jane Smith",
+            "Dataset Contact Email": "jane@example.com",
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Study ABD",
+            "Dataset Contact Name": "Jane Smith",
+            "Dataset Contact Email": "jane@example.com",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.7)
+
+    # Should identify as duplicates due to similar names and same contact
+    assert dataset1["id"] in duplicates
+    assert dataset2["id"] in duplicates
+
+
+def test_identify_duplicate_datasets_email_match():
+    # Test with same email but different names
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Different Study 1",
+            "Dataset Contact Name": "Alice Johnson",
+            "Dataset Contact Email": "researcher@university.edu",
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Different Study 2",
+            "Dataset Contact Name": "Bob Wilson",
+            "Dataset Contact Email": "researcher@university.edu",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.3)
+
+    # Should identify as duplicates due to same email
+    assert dataset1["id"] in duplicates
+    assert dataset2["id"] in duplicates
+
+
+def test_identify_duplicate_datasets_no_duplicates():
+    # Test with completely different datasets
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Alpha, 2018",
+            "Dataset Contact Name": "John Alpha",
+            "Dataset Contact Email": "alpha@university1.edu",
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Beta, 2019",
+            "Dataset Contact Name": "Joanne beta",
+            "Dataset Contact Email": "beta@university2.edu",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.51)
+
+    # Should not identify any duplicates
+    assert len(duplicates) == 0
+
+
+def test_identify_duplicate_datasets_missing_fields():
+    # Test with missing contact information
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Study with Missing Info",
+            "Dataset Contact Name": None,
+            "Dataset Contact Email": None,
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Study with Missing Info",
+            "Dataset Contact Name": "",
+            "Dataset Contact Email": "",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.5)
+
+    # Should still identify duplicates based on dataset name similarity
+    assert dataset1["id"] in duplicates
+    assert dataset2["id"] in duplicates
+
+
+def test_identify_duplicate_datasets_custom_threshold():
+    # Test with custom threshold
+    dataset1 = fake_record(
+        {
+            "Dataset Name": "Study ABC",
+            "Dataset Contact Name": "Researcher One",
+            "Dataset Contact Email": "one@example.com",
+        }
+    )
+    dataset2 = fake_record(
+        {
+            "Dataset Name": "Study XYZ",
+            "Dataset Contact Name": "Researcher Two",
+            "Dataset Contact Email": "two@example.com",
+        }
+    )
+
+    datasets = [dataset1, dataset2]
+
+    # With high threshold, should not match
+    duplicates_high = utils.identify_duplicate_datasets(datasets, threshold=0.9)
+    assert len(duplicates_high) == 0
+
+    # With very low threshold, should match (even dissimilar records)
+    duplicates_low = utils.identify_duplicate_datasets(datasets, threshold=0.01)
+    assert len(duplicates_low) > 0
+
+
+def test_identify_duplicate_datasets_large_dataset():
+    # Test with larger dataset to trigger different indexing strategy
+    datasets = []
+    for i in range(50):
+        dataset = fake_record(
+            {
+                "Dataset Name": f"Study {i}",
+                "Dataset Contact Name": f"Researcher {i}",
+                "Dataset Contact Email": f"researcher{i}@example.com",
+            }
+        )
+        datasets.append(dataset)
+
+    # Add a duplicate
+    duplicate = fake_record(
+        {
+            "Dataset Name": "Study 0",
+            "Dataset Contact Name": "Researcher 0",
+            "Dataset Contact Email": "researcher0@example.com",
+        }
+    )
+    datasets.append(duplicate)
+
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.5)
+
+    # Should find the duplicate
+    assert datasets[0]["id"] in duplicates
+    assert duplicate["id"] in duplicates

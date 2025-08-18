@@ -13,9 +13,11 @@ dependencies = [
     "asana",
     "dotenv",
     "openai",
+    "pandas",
     "pyairtable",
     "pydantic",
     "rayyan-sdk",
+    "recordlinkage",
     "typer",
 ]
 
