@@ -95,16 +95,21 @@ def test_download_pdf_success_and_no_url(monkeypatch, tmp_path):
     monkeypatch.setattr("bigger_picker.rayyan.tempfile.mkdtemp", lambda: str(tmp_path))
 
     # Create RayyanManager instance with mocked rayyan_instance
+    fake_path = tmp_path / "creds.json"
+    fake_path.write_text(
+        json.dumps({"refresh_token": "old", "access_token": "faketoken"})
+    )
+    monkeypatch.setenv("RAYYAN_JSON_PATH", str(fake_path))
     manager = RayyanManager()
     manager.rayyan_instance = mock_rayyan_instance
 
     path = manager.download_pdf(article)
-    
+
     # Verify API was called with correct fulltext ID
     mock_rayyan_instance.request.request_handler.assert_called_once_with(
         method="GET", path="/api/v1/fulltexts/good_id"
     )
-    
+
     # File exists and matches id
     assert Path(path).exists()
     assert Path(path).name == "99.pdf"
