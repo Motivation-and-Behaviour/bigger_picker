@@ -63,25 +63,33 @@ class RayyanManager:
             else:
                 raise e
 
-    @staticmethod
-    def download_pdf(article: dict) -> str:
-        url = None
+    def download_pdf(self, article: dict) -> str:
+        fulltext_id = None
         for fulltext in article["fulltexts"]:
             if fulltext["marked_as_deleted"]:
                 # Skip deleted files
                 continue
-            url = fulltext.get("url", None)
-            if url:
+            fulltext_id = fulltext.get("id", None)
+            if fulltext_id:
                 break
-        if url is None:
-            raise ValueError("No valid PDF URL found in the article.")
+        if fulltext_id is None:
+            raise ValueError("No fulltext found in the article.")
+
+        fulltext_details = self.rayyan_instance.request.request_handler(
+            method="GET", path=f"/api/v1/fulltexts/{fulltext_id}"
+        )
+
+        fulltext_url = fulltext_details.get("url", None)
+
+        if fulltext_url is None:
+            raise ValueError("No URL found for the fulltext.")
 
         temp_dir = tempfile.mkdtemp()
 
         filename = f"{article['id']}.pdf"
 
         file_path = os.path.join(temp_dir, filename)
-        response = requests.get(url)
+        response = requests.get(str(fulltext_url))
         response.raise_for_status()
 
         with open(file_path, "wb") as f:
