@@ -66,9 +66,15 @@ def test_download_pdf_success_and_no_url(monkeypatch, tmp_path):
     article = {
         "id": 99,
         "fulltexts": [
-            {"marked_as_deleted": True, "url": "http://bad"},
-            {"marked_as_deleted": False, "url": "http://good/pdf99"},
+            {"marked_as_deleted": True, "id": "bad_id"},
+            {"marked_as_deleted": False, "id": "good_id"},
         ],
+    }
+
+    # Mock the RayyanManager instance and its dependencies
+    mock_rayyan_instance = MagicMock()
+    mock_rayyan_instance.request.request_handler.return_value = {
+        "url": "http://example.com/pdf99"
     }
 
     # Mock requests.get
@@ -85,13 +91,35 @@ def test_download_pdf_success_and_no_url(monkeypatch, tmp_path):
     dummy = DummyResponse(b"binarypdf")
     monkeypatch.setattr("bigger_picker.rayyan.requests.get", lambda url: dummy)
 
-    path = RayyanManager.download_pdf(article)
+    # Mock tempfile.mkdtemp to use tmp_path
+    monkeypatch.setattr("bigger_picker.rayyan.tempfile.mkdtemp", lambda: str(tmp_path))
+
+    # Create RayyanManager instance with mocked rayyan_instance
+    manager = RayyanManager()
+    manager.rayyan_instance = mock_rayyan_instance
+
+    path = manager.download_pdf(article)
+    
+    # Verify API was called with correct fulltext ID
+    mock_rayyan_instance.request.request_handler.assert_called_once_with(
+        method="GET", path="/api/v1/fulltexts/good_id"
+    )
+    
     # File exists and matches id
     assert Path(path).exists()
     assert Path(path).name == "99.pdf"
     assert Path(path).read_bytes() == b"binarypdf"
 
-    # Now test no valid URL
+    # Now test no valid fulltext ID
     bad_article = {"id": 100, "fulltexts": []}
-    with pytest.raises(ValueError):
-        RayyanManager.download_pdf(bad_article)
+    with pytest.raises(ValueError, match="No fulltext found in the article."):
+        manager.download_pdf(bad_article)
+
+    # Test no URL in fulltext details
+    mock_rayyan_instance.request.request_handler.return_value = {}
+    article_no_url = {
+        "id": 101,
+        "fulltexts": [{"marked_as_deleted": False, "id": "no_url_id"}],
+    }
+    with pytest.raises(ValueError, match="No URL found for the fulltext."):
+        manager.download_pdf(article_no_url)
