@@ -29,6 +29,7 @@ ASANA_STATUS_ENUM_VALUES = {
     "Awaiting Triage": "1210433819516836",
     "Validated": "1210528062577747",
     "Non-priority": "1210433819516837",
+    "Mail Merge": "1211763557587633",
     "Contacting Authors": "1210433819516838",
     "Agreed & Awaiting Data": "1210468704477552",
     "Included": "1210433819516839",

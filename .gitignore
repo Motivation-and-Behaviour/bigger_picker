@@ -203,6 +203,7 @@ scratch*
 # Data
 # Prevent accidentally committing any data
 *.csv
+*.ris
 
 # MacOS
 .DS_Store

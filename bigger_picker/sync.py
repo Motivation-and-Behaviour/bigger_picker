@@ -305,6 +305,7 @@ class IntegrationManager:
         datasets_included_statuses = ["Included", "Agreed & Awaiting Data"]
         datasets_potential_statuses = [
             "Validated",
+            "Mail Merge",
             "Non-Priority",
             "Contacting Authors",
         ]
