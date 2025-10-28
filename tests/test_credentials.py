@@ -28,10 +28,14 @@ def test_load_token_missing(monkeypatch):
 def test_load_rayyan_credentials_missing_env(monkeypatch):
     # Ensure RAYYAN_JSON_PATH is not set
     monkeypatch.delenv("RAYYAN_JSON_PATH", raising=False)
+    monkeypatch.delenv("RAYYAN_CREDS_JSON", raising=False)
     # Expect a ValueError
     with pytest.raises(ValueError) as exc:
         creds.load_rayyan_credentials()
-    assert "Missing required environment variable: RAYYAN_JSON_PATH" in str(exc.value)
+    assert (
+        "Missing required environment variable: RAYYAN_JSON_PATH or RAYYAN_CREDS_JSON"
+        in str(exc.value)
+    )
 
 
 def test_load_rayyan_credentials_not_found(monkeypatch, tmp_path):

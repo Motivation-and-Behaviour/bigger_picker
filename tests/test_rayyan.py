@@ -40,6 +40,7 @@ def test_extract_article_metadata_and_helpers():
         "citation": "Journal Name - Some other info",
         "doi": "10.1000/xyz",
         "year": "2022",
+        "customizations": {"labels": {"SDQ": 1}},
     }
     meta = RayyanManager.extract_article_metadata(art)
     assert meta == {
@@ -49,6 +50,7 @@ def test_extract_article_metadata_and_helpers():
         "Journal": "Journal Name",
         "DOI": "10.1000/xyz",
         "Year": "2022",
+        "Search": ["SDQ"],
     }
 
     # Test join_names multiline
