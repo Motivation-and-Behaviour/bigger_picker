@@ -130,6 +130,13 @@ class RayyanManager:
 
     @staticmethod
     def extract_article_metadata(rayyan_article: dict) -> dict:
+        searches = [
+            label
+            for label in rayyan_article.get("customizations", {})
+            .get("labels", [])
+            .keys()
+            if label in config.ASANA_SEARCHES_ENUM_VALUES.keys()
+        ]
         extracted_info = {
             "Rayyan ID": rayyan_article["id"],
             "Article Title": rayyan_article.get("title", ""),
@@ -139,7 +146,9 @@ class RayyanManager:
             ),
             "DOI": rayyan_article.get("doi", ""),
             "Year": rayyan_article.get("year", ""),
+            "Search": searches,
         }
+
         return extracted_info
 
     @staticmethod

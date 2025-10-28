@@ -24,6 +24,7 @@ ASANA_CUSTOM_FIELD_IDS = {
     "Dataset Value": "1210433819516841",
     "Data Sharing Method": "1210468704477537",
     "Airtable Data": "1210433819516843",
+    "Searches": "1211763557587634",
 }
 ASANA_STATUS_ENUM_VALUES = {
     "Awaiting Triage": "1210433819516836",
@@ -34,6 +35,9 @@ ASANA_STATUS_ENUM_VALUES = {
     "Agreed & Awaiting Data": "1210468704477552",
     "Included": "1210433819516839",
     "Declined": "1210468704477553",
+}
+ASANA_SEARCHES_ENUM_VALUES = {
+    "SDQ": "1211763557587635",
 }
 # _______RENDER_________
 RENDER_WEBHOOK_URL = "https://bigger-picker.onrender.com/webhook"

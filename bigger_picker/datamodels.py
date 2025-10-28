@@ -62,3 +62,4 @@ class Article(ArticleLLMExtract):
     journal: str | None = Field(None, alias="Journal")
     doi: str | None = Field(None, alias="DOI")
     year: int | None = Field(None, alias="Year")
+    search: list[str] | None = Field(None, alias="Search")
