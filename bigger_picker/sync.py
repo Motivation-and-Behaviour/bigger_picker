@@ -303,7 +303,11 @@ class IntegrationManager:
             llm_extraction, article_metadata, pdf_path
         )
         self.create_task_from_dataset(dataset)
-        self.rayyan.update_article_labels(article["id"])
+        plan = {
+            self.rayyan.unextracted_label: -1,
+            self.rayyan.extracted_label: 1,
+        }
+        self.rayyan.update_article_labels(article["id"], plan)
 
     def updated_datasets_scores(self) -> bool:
         self._log("Scoring datasets...")
@@ -359,6 +363,40 @@ class IntegrationManager:
                         dataset_duplicates.append(duplicate)
                 payload = {"Possible Duplicates": dataset_duplicates}
                 self.airtable.update_record("Datasets", dataset_id, payload)
+
+    def screen_fulltext(self, article: dict):
+        pdf_path = self.rayyan.download_pdf(article)
+        if pdf_path is None:
+            # This shouldn't happen, but you never know
+            return
+        decision = self.openai.screen_record_fulltext(pdf_path)
+        if decision is None:
+            # Something with the LLM failed
+            return
+
+        decision_dict = decision.model_dump()
+
+        if decision_dict["vote"] not in ["include", "exclude"]:
+            # Invalid vote, skip
+            return
+
+        if decision_dict["vote"] == "exclude":
+            plan = {config.RAYYAN_LABELS["excluded"]: 1}
+            if decision_dict["triggered_exclusion"]:
+                excl_reason_idx = decision_dict["triggered_exclusion"][0]
+                excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
+                plan[excl_label] = 1
+            elif decision_dict["failed_inclusion"]:
+                excl_reason_idx = decision_dict["failed_inclusion"][0]
+                excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
+                plan[excl_label] = -1
+        else:
+            plan = {config.RAYYAN_LABELS["included"]: 1}
+            # plan[config.RAYYAN_LABELS["unextracted"]] = 1 # TODO: decide if we want this
+        self.rayyan.update_article_labels(article["id"], plan)
+        self.rayyan.create_article_note(
+            article["id"], f"LLM Reasoning: {decision_dict['rationale']}"
+        )
 
     def sync(self):
         self.sync_airtable_and_asana()  # HACK: need to update status first
