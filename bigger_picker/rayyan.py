@@ -50,6 +50,7 @@ class RayyanManager:
         )
 
         unscreened = []
+        priority = []
 
         for article in results["data"]:
             fulltext_id = self._get_fulltext_id(article)  # type: ignore
@@ -57,8 +58,17 @@ class RayyanManager:
                 continue
 
             article_labels = article.get("customizations", {}).get("labels", {})  # type: ignore
-            if not any(label in labels_to_check for label in article_labels):
+            if any(label in labels_to_check for label in article_labels):
+                continue
+
+            if any(
+                label in config.ASANA_SEARCHES_ENUM_VALUES for label in article_labels
+            ):
+                priority.append(article)
+            else:
                 unscreened.append(article)
+
+        unscreened = priority + unscreened
 
         return unscreened
 
