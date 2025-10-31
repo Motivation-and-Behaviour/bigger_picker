@@ -4,6 +4,7 @@ import tempfile
 
 import requests
 from rayyan import Rayyan
+from rayyan.notes import Notes
 from rayyan.review import Review
 
 import bigger_picker.config as config
@@ -25,53 +26,57 @@ class RayyanManager:
         self.rayyan_instance = Rayyan(rayyan_creds_path)
         self.review = Review(self.rayyan_instance)
         self.review_id = review_id
+        self.notes_instance = Notes(self.rayyan_instance)
         self.unextracted_label = unextracted_label
         self.extracted_label = extracted_label
 
-    def get_unextracted_articles(
-        self,
-    ) -> list[dict]:
+    def get_unextracted_articles(self) -> list[dict]:
         results_params = {"extra[user_labels][]": self.unextracted_label}
 
-        try:
-            included_results = self.review.results(self.review_id, results_params)  # type: ignore
-            return included_results["data"]  # type: ignore
-        except requests.HTTPError as e:
-            if e.response.status_code == 401:
-                # If we get a 401 error, refresh the tokens and retry
-                self._refresh_tokens()
-                included_results = self.review.results(self.review_id, results_params)  # type: ignore
-                return included_results["data"]  # type: ignore
-            else:
-                raise e
+        included_results = self._retry_on_auth_error(
+            lambda: self.review.results(self.review_id, results_params)  # type: ignore
+        )
 
-    def update_article_labels(
-        self,
-        article_id: int,
-    ) -> None:
-        plan = {
-            self.unextracted_label: -1,
-            self.extracted_label: 1,
-        }
-        try:
-            self.review.customize(self.review_id, article_id, plan)
-        except requests.HTTPError as e:
-            if e.response.status_code == 401:
-                # If we get a 401 error, refresh the tokens and retry
-                self._refresh_tokens()
-                self.review.customize(self.review_id, article_id, plan)
-            else:
-                raise e
+        return included_results["data"]  # type: ignore
+
+    def get_unscreened_fulltext(self) -> list[dict]:
+        results_params = {"extra[mode]": "included"}
+        labels_to_check = (
+            list(config.RAYYAN_LABELS.values()) + config.RAYYAN_EXCLUSION_LABELS
+        )
+
+        results = self._retry_on_auth_error(
+            lambda: self.review.results(self.review_id, results_params)  # type: ignore
+        )
+
+        unscreened = []
+
+        for article in results["data"]:
+            fulltext_id = self._get_fulltext_id(article)  # type: ignore
+            if fulltext_id is None:
+                continue
+
+            article_labels = article.get("customizations", {}).get("labels", {})  # type: ignore
+            if not any(label in labels_to_check for label in article_labels):
+                unscreened.append(article)
+
+        return unscreened
+
+    def update_article_labels(self, article_id: int, plan: dict) -> None:
+        self._retry_on_auth_error(
+            lambda: self.review.customize(self.review_id, article_id, plan)
+        )
+
+    def create_article_note(self, article_id: int, note_content: str) -> None:
+        self._retry_on_auth_error(
+            lambda: self.notes_instance.create_note(
+                self.review_id, article_id, note_content
+            )
+        )
 
     def download_pdf(self, article: dict) -> str:
-        fulltext_id = None
-        for fulltext in article["fulltexts"]:
-            if fulltext["marked_as_deleted"]:
-                # Skip deleted files
-                continue
-            fulltext_id = fulltext.get("id", None)
-            if fulltext_id:
-                break
+        fulltext_id = self._get_fulltext_id(article)
+
         if fulltext_id is None:
             raise ValueError("No fulltext found in the article.")
 
@@ -96,6 +101,17 @@ class RayyanManager:
             f.write(response.content)
 
         return file_path
+
+    def _retry_on_auth_error(self, operation):
+        try:
+            return operation()
+        except requests.HTTPError as e:
+            if e.response.status_code == 401:
+                # If we get a 401 error, refresh the tokens and retry
+                self._refresh_tokens()
+                return operation()
+            else:
+                raise e
 
     def _refresh_tokens(self, update_local: bool = True):
         with open(self._rayyan_creds_path) as f:
@@ -163,3 +179,16 @@ class RayyanManager:
     def _extract_journal(citation_str: str) -> str:
         parts = citation_str.split("-")
         return parts[0].strip() if parts else ""
+
+    @staticmethod
+    def _get_fulltext_id(article: dict) -> str | None:
+        fulltext_id = None
+        for fulltext in article["fulltexts"]:
+            if fulltext["marked_as_deleted"]:
+                # Skip deleted files
+                continue
+            fulltext_id = fulltext.get("id", None)
+            if fulltext_id:
+                break
+
+        return fulltext_id

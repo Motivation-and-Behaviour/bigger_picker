@@ -44,7 +44,7 @@ where = ["."]
 [tool.ruff]
 line-length = 88
 target-version = "py311"
-exclude = [".venv", "__pycache__"]
+exclude = [".venv", "__pycache__", "scratch*"]
 
 [tool.ruff.lint]
 extend-select = [

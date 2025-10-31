@@ -63,3 +63,14 @@ class Article(ArticleLLMExtract):
     doi: str | None = Field(None, alias="DOI")
     year: int | None = Field(None, alias="Year")
     search: list[str] | None = Field(None, alias="Search")
+
+
+class ScreeningDecision(BaseModel):
+    vote: Literal["include", "exclude"] = Field(
+        description="Final decision. Choose exactly one."
+    )
+    matched_inclusion: list[int] | None = Field(None)
+    failed_inclusion: list[int] | None = Field(None)
+    triggered_exclusion: list[int] | None = Field(None)
+    exclusion_reasons: list[str] | None = Field(None)
+    rationale: str
