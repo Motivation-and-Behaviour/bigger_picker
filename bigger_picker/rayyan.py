@@ -112,16 +112,18 @@ class RayyanManager:
 
         return file_path
 
-    def _retry_on_auth_error(self, operation):
-        try:
-            return operation()
-        except requests.HTTPError as e:
-            if e.response.status_code == 401:
-                # If we get a 401 error, refresh the tokens and retry
-                self._refresh_tokens()
+    def _retry_on_auth_error(self, operation, max_retries=3):
+        for attempt in range(max_retries):
+            try:
                 return operation()
-            else:
-                raise e
+            except requests.HTTPError as e:
+                if e.response.status_code == 401:
+                    # If we get a 401 error, refresh the tokens and retry
+                    self._refresh_tokens()
+
+                # If this was the last attempt, raise the error
+                if attempt == max_retries - 1:
+                    raise e
 
     def _refresh_tokens(self, update_local: bool = True):
         with open(self._rayyan_creds_path) as f:

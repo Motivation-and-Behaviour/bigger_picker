@@ -84,7 +84,7 @@ Follow the schema exactly:
 - Use 1-based indices for criteria lists.
 - If none apply, return an empty list [] for any list field.
 - 'triggered_exclusion' and 'exclusion_reasons' must align in order and length.
-- 'rationale' should be a short paragraph (3-6 sentences)."""  # noqa: E501
+- 'rationale' should be a short paragraph (3-6 sentences) and must not exceed 1000 characters."""  # noqa: E501
 
 ARTICLE_EXTRACTION_PROMPT = """ 
 You are an experienced research assistant supporting a systematic review of academic studies on children's screen time and its outcomes.
