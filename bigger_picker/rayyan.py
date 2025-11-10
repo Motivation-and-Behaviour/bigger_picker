@@ -37,7 +37,21 @@ class RayyanManager:
             lambda: self.review.results(self.review_id, results_params)  # type: ignore
         )
 
-        return included_results["data"]  # type: ignore
+        unextracted = []
+        priority = []
+
+        for article in included_results["data"]:  # type: ignore
+            article_labels = article.get("customizations", {}).get("labels", {})  # type: ignore
+            if any(
+                label in config.ASANA_SEARCHES_ENUM_VALUES for label in article_labels
+            ):
+                priority.append(article)
+            else:
+                unextracted.append(article)
+
+        unextracted = priority + unextracted
+
+        return unextracted  # type: ignore
 
     def get_unscreened_fulltext(self) -> list[dict]:
         results_params = {"extra[mode]": "included"}
@@ -52,7 +66,7 @@ class RayyanManager:
         unscreened = []
         priority = []
 
-        for article in results["data"]:
+        for article in results["data"]:  # type: ignore
             fulltext_id = self._get_fulltext_id(article)  # type: ignore
             if fulltext_id is None:
                 continue

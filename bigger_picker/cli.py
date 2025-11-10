@@ -69,7 +69,7 @@ def process(
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TaskProgressColumn(),
-        TimeElapsedColumn(),  #
+        TimeElapsedColumn(),
         TimeRemainingColumn(),
         console=console,
     ) as progress:
