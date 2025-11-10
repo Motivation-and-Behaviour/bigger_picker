@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bigger_picker"
-version = "0.1.2"
+version = "0.2.0"
 description = "A simple set of tools to link Rayyan, Airtable, Asana, and OpenAI for supporting the Bigger Picture project."
 authors = [{ name = "Taren Sanders", email = "taren.sanders@acu.edu.au" }]
 readme = "README.md"
@@ -44,7 +44,7 @@ where = ["."]
 [tool.ruff]
 line-length = 88
 target-version = "py311"
-exclude = [".venv", "__pycache__"]
+exclude = [".venv", "__pycache__", "scratch*"]
 
 [tool.ruff.lint]
 extend-select = [
