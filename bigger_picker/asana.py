@@ -1,6 +1,8 @@
+import json
 import time
 
 import asana
+from asana.rest import ApiException
 
 import bigger_picker.config as config
 from bigger_picker.credentials import load_token
@@ -35,8 +37,10 @@ class AsanaManager:
         configuration.access_token = asana_token
         self.client = asana.ApiClient(configuration)
         self.tasks_api_instance = asana.TasksApi(self.client)
+        self.events_api_instance = asana.EventsApi(self.client)
         self.project_id = project_id
         self.tasks: list[dict] = []
+        self.event_sync_token: str | None = None
 
     def fetch_tasks(self):
         self.tasks = self.tasks_api_instance.get_tasks_for_project(
@@ -76,6 +80,22 @@ class AsanaManager:
             delay *= 2
 
         return None
+
+    def get_events(self):
+        opts = {"sync": self.event_sync_token}
+        try:
+            api_response = self.events_api_instance.get_events(
+                self.project_id, opts, full_payload=True
+            )
+            self.event_sync_token = api_response.get("sync", None)  # type: ignore
+            return api_response.get("data", [])  # type: ignore
+        except ApiException as e:
+            if e.status == 412:
+                errors = json.loads(e.body.decode("utf-8"))  # type: ignore
+                self.event_sync_token = errors["sync"]
+                return self.get_events()
+            else:
+                raise
 
     @staticmethod
     def get_custom_field_value(
