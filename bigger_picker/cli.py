@@ -219,9 +219,12 @@ def monitor(
         table.add_column("Metric", style="cyan")
         table.add_column("Value", style="green")
 
+        uptime = str(datetime.now() - stats["start_time"]).split(".")[0]
+
         table.add_row("Status", stats["status"])
-        table.add_row("Uptime", str(stats["uptime"]))
+        table.add_row("Uptime", uptime)
         table.add_row("Last Check", stats["last_check"])
+        table.add_row("Last Sync", stats["last_sync"])
         table.add_row("Total Syncs", str(stats["total_syncs"]))
         table.add_row("Total Polls", str(stats["total_polls"]))
         table.add_row("Consecutive Errors", str(stats["consecutive_errors"]))
@@ -251,8 +254,8 @@ def monitor(
 
     stats = {
         "status": "[green]Running[/green]",
-        "uptime": datetime.now() - datetime.now(),
         "last_check": "Never",
+        "last_sync": "Never",
         "total_syncs": 0,
         "consecutive_errors": 0,
         "total_polls": 0,
@@ -265,14 +268,12 @@ def monitor(
         ) as live:
             while True:
                 try:
-                    stats["uptime"] = datetime.now() - stats["start_time"]
                     stats["status"] = "[cyan]Checking...[/cyan]"
                     stats["total_polls"] += 1
                     live.update(create_stats_table(stats))
 
                     events = integration.asana.get_events()
-                    check_time = datetime.now().strftime("%H:%M:%S")
-                    stats["last_check"] = check_time
+                    stats["last_check"] = datetime.now().strftime("%H:%M:%S")
 
                     if events or stats["total_syncs"] == 0:
                         stats["consecutive_errors"] = 0
@@ -283,6 +284,9 @@ def monitor(
                         stats["total_syncs"] += 1
                         integration.asana.get_events()  # Clear events after sync
                         stats["status"] = "[green]✓ Sync complete[/green]"
+                        stats["last_sync"] = datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
                     else:
                         stats["status"] = "[green]Idle[/green]"
 
