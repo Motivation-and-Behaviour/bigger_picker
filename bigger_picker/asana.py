@@ -81,8 +81,12 @@ class AsanaManager:
 
         return None
 
-    def get_events(self):
+    def get_events(self, max_retries: int = 3, current_retry: int = 0):
+        if current_retry >= max_retries:
+            raise Exception(f"Max retries ({max_retries}) exceeded for get_events")
+
         opts = {"sync": self.event_sync_token}
+
         try:
             api_response = self.events_api_instance.get_events(
                 self.project_id, opts, full_payload=True
@@ -93,7 +97,9 @@ class AsanaManager:
             if e.status == 412:
                 errors = json.loads(e.body.decode("utf-8"))  # type: ignore
                 self.event_sync_token = errors["sync"]
-                return self.get_events()
+                return self.get_events(
+                    max_retries=max_retries, current_retry=current_retry + 1
+                )
             else:
                 raise
 

@@ -205,7 +205,7 @@ def monitor(
         None, help="Path to Rayyan credentials JSON file"
     ),
     interval: int = typer.Option(
-        60, help="Interval in minutes between checks for changes"
+        60, help="Interval in seconds between checks for changes"
     ),
     max_errors: int = typer.Option(
         5, help="Maximum number of consecutive errors before stopping"
