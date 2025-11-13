@@ -177,8 +177,6 @@ def identify_duplicate_datasets(
 
     n_rows = len(df_clean)
 
-    window_size = 10 if n_rows < 3000 else 5
-
     if n_rows < 1000:
         # Small dataset: compare everything
         indexer.full()
@@ -186,6 +184,7 @@ def identify_duplicate_datasets(
 
     else:
         # Medium dataset: multiple loose blocking
+        window_size = 9 if n_rows < 3000 else 5
         indexer.sortedneighbourhood("fields.Dataset Name", window=window_size)
 
         # Add email blocking
