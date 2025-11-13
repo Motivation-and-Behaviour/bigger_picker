@@ -204,11 +204,24 @@ Remember that you can [add][addrecord] or [remove][removerecord] outcomes if the
 
 <div class="grid" markdown>
 
+<div markdown>
 Once all of the data for the article has been checked, you can check the dataset fields.
 In particular, if you changed the sample size or the corresponding author, you should also update these fields in the dataset form.
 
-![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200)
+We also need to check that the dataset contact details are correct.
+In particular, you should check:
 
+- **Dataset Contact Name** is a correctly formatted name.
+  That is, remove any titles (e.g., Dr., Prof.), initials (e.g., J. Doe) and ensure it is in 'First Last' format.
+- **Dataset Contact Email** field matches the corresponding author email.
+  If the article is quite old, a quick Google search may help to find a current email address.
+
+</div>
+
+<div markdown>
+
+![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200)
+</div>
 </div>
 
 ### Updating the record in Asana
@@ -222,6 +235,7 @@ Before doing this, check that you have:
 - [x] [Removed any incorrect populations, screen time measures, or outcomes][removerecord]
 - [x] [Added any additional populations, screen time measures, or outcomes][addrecord] that were not extracted by the AI
 - [x] [Checked that the dataset is not a duplicate][dedupe]
+- [x] Check the name and email of the corresponding author
 
 #### Update the Asana task
 
