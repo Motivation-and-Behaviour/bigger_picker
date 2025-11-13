@@ -6,7 +6,6 @@ import typer
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.live import Live
-from rich.panel import Panel
 from rich.progress import (
     BarColumn,
     Progress,
