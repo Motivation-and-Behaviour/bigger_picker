@@ -291,6 +291,10 @@ Before doing this, check that you have:
 
     ![Step 13 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&fit=crop&fp-x=0.5329&fp-y=0.6602&fp-z=2.4712&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=445&mark-y=354&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
+    ???+ tip
+        If the dataset is from some countries (e.g., China, Russia), we are unlikely to be able to access it due to Australia's Foreign Interference laws.
+        In this case, you can skip 'Validated' and instead mark the dataset as 'Non-priority'.
+
 </div>
 
 That's it!
