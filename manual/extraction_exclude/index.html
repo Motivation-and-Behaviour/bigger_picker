@@ -5,26 +5,28 @@
       
       
       
-        <link rel="canonical" href="https://motivation-and-behaviour.github.io/bigger_picker/cli/">
+        <link rel="canonical" href="https://motivation-and-behaviour.github.io/bigger_picker/manual/extraction_exclude/">
       
       
-        <link rel="prev" href="../manual/data_management/">
+        <link rel="prev" href="../extraction_dedupe/">
       
+      
+        <link rel="next" href="../data_management/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
       
-        <title>CLI - Bigger Picker Documentation</title>
+        <title>Excluding Datasets - Bigger Picker Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
       
       
 
@@ -43,15 +45,15 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
-  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
@@ -73,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cli-reference" class="md-skip">
+        <a href="#excluding-datasets" class="md-skip">
           Skip to content
         </a>
       
@@ -89,7 +91,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Bigger Picker Documentation" class="md-header__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
+    <a href="../.." title="Bigger Picker Documentation" class="md-header__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
@@ -109,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI
+              Excluding Datasets
             
           </span>
         </div>
@@ -190,7 +192,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -207,11 +209,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../manual/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -227,11 +231,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../../cli/" class="md-tabs__link">
         
   
   
@@ -274,7 +276,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Bigger Picker Documentation" class="md-nav__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
+    <a href="../.." title="Bigger Picker Documentation" class="md-nav__button md-logo" aria-label="Bigger Picker Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
@@ -304,7 +306,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -328,26 +330,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -365,7 +372,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -383,7 +390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -417,17 +424,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2">
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
             
   
   
@@ -463,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/screening_overview/" class="md-nav__link">
+      <a href="../screening_overview/" class="md-nav__link">
         
   
   
@@ -491,7 +501,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/screening_process/" class="md-nav__link">
+      <a href="../screening_process/" class="md-nav__link">
         
   
   
@@ -524,26 +534,31 @@
                 
   
   
+    
   
   
+  
     
     
     
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3">
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -561,7 +576,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -579,7 +594,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/extraction_overview/" class="md-nav__link">
+      <a href="../extraction_overview/" class="md-nav__link">
         
   
   
@@ -607,7 +622,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/extraction_process/" class="md-nav__link">
+      <a href="../extraction_process/" class="md-nav__link">
         
   
   
@@ -632,8 +647,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -644,11 +661,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_3">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_3" checked>
         
           
           <label class="md-nav__link" for="__nav_2_3_3" id="__nav_2_3_3_label" tabindex="0">
@@ -669,7 +686,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_3_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -687,7 +704,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/extraction_addremove/" class="md-nav__link">
+      <a href="../extraction_addremove/" class="md-nav__link">
         
   
   
@@ -715,7 +732,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/extraction_addvalidated/" class="md-nav__link">
+      <a href="../extraction_addvalidated/" class="md-nav__link">
         
   
   
@@ -743,7 +760,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/extraction_dedupe/" class="md-nav__link">
+      <a href="../extraction_dedupe/" class="md-nav__link">
         
   
   
@@ -768,10 +785,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../manual/extraction_exclude/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Excluding Datasets
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -787,6 +831,132 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rationale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rationale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview-of-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview of Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#excluding-a-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Excluding a Dataset
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Excluding a Dataset">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#airtable-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Airtable Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Airtable Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete-the-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete the dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asana-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asana Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Asana Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete-the-dataset-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete the dataset task
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rayyan-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rayyan Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -815,7 +985,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../manual/data_management/" class="md-nav__link">
+      <a href="../data_management/" class="md-nav__link">
         
   
   
@@ -847,37 +1017,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CLI
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
         
   
   
@@ -893,126 +1036,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#bigger-picker" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        bigger-picker
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="bigger-picker">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#bigger-picker-monitor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        monitor
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bigger-picker-process" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        process
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bigger-picker-screenft" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        screenft
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bigger-picker-sync" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sync
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1037,112 +1060,70 @@
   
 
 
-<h1 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">¶</a></h1>
-<p>The Bigger Picker tool is a command-line interface (CLI) for syncing the various applications used by the Bigger Picture team.
-It orchestrates the automated data extraction process for articles identified in Rayyan, and maintains a sync between Rayyan, Airtable, and Asana.</p>
-<p>These docs are a very brief reference for how to use the CLI tool.</p>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¶</a></h2>
+<h1 id="excluding-datasets">Excluding Datasets<a class="headerlink" href="#excluding-datasets" title="Permanent link">¶</a></h1>
+<h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">¶</a></h2>
+<p>Sometimes when checking articles, you may find that a dataset should have been excluded at the review stage.
+In other words, the dataset did not meet the <a href="../screening_overview/#inclusion-and-exclusion-criteria">inclusion criteria</a> and should be excluded.
+The steps below outline how to make sure the dataset is correctly excluded.</p>
+<h2 id="overview-of-steps">Overview of Steps<a class="headerlink" href="#overview-of-steps" title="Permanent link">¶</a></h2>
+<p>Once you have identified that a dataset should have been excluded, you will need to remove it from Airtable and Asana, and mark it as excluded in Rayyan.
+The full process is below, but the general steps are:</p>
 <ol>
-<li>
-<p>Clone the repository:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>&lt;https://github.com/Motivation-and-Behaviour/bigger_picker.git&gt;
-<span class="nb">cd</span><span class="w"> </span>bigger_picker
-</code></pre></div>
-</li>
-<li>
-<p>Install dependencies:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</code></pre></div>
-<p>You can also optionally install the development dependencies:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
-</code></pre></div>
-</li>
-<li>
-<p>Set up your <code>.env</code> file with the required API keys and configuration values.
-   The provided <code>.env.example</code> can be used as a template.</p>
-</li>
+<li>Delete the dataset from Airtable</li>
+<li>Delete the dataset task from Asana</li>
+<li>In Rayyan, mark the dataset as excluded with the appropriate reason</li>
 </ol>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">¶</a></h2>
-<p>Most settings for the project are set in the <a href="https://github.com/Motivation-and-Behaviour/bigger_picker/blob/main/bigger_picker/config.py">bigger_picker/config.py</a> file.
-If you are using this package for a project other than the Bigger Picture, you will need to adjust the settings there.
-Some other components are also hardcoded.</p>
-<p>You will need API keys for Airtable, Asana, and OpenAI.
-You will also need a <code>rayyan_tokens.json</code> file for Rayyan API authentication.</p>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">¶</a></h2>
-<p>Once installed, you can use the command-line interface (CLI) to interact with the Bigger Picker tools.</p>
-<p>The methods for interacting with the CLI are outlined below.</p>
-<h3 id="bigger-picker">bigger-picker<a class="headerlink" href="#bigger-picker" title="Permanent link">¶</a></h3>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>bigger-picker [OPTIONS] COMMAND [ARGS]...
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --install-completion  Install completion for the current shell.
-  --show-completion     Show completion for the current shell, to copy it or
-                        customize the installation.
-  --help                Show this message and exit.
-</code></pre></div>
-<h4 id="bigger-picker-monitor">bigger-picker monitor<a class="headerlink" href="#bigger-picker-monitor" title="Permanent link">¶</a></h4>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>bigger-picker monitor [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --dotenv-path TEXT        Path to .env file with credentials
-  --airtable-api-key TEXT   Airtable API key
-  --asana-token TEXT        Asana API token
-  --openai-api-key TEXT     OpenAI API key
-  --openai-model TEXT       OpenAI model to use  \[default: gpt-4.1]
-  --rayyan-creds-path TEXT  Path to Rayyan credentials JSON file
-  --interval INTEGER        Interval in seconds between checks for changes
-                            \[default: 60]
-  --max-errors INTEGER      Maximum number of consecutive errors before
-                            stopping  \[default: 5]
-  --debug                   Enable debug logging to console
-  --help                    Show this message and exit.
-</code></pre></div>
-<h4 id="bigger-picker-process">bigger-picker process<a class="headerlink" href="#bigger-picker-process" title="Permanent link">¶</a></h4>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>bigger-picker process [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --dotenv-path TEXT        Path to .env file with credentials
-  --airtable-api-key TEXT   Airtable API key
-  --asana-token TEXT        Asana API token
-  --openai-api-key TEXT     OpenAI API key
-  --openai-model TEXT       OpenAI model to use  \[default: gpt-4.1]
-  --rayyan-creds-path TEXT  Path to Rayyan credentials JSON file
-  --max-articles INTEGER    Maximum number of articles to process
-  --debug                   Enable debug logging to console
-  --help                    Show this message and exit.
-</code></pre></div>
-<h4 id="bigger-picker-screenft">bigger-picker screenft<a class="headerlink" href="#bigger-picker-screenft" title="Permanent link">¶</a></h4>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>bigger-picker screenft [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --dotenv-path TEXT        Path to .env file with credentials
-  --airtable-api-key TEXT   Airtable API key
-  --asana-token TEXT        Asana API token
-  --openai-api-key TEXT     OpenAI API key
-  --openai-model TEXT       OpenAI model to use  \[default: gpt-5]
-  --rayyan-creds-path TEXT  Path to Rayyan credentials JSON file
-  --max-articles INTEGER    Maximum number of articles to process
-  --debug                   Enable debug logging to console
-  --help                    Show this message and exit.
-</code></pre></div>
-<h4 id="bigger-picker-sync">bigger-picker sync<a class="headerlink" href="#bigger-picker-sync" title="Permanent link">¶</a></h4>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>bigger-picker sync [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --dotenv-path TEXT        Path to .env file with credentials
-  --airtable-api-key TEXT   Airtable API key
-  --asana-token TEXT        Asana API token
-  --openai-api-key TEXT     OpenAI API key
-  --openai-model TEXT       OpenAI model to use  \[default: gpt-4.1]
-  --rayyan-creds-path TEXT  Path to Rayyan credentials JSON file
-  --debug                   Enable debug logging to console
-  --help                    Show this message and exit.
-</code></pre></div>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>If a dataset has more than one article attached to it, make sure that <strong>all articles</strong> do not meet the inclusion criteria before excluding.
+For example, if an article has a sample age over 18 but another article from the same dataset has a sample age under 18, then the dataset should <strong>not</strong> be excluded.</p>
+</details>
+<h2 id="excluding-a-dataset">Excluding a Dataset<a class="headerlink" href="#excluding-a-dataset" title="Permanent link">¶</a></h2>
+<h3 id="airtable-steps"><a href="https://airtable.com/appYuP4DjRt023FK1">Airtable</a> Steps<a class="headerlink" href="#airtable-steps" title="Permanent link">¶</a></h3>
+<h4 id="delete-the-dataset">Delete the dataset<a class="headerlink" href="#delete-the-dataset" title="Permanent link">¶</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-right-click-on-the-dataset">1. Right click on the dataset<a class="headerlink" href="#1-right-click-on-the-dataset" title="Permanent link">¶</a></h5>
+<hr>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/12336392-cc66-4bef-a25d-281bc67c1bef/ab3a415b-17ea-4829-a1db-9dae468cd63d.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4623&amp;fp-y=0.5036&amp;fp-z=2.5546&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=460&amp;mark-y=463&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yODAmaD04MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-desc-position="bottom"><img alt="Step 9 screenshot" src="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/12336392-cc66-4bef-a25d-281bc67c1bef/ab3a415b-17ea-4829-a1db-9dae468cd63d.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.4623&amp;fp-y=0.5036&amp;fp-z=2.5546&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=460&amp;mark-y=463&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yODAmaD04MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw"></a></p>
+</li>
+<li>
+<h5 id="2-select-delete-record">2. Select Delete record<a class="headerlink" href="#2-select-delete-record" title="Permanent link">¶</a></h5>
+<hr>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/2c38d208-ddd3-40cf-b6d5-9bf897b4e4f9/ee6a2063-0a93-4eb6-92fc-94155db0fdd7.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5794&amp;fp-y=0.7589&amp;fp-z=2.2245&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=400&amp;mark-y=466&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zOTkmaD03NSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-desc-position="bottom"><img alt="Step 10 screenshot" src="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/2c38d208-ddd3-40cf-b6d5-9bf897b4e4f9/ee6a2063-0a93-4eb6-92fc-94155db0fdd7.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.5794&amp;fp-y=0.7589&amp;fp-z=2.2245&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=400&amp;mark-y=466&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zOTkmaD03NSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw"></a></p>
+</li>
+<li>
+<h5 id="3-click-on-delete-record-in-the-confirmation-dialog">3. Click on Delete record in the confirmation dialog<a class="headerlink" href="#3-click-on-delete-record-in-the-confirmation-dialog" title="Permanent link">¶</a></h5>
+<hr>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/97e9c3d6-69e0-4df7-9ca7-185ae225e775/caf96290-65bb-4189-a6e4-a62a4b0f559e.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.6081&amp;fp-y=0.5569&amp;fp-z=2.6308&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=474&amp;mark-y=459&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yNTMmaD04OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-desc-position="bottom"><img alt="Step 11 screenshot" src="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/97e9c3d6-69e0-4df7-9ca7-185ae225e775/caf96290-65bb-4189-a6e4-a62a4b0f559e.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.6081&amp;fp-y=0.5569&amp;fp-z=2.6308&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=474&amp;mark-y=459&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0yNTMmaD04OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw"></a></p>
+</li>
+</ul>
+</div>
+<h3 id="asana-steps"><a href="https://app.asana.com/1/653672074038961/home">Asana</a> Steps<a class="headerlink" href="#asana-steps" title="Permanent link">¶</a></h3>
+<h4 id="delete-the-dataset-task">Delete the dataset task<a class="headerlink" href="#delete-the-dataset-task" title="Permanent link">¶</a></h4>
+<div class="grid cards">
+<ul>
+<li>
+<h5 id="1-right-click-on-the-dataset-task">1. Right click on the dataset task<a class="headerlink" href="#1-right-click-on-the-dataset-task" title="Permanent link">¶</a></h5>
+<hr>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/3d895e44-6645-43eb-9ff4-a645a83ff18c/62b7b90c-2b0f-4091-86a2-a091081de4e6.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.3471&amp;fp-y=0.5286&amp;fp-z=1.4753&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=266&amp;mark-y=477&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02NjkmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-desc-position="bottom"><img alt="Step 12 screenshot" src="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/3d895e44-6645-43eb-9ff4-a645a83ff18c/62b7b90c-2b0f-4091-86a2-a091081de4e6.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.3471&amp;fp-y=0.5286&amp;fp-z=1.4753&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=266&amp;mark-y=477&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz02NjkmaD01MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw"></a></p>
+</li>
+<li>
+<h5 id="2-click-on-delete-task">2. Click on Delete task<a class="headerlink" href="#2-click-on-delete-task" title="Permanent link">¶</a></h5>
+<hr>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/f99d8394-0567-49c0-b9c7-2b73370d523b/0c6b0416-c154-4ec7-8ec1-7f7f4b6f1e30.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.2423&amp;fp-y=0.7733&amp;fp-z=2.3502&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=423&amp;mark-y=462&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNTQmaD04MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" data-desc-position="bottom"><img alt="Step 13 screenshot" src="https://images.tango.us/workflows/d4e6501a-c2cf-4145-b224-ea1eda6ce403/steps/f99d8394-0567-49c0-b9c7-2b73370d523b/0c6b0416-c154-4ec7-8ec1-7f7f4b6f1e30.png?crop=focalpoint&amp;fit=crop&amp;fp-x=0.2423&amp;fp-y=0.7733&amp;fp-z=2.3502&amp;w=1200&amp;border=2%2CF4F2F7&amp;border-radius=8%2C8%2C8%2C8&amp;border-radius-inner=8%2C8%2C8%2C8&amp;blend-align=bottom&amp;blend-mode=normal&amp;blend-x=0&amp;blend-w=1200&amp;mark-x=423&amp;mark-y=462&amp;m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zNTQmaD04MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw"></a></p>
+</li>
+</ul>
+</div>
+<h3 id="rayyan-steps"><a href="https://www.rayyan.ai/">Rayyan</a> Steps<a class="headerlink" href="#rayyan-steps" title="Permanent link">¶</a></h3>
+<p>The steps for excluding a dataset in Rayyan are the same as for <a href="../screening_process/#full-text-screening">excluding during screening</a>.</p>
+<ol>
+<li>Navigate to the <strong>Full Text Screening</strong> tab.</li>
+<li>Use the search bar to find the dataset by its title.</li>
+<li>Add an exclusion reason by clicking on the dataset, then selecting the 'Exclude with Reasons' box.</li>
+<li>Click the red 'Exclude' button to finalise the exclusion.</li>
+</ol>
 
 
 
@@ -1163,7 +1144,7 @@ You will also need a <code>rayyan_tokens.json</code> file for Rayyan API authent
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 3, 2025 00:16:18 UTC">July 3, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 14, 2025 03:19:47 UTC">November 14, 2025</span>
   </span>
 
     
@@ -1214,7 +1195,7 @@ You will also need a <code>rayyan_tokens.json</code> file for Rayyan API authent
       <nav class="md-footer__inner md-grid" aria-label="Footer">
         
           
-          <a href="../manual/data_management/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Data Management">
+          <a href="../extraction_dedupe/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Deduplicating Datasets">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
@@ -1224,11 +1205,27 @@ You will also need a <code>rayyan_tokens.json</code> file for Rayyan API authent
                 Previous
               </span>
               <div class="md-ellipsis">
-                Data Management
+                Deduplicating Datasets
               </div>
             </div>
           </a>
         
+        
+          
+          <a href="../data_management/" class="md-footer__link md-footer__link--next" aria-label="Next: Data Management">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Data Management
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+            </div>
+          </a>
         
       </nav>
     
@@ -1260,10 +1257,10 @@ You will also need a <code>rayyan_tokens.json</code> file for Rayyan API authent
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "navigation.tracking", "content.code.copy", "content.tooltips", "search.suggest", "search.highlight", "toc.integrate", "toc.follow"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "navigation.tracking", "content.code.copy", "content.tooltips", "search.suggest", "search.highlight", "toc.integrate", "toc.follow"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
       
     
   
