@@ -300,7 +300,13 @@ def monitor(
                         live.update(create_stats_table(stats))
                         break
 
-                time.sleep(interval)
+                for t in range(interval):
+                    time_to_sync = interval - t
+                    stats["status"] = (
+                        f"[green]Idle (syncing in {time_to_sync}s)[/green]"
+                    )
+                    live.update(create_stats_table(stats))
+                    time.sleep(1)
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Monitor stopped by user[/yellow]")
