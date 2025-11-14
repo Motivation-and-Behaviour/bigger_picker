@@ -78,5 +78,6 @@ nav:
               - Adding or Removing Populations, Screen Time Measures, and Outcomes: manual/extraction_addremove.md
               - Adding New Validated Outcomes: manual/extraction_addvalidated.md
               - Deduplicating Datasets: manual/extraction_dedupe.md
+              - Excluding Datasets: manual/extraction_exclude.md
       - Data Management: manual/data_management.md
   - CLI: cli.md
