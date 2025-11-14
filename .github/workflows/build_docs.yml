@@ -59,7 +59,7 @@ jobs:
       - name: Notify Teams
         if: success() && github.event_name == 'push'
         run: |
-          curl -H 'Content-Type: application/json' -d '{
+          curl -L -H 'Content-Type: application/json' -d '{
             "title": "Documentation Updated",
             "actor": "${{ github.actor }}",
             "repository": "${{ github.repository }}",
