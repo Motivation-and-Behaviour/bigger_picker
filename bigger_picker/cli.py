@@ -31,7 +31,7 @@ def process(
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
     asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
+    openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
     rayyan_creds_path: str = typer.Option(
         None, help="Path to Rayyan credentials JSON file"
     ),
@@ -100,7 +100,7 @@ def sync(
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
     asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
+    openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
     rayyan_creds_path: str = typer.Option(
         None, help="Path to Rayyan credentials JSON file"
     ),
@@ -141,7 +141,7 @@ def screenft(
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
     asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-5", help="OpenAI model to use"),
+    openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
     rayyan_creds_path: str = typer.Option(
         None, help="Path to Rayyan credentials JSON file"
     ),
@@ -200,7 +200,7 @@ def monitor(
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
     asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-4.1", help="OpenAI model to use"),
+    openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
     rayyan_creds_path: str = typer.Option(
         None, help="Path to Rayyan credentials JSON file"
     ),
