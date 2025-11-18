@@ -347,10 +347,10 @@ class IntegrationManager:
 
         return updated_any_datasets
 
-    def mark_duplicates(self, thereshold=0.51):
+    def mark_duplicates(self, threshold=0.51):
         self._log("Marking duplicates...")
         datasets = self.airtable.tables["Datasets"].all()
-        duplicates = utils.identify_duplicate_datasets(datasets, threshold=thereshold)
+        duplicates = utils.identify_duplicate_datasets(datasets, threshold=threshold)
 
         for dataset in datasets:
             dataset_id = dataset["id"]

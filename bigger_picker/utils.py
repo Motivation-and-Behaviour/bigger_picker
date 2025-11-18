@@ -90,17 +90,23 @@ def compute_year_value(
     y_max: int | None,
 ) -> float:
     if y_min is None or y_max is None:
-        return 1.0
+        return 0.5
+
+    year_last = dataset["fields"].get("Year of Last Data Point")
+    if year_last is None:
+        return 0.5
 
     if y_max > y_min:
         R_i = (dataset["fields"]["Year of Last Data Point"] - y_min) / (y_max - y_min)
     else:
-        R_i = 1.0
+        R_i = 0.5
 
     return R_i
 
 
-def compute_age_cache(datasets_included: list[RecordDict]) -> dict[str, float] | None:
+def compute_age_cache(
+    datasets_included: list[RecordDict],
+) -> dict[str, tuple[float, float, int]]:
     cache = {}
     for dset in datasets_included:
         mean_j = dset["fields"].get("Mean Ages")
@@ -148,6 +154,8 @@ def compute_age_value(dataset: RecordDict, age_cache: dict | None) -> float:
 
     wi = [w / total_wi for w in wi_unnorm]
     CovWeighted = sum(Cov[a] * w for a, w in zip(ages, wi, strict=False))
+    if n_dsets == 0:
+        return 0.0
     avg_N = total_N / n_dsets
     coverage_scaled = CovWeighted / avg_N
     A_i = 1.0 / (1.0 + coverage_scaled)

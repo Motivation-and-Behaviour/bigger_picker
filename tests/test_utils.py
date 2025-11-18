@@ -97,9 +97,7 @@ def test_compute_outcome_value():
     # Test with various numbers of searches
     ds_no_searches = fake_record({"Searches": []})
     ds_one_search = fake_record({"Searches": ["Search1"]})
-    ds_multiple_searches = fake_record(
-        {"Searches": ["Search1", "Search2", "Search3"]}
-    )
+    ds_multiple_searches = fake_record({"Searches": ["Search1", "Search2", "Search3"]})
 
     assert utils.compute_outcome_value(ds_no_searches) == 0
     assert utils.compute_outcome_value(ds_one_search) == 1
@@ -173,15 +171,15 @@ def test_compute_year_value():
 
 
 def test_compute_year_value_same_year():
-    # When y_min == y_max, should return 1.0
+    # When y_min == y_max, should return 0.5
     ds = fake_record({"Year of Last Data Point": 2020})
-    assert utils.compute_year_value(ds, 2020, 2020) == 1.0
+    assert utils.compute_year_value(ds, 2020, 2020) == 0.5
 
 
 def test_compute_year_value_no_range():
-    # When year range is None, should return 1.0
+    # When year range is None, should return 0.5
     ds = fake_record({"Year of Last Data Point": 2020})
-    assert utils.compute_year_value(ds, None, None) == 1.0
+    assert utils.compute_year_value(ds, None, None) == 0.5
 
 
 def test_compute_age_cache():
@@ -284,7 +282,7 @@ def test_compute_dataset_value_no_included():
     # Default weights: alpha=1 / math.log(1000), epsilon=1
     expected_size = (1 / math.log(1000)) * math.log(400 + 1)
     # years = [2020], so y_min == y_max => R_i = 1
-    expected_recency = 1.0
+    expected_recency = 0.5
     expected = expected_size + expected_recency
 
     # year_min = year_max = 2020, age_cache = None
