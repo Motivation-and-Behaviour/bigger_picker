@@ -13,8 +13,16 @@ def fix_age(dataset: RecordDict) -> RecordDict:
     fields["Mean Ages"] = float(fields["Mean Ages"][0]) if fields["Mean Ages"] else None
     fields["SD Ages"] = float(fields["SD Ages"][0]) if fields["SD Ages"] else None
 
-    fields["Min Ages"] = None if fields["Min Ages"] == 0 else fields["Min Ages"]
-    fields["Max Ages"] = None if fields["Max Ages"] == 0 else fields["Max Ages"]
+    fields["Min Ages"] = (
+        None
+        if fields["Min Ages"] == 0 or fields["Min Ages"] < 0
+        else fields["Min Ages"]
+    )
+    fields["Max Ages"] = (
+        None
+        if fields["Max Ages"] == 0 or fields["Max Ages"] > 18
+        else fields["Max Ages"]
+    )
 
     if fields["Min Ages"] and fields["Max Ages"]:
         # If we have both the min and max, we can estimate missing means and SDs
@@ -25,6 +33,12 @@ def fix_age(dataset: RecordDict) -> RecordDict:
         if not fields["SD Ages"]:
             # Estimate the SD as a quarter of the range
             fields["SD Ages"] = (fields["Max Ages"] - fields["Min Ages"]) / 4
+
+    # If the mean is outside the allowed range, set to None
+    if fields["Mean Ages"] is not None:
+        if fields["Mean Ages"] > 18 or fields["Mean Ages"] < 0:
+            fields["Mean Ages"] = None
+            fields["SD Ages"] = None
 
     dataset["fields"] = fields
     return dataset
@@ -44,10 +58,116 @@ def fix_dataset(dataset: RecordDict) -> RecordDict:
     return dataset
 
 
-def compute_dataset_value(
-    dataset: RecordDict,
+def compute_size_value(dataset: RecordDict) -> float:
+    N_i = dataset["fields"].get("Total Sample Size", 0)
+    return math.log(N_i + 1)
+
+
+def compute_outcome_value(dataset: RecordDict) -> int:
+    return len(dataset["fields"].get("Searches", []))
+
+
+def compute_year_range(
     datasets_included: list[RecordDict],
     datasets_potential: list[RecordDict],
+) -> tuple[int | None, int | None]:
+    years = {
+        year
+        for dset in datasets_potential + datasets_included
+        if (year := dset["fields"].get("Year of Last Data Point")) is not None
+        and year > 1950
+    }
+
+    if years:
+        return min(years), max(years)  # type: ignore
+    else:
+        return None, None
+
+
+def compute_year_value(
+    dataset: RecordDict,
+    y_min: int | None,
+    y_max: int | None,
+) -> float:
+    if y_min is None or y_max is None:
+        return 0.5
+
+    year_last = dataset["fields"].get("Year of Last Data Point")
+    if year_last is None:
+        return 0.5
+
+    if y_max > y_min:
+        R_i = (dataset["fields"]["Year of Last Data Point"] - y_min) / (y_max - y_min)
+    else:
+        R_i = 0.5
+
+    return R_i
+
+
+def compute_age_cache(
+    datasets_included: list[RecordDict],
+) -> dict[str, tuple[float, float, int]]:
+    cache = {}
+    for dset in datasets_included:
+        mean_j = dset["fields"].get("Mean Ages")
+        sd_j = dset["fields"].get("SD Ages")
+        N_j = dset["fields"].get("Total Sample Size", 0)
+        if mean_j is not None and sd_j is not None and sd_j > 0:
+            cache[dset["id"]] = (mean_j, sd_j, N_j)
+
+    return cache
+
+
+def compute_age_value(dataset: RecordDict, age_cache: dict | None) -> float:
+    if age_cache is None:
+        return 0.0
+
+    mean_i = dataset["fields"].get("Mean Ages")
+    sd_i = dataset["fields"].get("SD Ages")
+    if mean_i is None or sd_i is None or sd_i <= 0:
+        return 0.0
+
+    a_min = int(math.floor(mean_i - 3 * sd_i))
+    a_max = int(math.ceil(mean_i + 3 * sd_i))
+    ages = list(range(a_min, a_max + 1))
+
+    Cov = {a: 0.0 for a in ages}
+    total_N = 0
+    n_dsets = 0
+
+    for mean_j, sd_j, N_j in age_cache.values():
+        total_N += N_j
+        n_dsets += 1
+        wj_unnorm = [math.exp(-((a - mean_j) ** 2) / (2 * sd_j**2)) for a in ages]
+        total_wj = sum(wj_unnorm)
+        if total_wj == 0:
+            continue
+        wj = [w / total_wj for w in wj_unnorm]
+
+        for a, w in zip(ages, wj, strict=False):
+            Cov[a] += N_j * w
+
+    wi_unnorm = [math.exp(-((a - mean_i) ** 2) / (2 * sd_i**2)) for a in ages]
+    total_wi = sum(wi_unnorm)
+    if total_wi == 0:
+        return 0.0
+
+    wi = [w / total_wi for w in wi_unnorm]
+    CovWeighted = sum(Cov[a] * w for a, w in zip(ages, wi, strict=False))
+    if n_dsets == 0:
+        return 0.0
+    avg_N = total_N / n_dsets
+    coverage_scaled = CovWeighted / avg_N
+    A_i = 1.0 / (1.0 + coverage_scaled)
+
+    return A_i
+
+
+def compute_dataset_value(
+    dataset: RecordDict,
+    year_min: int | None,
+    year_max: int | None,
+    age_cache: dict | None,
     weights: dict[str, float] | None = None,
 ) -> float:
     """
@@ -67,90 +187,17 @@ def compute_dataset_value(
     delta = weights["delta"] if weights and "delta" in weights else 2
     epsilon = weights["epsilon"] if weights and "epsilon" in weights else 1
 
-    # Sample size term
-    N_i = dataset["fields"].get("Total Sample Size", 0)
-    size_term = alpha * math.log(N_i + 1)
+    N_i = compute_size_value(dataset)
+    R_i = compute_year_value(dataset, year_min, year_max)
+    O_i = compute_outcome_value(dataset)
+    A_i = compute_age_value(dataset, age_cache)
+    S_i = O_i * A_i
 
-    # Recency term: R_i
-    years = [
-        dset["fields"].get("Year of Last Data Point")
-        for dset in datasets_potential + datasets_included
-        if dset["fields"].get("Year of Last Data Point") is not None
-    ]
-    if years:
-        y_min, y_max = min(years), max(years)  # type: ignore
-        if y_max > y_min:
-            R_i = (dataset["fields"]["Year of Last Data Point"] - y_min) / (
-                y_max - y_min
-            )
-        else:
-            R_i = 1.0
-    else:
-        R_i = 1.0
-    recency_term = epsilon * R_i
-
-    # If no datasets are yet included, skip O_i, A_i, S_i
-    if not datasets_included:
-        return size_term + recency_term
-
-    # Outcome‐need term
-    # average over all outcomes in this dataset
-    outcomes_i = dataset["fields"].get("Articles: Outcomes", [])
-    # build coverage map: outcome -> total N in included datasets
-    coverage = {}
-    for dset in datasets_included:
-        Nj = dset["fields"].get("Total Sample Size", 0)
-        for outcome in dset["fields"].get("Articles: Outcomes", []):
-            coverage[outcome] = coverage.get(outcome, 0) + Nj
-
-    outcome_list = [1.0 / (1.0 + coverage.get(outcome, 0)) for outcome in outcomes_i]
-    O_i = sum(outcome_list) / len(outcome_list) if outcome_list else 0.0
-    outcome_term = beta * O_i
-
-    # Age‐need term: A_i
-    mean_i = dataset["fields"].get("Mean Ages")
-    sd_i = dataset["fields"].get("SD Ages")
-    if mean_i is None or sd_i is None or sd_i <= 0:
-        A_i = 0.0
-    else:
-        # discretise ages from mean_i±3sd_i
-        a_min = int(math.floor(mean_i - 3 * sd_i))
-        a_max = int(math.ceil(mean_i + 3 * sd_i))
-        ages = list(range(a_min, a_max + 1))
-
-        # build Cov(a) = sum_j [ N_j * weight_j(a) ]
-        Cov = {a: 0.0 for a in ages}
-        for d in datasets_included:
-            mean_j = d["fields"].get("Mean Ages")
-            sd_j = d["fields"].get("SD Ages")
-            N_j = d["fields"].get("Total Sample Size", 0)
-            if mean_j is None or sd_j is None or sd_j <= 0:
-                continue
-
-            # weights for dataset j over the same age grid
-            wj_unnorm = [math.exp(-((a - mean_j) ** 2) / (2 * sd_j**2)) for a in ages]
-            total_wj = sum(wj_unnorm)
-            if total_wj == 0:
-                continue
-            wj = [w / total_wj for w in wj_unnorm]
-
-            for a, w in zip(ages, wj, strict=False):
-                Cov[a] += N_j * w
-
-        # now weight Cov(a) by this dataset’s own age‐distribution
-        wi_unnorm = [math.exp(-((a - mean_i) ** 2) / (2 * sd_i**2)) for a in ages]
-        total_wi = sum(wi_unnorm)
-        if total_wi == 0:
-            A_i = 0.0
-        else:
-            wi = [w / total_wi for w in wi_unnorm]
-            CovWeighted = sum(Cov[a] * w for a, w in zip(ages, wi, strict=False))
-            A_i = 1.0 / (1.0 + CovWeighted)
-
-    age_term = gamma * A_i
-
-    # Synergy term: S_i = O_i * A_i
-    synergy_term = delta * (O_i * A_i)
+    size_term = N_i * alpha
+    recency_term = R_i * epsilon
+    outcome_term = O_i * beta
+    age_term = A_i * gamma
+    synergy_term = S_i * delta
 
     # Sum everything
     return size_term + outcome_term + age_term + synergy_term + recency_term
