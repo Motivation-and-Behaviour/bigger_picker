@@ -202,12 +202,53 @@ Remember that you can [add][addrecord] or [remove][removerecord] outcomes if the
 
 #### Check the dataset form
 
-<div class="grid" markdown>
-
 Once all of the data for the article has been checked, you can check the dataset fields.
-In particular, if you changed the sample size or the corresponding author, you should also update these fields in the dataset form.
 
-![Step 2 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/380d1c4c-af3f-49bb-a25f-54b6796d8310/0f92d4b8-6114-4b58-a4b4-51e6e0f1366a.png?crop=focalpoint&fit=crop&fp-x=0.4787&fp-y=0.3824&fp-z=2.0000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200)
+<div class="grid cards" markdown>
+
+- ##### 1. Check the sample size
+
+    ---
+
+    If you changed the sample size you should also update it in the dataset form.
+
+    ![Step 25 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9734c348-2b56-499c-af53-38fa646a3d7b/5dfb6664-33b1-4a32-9935-90eda82c37e6.png?crop=focalpoint&fit=crop)
+
+- ##### 2. Check the contact name
+
+    ---
+
+    Check that the dataset contact name is a correctly formatted name.
+    That is, remove any titles (e.g., Dr., Prof.), initials (e.g., J. Doe) and ensure it is in 'First Last' format.
+
+    ![Step 25 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/9734c348-2b56-499c-af53-38fa646a3d7b/5dfb6664-33b1-4a32-9935-90eda82c37e6.png?crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=393&mark-y=640&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTMlMkNGRjc0NDImdz03MzcmaD02MiZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+- ##### 3. Check the contact email
+
+    ---
+
+    Check the email field matches the corresponding author email.
+    If the article is quite old, a quick Google search may help to find a current email address.
+
+    ![Step 26 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/5e3cfdee-0970-443f-981b-d7694caba4d8/8b32a51f-3d92-40cb-bdda-be707e12ef32.png?crop=focalpoint&fit=crop&fp-x=0.4603&fp-y=0.4116&fp-z=1.6869&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=304&mark-y=516&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz01OTMmaD01MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+- ##### 4. Check the potential duplicates
+
+    ---
+
+    Check the 'Potential Duplicates' field to see if there are any potential duplicates.
+    If there are, follow the [deduplication instructions][dedupe] to resolve them.
+
+    ![Step 27 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/ea76be3d-50de-435c-bcbc-a41a4c6b5c97/b21ed2f6-e7d3-42b8-9497-55d8a043cf95.png?crop=focalpoint&fit=crop&fp-x=0.2913&fp-y=0.7688&fp-z=2.0546&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=370&mark-y=531&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz00NjAmaD03MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+- ##### 5. Check if this is a national or government dataset
+
+    ---
+
+    If the dataset is a national dataset, or one that is run by a government, the recruitment process may be different.
+    Use the checkbox to indicate if this is the case.
+
+    ![Step 28 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/bffdac57-2eb6-4dd1-ae65-c87be6cbdde7/2624735b-576c-4cdb-bc9e-7f7bacdbfedb.png?crop=focalpoint&fit=crop&fp-x=0.2801&fp-y=0.8073&fp-z=2.1884&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=394&mark-y=585&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz00MTImaD04MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
 
 </div>
 
@@ -222,6 +263,7 @@ Before doing this, check that you have:
 - [x] [Removed any incorrect populations, screen time measures, or outcomes][removerecord]
 - [x] [Added any additional populations, screen time measures, or outcomes][addrecord] that were not extracted by the AI
 - [x] [Checked that the dataset is not a duplicate][dedupe]
+- [x] Check the name and email of the corresponding author
 
 #### Update the Asana task
 
@@ -248,6 +290,10 @@ Before doing this, check that you have:
     ---
 
     ![Step 13 screenshot](https://images.tango.us/workflows/13ff0506-9759-4da9-8681-1f0d387f23a7/steps/e04835be-f6a1-49fe-a281-2e71fb07e500/7b3b41e7-7498-49f4-9882-08de486fef4d.png?crop=focalpoint&fit=crop&fp-x=0.5329&fp-y=0.6602&fp-z=2.4712&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&mark-x=445&mark-y=354&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTQlMkNGRjc0NDImdz0zMTAmaD02MyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw)
+
+    ???+ tip
+        If the dataset is from some countries (e.g., China, Russia), we are unlikely to be able to access it due to Australia's Foreign Interference laws.
+        In this case, you can skip 'Validated' and instead mark the dataset as 'Non-priority'.
 
 </div>
 
