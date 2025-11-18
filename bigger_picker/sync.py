@@ -2,16 +2,12 @@ from pyairtable.api.types import RecordDict
 from rich.console import Console
 
 import bigger_picker.config as config
+import bigger_picker.utils as utils
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
 from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
-from bigger_picker.utils import (
-    compute_dataset_value,
-    fix_dataset,
-    identify_duplicate_datasets,
-)
 
 
 class IntegrationManager:
@@ -316,8 +312,8 @@ class IntegrationManager:
         datasets_potential_statuses = [
             "Validated",
             "Mail Merge",
-            "Non-Priority",
             "Contacting Authors",
+            "Awaiting Triage",
         ]
         self._log("Fetching datasets from Airtable")
         datasets = self.airtable.tables["Datasets"].all()
@@ -326,16 +322,23 @@ class IntegrationManager:
         datasets_potential = []
         for dataset in datasets:
             if dataset["fields"].get("Status") in datasets_included_statuses:
-                datasets_included.append(fix_dataset(dataset))
+                datasets_included.append(utils.fix_dataset(dataset))
 
             elif dataset["fields"].get("Status") in datasets_potential_statuses:
-                datasets_potential.append(fix_dataset(dataset))
+                datasets_potential.append(utils.fix_dataset(dataset))
 
         updated_any_datasets = False
 
+        # Precompute data needed for scores
+        year_min, year_max = utils.compute_year_range(
+            datasets_included, datasets_potential
+        )
+        age_cache = utils.compute_age_cache(datasets_included)
+
         for dataset in datasets_potential:
             dataset_value = round(
-                compute_dataset_value(dataset, datasets_included, datasets_potential), 3
+                utils.compute_dataset_value(dataset, year_min, year_max, age_cache),
+                3,
             )
             payload = {"Dataset Value": dataset_value}
             if dataset["fields"].get("Dataset Value") != dataset_value:
@@ -347,7 +350,7 @@ class IntegrationManager:
     def mark_duplicates(self, thereshold=0.51):
         self._log("Marking duplicates...")
         datasets = self.airtable.tables["Datasets"].all()
-        duplicates = identify_duplicate_datasets(datasets, threshold=thereshold)
+        duplicates = utils.identify_duplicate_datasets(datasets, threshold=thereshold)
 
         for dataset in datasets:
             dataset_id = dataset["id"]

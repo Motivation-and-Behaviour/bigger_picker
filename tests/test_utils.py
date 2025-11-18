@@ -73,10 +73,213 @@ def test_fix_dataset():
     assert fixed_dataset["fields"]["Earliest Publication"] == 2020
 
 
+def test_compute_size_value():
+    # Test with various sample sizes
+    ds_zero = fake_record({"Total Sample Size": 0})
+    ds_small = fake_record({"Total Sample Size": 10})
+    ds_medium = fake_record({"Total Sample Size": 100})
+    ds_large = fake_record({"Total Sample Size": 1000})
+
+    # Size value is log(N+1)
+    assert utils.compute_size_value(ds_zero) == math.log(1)
+    assert utils.compute_size_value(ds_small) == pytest.approx(math.log(11))
+    assert utils.compute_size_value(ds_medium) == pytest.approx(math.log(101))
+    assert utils.compute_size_value(ds_large) == pytest.approx(math.log(1001))
+
+
+def test_compute_size_value_missing_field():
+    # Test when Total Sample Size is missing
+    ds_missing = fake_record({})
+    assert utils.compute_size_value(ds_missing) == math.log(1)
+
+
+def test_compute_outcome_value():
+    # Test with various numbers of searches
+    ds_no_searches = fake_record({"Searches": []})
+    ds_one_search = fake_record({"Searches": ["Search1"]})
+    ds_multiple_searches = fake_record(
+        {"Searches": ["Search1", "Search2", "Search3"]}
+    )
+
+    assert utils.compute_outcome_value(ds_no_searches) == 0
+    assert utils.compute_outcome_value(ds_one_search) == 1
+    assert utils.compute_outcome_value(ds_multiple_searches) == 3
+
+
+def test_compute_outcome_value_missing_field():
+    # Test when Searches field is missing
+    ds_missing = fake_record({})
+    assert utils.compute_outcome_value(ds_missing) == 0
+
+
+def test_compute_year_range_with_valid_years():
+    included = [
+        fake_record({"Year of Last Data Point": 2010}),
+        fake_record({"Year of Last Data Point": 2015}),
+    ]
+    potential = [
+        fake_record({"Year of Last Data Point": 2000}),
+        fake_record({"Year of Last Data Point": 2020}),
+    ]
+
+    y_min, y_max = utils.compute_year_range(included, potential)
+    assert y_min == 2000
+    assert y_max == 2020
+
+
+def test_compute_year_range_filters_old_years():
+    # Years before 1950 should be filtered out
+    included = [fake_record({"Year of Last Data Point": 1900})]
+    potential = [
+        fake_record({"Year of Last Data Point": 2010}),
+        fake_record({"Year of Last Data Point": 2020}),
+    ]
+
+    y_min, y_max = utils.compute_year_range(included, potential)
+    assert y_min == 2010
+    assert y_max == 2020
+
+
+def test_compute_year_range_no_valid_years():
+    # All years before 1950
+    included = [fake_record({"Year of Last Data Point": 1900})]
+    potential = [fake_record({"Year of Last Data Point": 1945})]
+
+    y_min, y_max = utils.compute_year_range(included, potential)
+    assert y_min is None
+    assert y_max is None
+
+
+def test_compute_year_range_missing_years():
+    # Missing year fields
+    included = [fake_record({})]
+    potential = [fake_record({"Year of Last Data Point": None})]
+
+    y_min, y_max = utils.compute_year_range(included, potential)
+    assert y_min is None
+    assert y_max is None
+
+
+def test_compute_year_value():
+    # Test with a range from 2000 to 2020
+    ds_old = fake_record({"Year of Last Data Point": 2000})
+    ds_mid = fake_record({"Year of Last Data Point": 2010})
+    ds_new = fake_record({"Year of Last Data Point": 2020})
+
+    # R_i = (year - y_min) / (y_max - y_min)
+    assert utils.compute_year_value(ds_old, 2000, 2020) == pytest.approx(0.0)
+    assert utils.compute_year_value(ds_mid, 2000, 2020) == pytest.approx(0.5)
+    assert utils.compute_year_value(ds_new, 2000, 2020) == pytest.approx(1.0)
+
+
+def test_compute_year_value_same_year():
+    # When y_min == y_max, should return 1.0
+    ds = fake_record({"Year of Last Data Point": 2020})
+    assert utils.compute_year_value(ds, 2020, 2020) == 1.0
+
+
+def test_compute_year_value_no_range():
+    # When year range is None, should return 1.0
+    ds = fake_record({"Year of Last Data Point": 2020})
+    assert utils.compute_year_value(ds, None, None) == 1.0
+
+
+def test_compute_age_cache():
+    included = [
+        fake_record(
+            {
+                "Mean Ages": 10.0,
+                "SD Ages": 2.0,
+                "Total Sample Size": 100,
+            }
+        ),
+        fake_record(
+            {
+                "Mean Ages": 15.0,
+                "SD Ages": 3.0,
+                "Total Sample Size": 200,
+            }
+        ),
+    ]
+
+    cache = utils.compute_age_cache(included)
+    assert cache is not None
+    assert len(cache) == 2
+
+    # Check that the cache contains the correct values
+    id1, id2 = included[0]["id"], included[1]["id"]
+    assert cache[id1] == (10.0, 2.0, 100)
+    assert cache[id2] == (15.0, 3.0, 200)
+
+
+def test_compute_age_cache_filters_invalid():
+    # Should filter out datasets with missing or invalid age data
+    included = [
+        fake_record({"Mean Ages": 10.0, "SD Ages": 2.0, "Total Sample Size": 100}),
+        fake_record({"Mean Ages": None, "SD Ages": 2.0, "Total Sample Size": 100}),
+        fake_record({"Mean Ages": 10.0, "SD Ages": None, "Total Sample Size": 100}),
+        fake_record({"Mean Ages": 10.0, "SD Ages": 0, "Total Sample Size": 100}),
+        fake_record({"Mean Ages": 10.0, "SD Ages": -1, "Total Sample Size": 100}),
+    ]
+
+    cache = utils.compute_age_cache(included)
+    assert cache is not None
+    # Only the first dataset should be in the cache
+    assert len(cache) == 1
+    assert cache[included[0]["id"]] == (10.0, 2.0, 100)
+
+
+def test_compute_age_cache_empty():
+    cache = utils.compute_age_cache([])
+    assert cache == {}
+
+
+def test_compute_age_value_no_cache():
+    ds = fake_record({"Mean Ages": 10.0, "SD Ages": 2.0})
+    assert utils.compute_age_value(ds, None) == 0.0
+
+
+def test_compute_age_value_missing_mean():
+    ds = fake_record({"Mean Ages": None, "SD Ages": 2.0})
+    cache = {"rec1": (10.0, 2.0, 100)}
+    assert utils.compute_age_value(ds, cache) == 0.0
+
+
+def test_compute_age_value_missing_sd():
+    ds = fake_record({"Mean Ages": 10.0, "SD Ages": None})
+    cache = {"rec1": (10.0, 2.0, 100)}
+    assert utils.compute_age_value(ds, cache) == 0.0
+
+
+def test_compute_age_value_zero_sd():
+    ds = fake_record({"Mean Ages": 10.0, "SD Ages": 0})
+    cache = {"rec1": (10.0, 2.0, 100)}
+    assert utils.compute_age_value(ds, cache) == 0.0
+
+
+def test_compute_age_value_with_overlap():
+    # Test with overlapping age distributions
+    cache = {"rec1": (10.0, 2.0, 100)}
+    ds_overlap = fake_record({"Mean Ages": 10.0, "SD Ages": 2.0})
+
+    value = utils.compute_age_value(ds_overlap, cache)
+    # With same distribution parameters, there's coverage but spread over range
+    # The actual value is approximately 0.876
+    assert 0.85 < value < 0.90
+
+
+def test_compute_age_value_no_overlap():
+    # Test with non-overlapping age distributions
+    cache = {"rec1": (5.0, 0.5, 100)}
+    ds_no_overlap = fake_record({"Mean Ages": 15.0, "SD Ages": 0.5})
+
+    value = utils.compute_age_value(ds_no_overlap, cache)
+    # With no overlap, coverage should be very low, A_i should be close to 1
+    assert value > 0.9
+
+
 def test_compute_dataset_value_no_included():
     ds = fake_record({"Total Sample Size": 400, "Year of Last Data Point": 2020})
-    included = []
-    potential = [ds]
 
     # Default weights: alpha=1 / math.log(1000), epsilon=1
     expected_size = (1 / math.log(1000)) * math.log(400 + 1)
@@ -84,71 +287,74 @@ def test_compute_dataset_value_no_included():
     expected_recency = 1.0
     expected = expected_size + expected_recency
 
-    value = utils.compute_dataset_value(ds, included, potential)
+    # year_min = year_max = 2020, age_cache = None
+    value = utils.compute_dataset_value(
+        ds, year_min=2020, year_max=2020, age_cache=None
+    )
     assert pytest.approx(value, rel=1e-6) == expected
 
 
 def test_compute_dataset_value_recency_scaling():
     ds_new = fake_record({"Total Sample Size": 400, "Year of Last Data Point": 2020})
     ds_old = fake_record({"Total Sample Size": 400, "Year of Last Data Point": 2000})
-    included = []
-    potential = [ds_new, ds_old]
 
-    df_new_val = utils.compute_dataset_value(ds_new, included, potential)
-    df_old_val = utils.compute_dataset_value(ds_old, included, potential)
+    # Year range from 2000 to 2020
+    year_min, year_max = 2000, 2020
+
+    df_new_val = utils.compute_dataset_value(
+        ds_new, year_min=year_min, year_max=year_max, age_cache=None
+    )
+    df_old_val = utils.compute_dataset_value(
+        ds_old, year_min=year_min, year_max=year_max, age_cache=None
+    )
 
     assert df_new_val > df_old_val, "Newer dataset should have higher value"
 
 
 def test_compute_dataset_value_outcome_term():
-    included = [fake_record({"Total Sample Size": 50, "Articles: Outcomes": ["X"]})]
     candidate = fake_record(
         {
             "Total Sample Size": 0,
             "Year of Last Data Point": 2021,
-            "Articles: Outcomes": ["X", "Y"],
+            "Searches": ["Search1", "Search2", "Search3"],
             "Mean Ages": None,
             "SD Ages": None,
         }
     )
     weights = {"alpha": 0.0, "beta": 1.0, "gamma": 0.0, "delta": 0.0, "epsilon": 0.0}
-    potential = [candidate]
 
-    # coverage: X→50, Y→0 → O_i = (1/(1+50) + 1/(1+0)) / 2
-    expected_O = (1 / (1 + 50) + 1) / 2
-    val = utils.compute_dataset_value(candidate, included, potential, weights=weights)
+    # O_i = number of searches = 3
+    expected_O = 3.0
+    val = utils.compute_dataset_value(
+        candidate, year_min=None, year_max=None, age_cache=None, weights=weights
+    )
     assert pytest.approx(val, rel=1e-6) == expected_O
 
 
 def test_compute_dataset_value_age_term():
-    # One included dataset with mean=10, sd=0.1, N=100
-    included = [
-        fake_record(
-            {
-                "Total Sample Size": 100,
-                "Mean Ages": 10.0,
-                "SD Ages": 0.1,
-                "Articles: Outcomes": [],
-            }
-        )
-    ]
-    # Candidate with same mean=10, sd=0.1
+    # Candidate with mean=10, sd=0.1
     candidate = fake_record(
         {
             "Total Sample Size": 0,
             "Year of Last Data Point": 2021,
-            "Articles: Outcomes": [],
+            "Searches": [],
             "Mean Ages": 10.0,
             "SD Ages": 0.1,
         }
     )
     # Weights to isolate age term
     weights = {"alpha": 0.0, "beta": 0.0, "gamma": 1.0, "delta": 0.0, "epsilon": 0.0}
-    potential = [candidate]
 
-    # Since distributions align perfectly, CovWeighted = 100 → A_i = 1/(1+100)
-    expected_A = 1 / (1 + 100)
-    val = utils.compute_dataset_value(candidate, included, potential, weights=weights)
+    # Create age_cache with one included dataset: mean=10, sd=0.1, N=100
+    age_cache = {"rec123": (10.0, 0.1, 100)}
+
+    # Since distributions align perfectly:
+    # CovWeighted ≈ 100, avg_N = 100, coverage_scaled = 100/100 = 1
+    # A_i = 1/(1+1) = 0.5
+    expected_A = 1 / (1 + 1)
+    val = utils.compute_dataset_value(
+        candidate, year_min=None, year_max=None, age_cache=age_cache, weights=weights
+    )
     assert pytest.approx(val, rel=1e-6) == expected_A
 
 
