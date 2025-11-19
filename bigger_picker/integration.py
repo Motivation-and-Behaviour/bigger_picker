@@ -7,6 +7,7 @@ import bigger_picker.config as config
 import bigger_picker.utils as utils
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
+from bigger_picker.batchtracker import BatchTracker
 from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
@@ -40,6 +41,7 @@ class IntegrationManager:
         rayyan_manager: RayyanManager | None = None,
         airtable_manager: AirtableManager | None = None,
         openai_manager: OpenAIManager | None = None,
+        batch_tracker: BatchTracker | None = None,
         console: Console | None = None,
         debug: bool = False,
     ):
@@ -47,6 +49,7 @@ class IntegrationManager:
         self.rayyan = rayyan_manager
         self.airtable = airtable_manager
         self.openai = openai_manager
+        self.tracker = batch_tracker
         self.console = console or Console()
         self.debug = debug
 

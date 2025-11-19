@@ -24,7 +24,7 @@ class OpenAIManager:
         self.model = model
 
     def extract_article_info(self, pdf_path: str):
-        file = self._upload_file(pdf_path)
+        file = self.upload_file(pdf_path)
 
         response = self.client.responses.parse(
             model=self.model,
@@ -51,7 +51,7 @@ class OpenAIManager:
         return response.output_parsed
 
     def screen_record_fulltext(self, pdf_path: str):
-        file = self._upload_file(pdf_path)
+        file = self.upload_file(pdf_path)
 
         inputs = self._build_fulltext_prompt(file.id)
 
@@ -62,6 +62,60 @@ class OpenAIManager:
         )
 
         return response.output_parsed
+
+    def prepare_abstract_body(self, abstract: str) -> dict:
+        """Returns the body for the batch request (messages + schema)."""
+        inputs = self._build_abstract_prompt(abstract)
+        return self._build_structured_payload(inputs, ScreeningDecision)
+
+    def prepare_fulltext_body(self, file_id: str) -> dict:
+        """
+        Requires a file_id.
+        The IntegrationManager must call upload_file first.
+        """
+        inputs = self._build_fulltext_prompt(file_id)
+        return self._build_structured_payload(inputs, ScreeningDecision)
+
+    def prepare_extraction_body(self, file_id: str) -> dict:
+        """
+        Requires a file_id.
+        The IntegrationManager must call upload_file first.
+        """
+        inputs = [
+            {"role": "system", "content": ARTICLE_EXTRACTION_PROMPT},
+            {
+                "role": "user",
+                "content": [{"type": "input_file", "file_id": file_id}],
+            },
+        ]
+        return self._build_structured_payload(inputs, ArticleLLMExtract)
+
+    def parse_screening_decision(self, json_content: str) -> ScreeningDecision:
+        return ScreeningDecision.model_validate_json(json_content)
+
+    def parse_extraction_result(self, json_content: str) -> ArticleLLMExtract:
+        return ArticleLLMExtract.model_validate_json(json_content)
+
+    def upload_file(self, pdf_path: str) -> FileObject:
+        with open(pdf_path, "rb") as f:
+            return self.client.files.create(file=f, purpose="user_data")
+
+    def _build_structured_payload(self, messages: list, pydantic_model) -> dict:
+        """
+        Constructs the chat completion payload with manual JSON schema.
+        """
+        return {
+            "model": self.model,
+            "messages": messages,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": pydantic_model.__name__,
+                    "schema": pydantic_model.model_json_schema(),
+                    "strict": True,
+                },
+            },
+        }
 
     def _build_abstract_prompt(self, abstract: str) -> list[ResponseInputItemParam]:
         prompt = (
@@ -105,7 +159,3 @@ class OpenAIManager:
     @staticmethod
     def _number_criteria(criteria: list[str]) -> str:
         return "\n".join(f"{i + 1}. {c}" for i, c in enumerate(criteria))
-
-    def _upload_file(self, pdf_path: str) -> FileObject:
-        with open(pdf_path, "rb") as f:
-            return self.client.files.create(file=f, purpose="user_data")

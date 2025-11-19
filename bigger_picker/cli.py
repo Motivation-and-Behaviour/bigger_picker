@@ -18,9 +18,9 @@ from rich.table import Table
 
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
+from bigger_picker.integration import IntegrationManager
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
-from bigger_picker.sync import IntegrationManager
 
 app = typer.Typer()
 
