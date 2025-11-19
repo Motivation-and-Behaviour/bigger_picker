@@ -1,6 +1,8 @@
 import json
 import os
 import tempfile
+from functools import partial
+from itertools import batched
 
 import requests
 from rayyan import Rayyan
@@ -53,17 +55,65 @@ class RayyanManager:
 
         return unextracted  # type: ignore
 
-    def get_unscreened_fulltext(self) -> list[dict]:
+    def get_unscreened_abstracts(
+        self, max_articles: int | None = None, batch_size: int = 1000
+    ) -> list[dict]:
+        labels_to_check = (
+            list(config.RAYYAN_LABELS.values()) + config.RAYYAN_EXCLUSION_LABELS
+        )
+
+        # First just to get the total number of results
+        results_params = {"start": 0, "length": 10}
+        results = self._retry_on_auth_error(
+            lambda: self.review.results(self.review_id, results_params)  # type: ignore
+        )
+        total_articles = results["recordsFiltered"]  # type: ignore
+        batches = batched(range(0, total_articles), batch_size)
+
+        non_priority = []
+        priority = []
+
+        for batch in batches:
+            results_params = {"start": batch[0], "length": len(batch)}
+            results = self._retry_on_auth_error(
+                partial(self.review.results, self.review_id, results_params)  # type: ignore
+            )
+
+            for article in results["data"]:  # type: ignore
+                article_labels = article.get("customizations", {}).get("labels", {})  # type: ignore
+                if any(label in labels_to_check for label in article_labels):
+                    continue
+
+                if any(
+                    label in config.ASANA_SEARCHES_ENUM_VALUES
+                    for label in article_labels
+                ):
+                    priority.append(article)
+                else:
+                    non_priority.append(article)
+
+            if max_articles is not None:
+                if len(priority) + len(non_priority) >= max_articles:
+                    break
+
+        unscreened = priority + non_priority
+        if max_articles is not None:
+            unscreened = unscreened[:max_articles]
+
+        return unscreened
+
+    def get_unscreened_fulltexts(self, max_articles: int | None = None) -> list[dict]:
         results_params = {"extra[mode]": "included"}
         labels_to_check = (
             list(config.RAYYAN_LABELS.values()) + config.RAYYAN_EXCLUSION_LABELS
         )
+        labels_to_check.remove(config.RAYYAN_LABELS["abstract_included"])
 
         results = self._retry_on_auth_error(
             lambda: self.review.results(self.review_id, results_params)  # type: ignore
         )
 
-        unscreened = []
+        non_priority = []
         priority = []
 
         for article in results["data"]:  # type: ignore
@@ -80,11 +130,13 @@ class RayyanManager:
             ):
                 priority.append(article)
             else:
-                unscreened.append(article)
+                non_priority.append(article)
 
-        unscreened = priority + unscreened
+            if max_articles is not None:
+                if len(priority) + len(non_priority) >= max_articles:
+                    break
 
-        return unscreened
+        return priority + non_priority
 
     def update_article_labels(self, article_id: int, plan: dict) -> None:
         self._retry_on_auth_error(
