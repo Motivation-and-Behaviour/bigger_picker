@@ -5,6 +5,8 @@ RAYYAN_LABELS = {
     "extracted": "Included: AI Extracted",
     "included": "BP: Included",
     "excluded": "BP: Excluded",
+    "abstract_included": "BP: Abstract Included",
+    "abstract_excluded": "BP: Abstract Excluded",
 }
 RAYYAN_EXCLUSION_LABELS = [
     "__EXR__wrong age",
@@ -79,13 +81,20 @@ EXCLUSION_CRITERIA = [
     "Full-text not available in English",  # noqa: E501
 ]
 
-SCREENING_INSTRUCTIONS = """
+FULLTEXT_SCREENING_INSTRUCTIONS = """
+# Instructions
 We now assess whether the paper should be included from the systematic review by evaluating it against each and every predefined inclusion and exclusion criterion. First, we will reflect on how we will decide whether a paper should be included or excluded. Then, we will think step by step for each criteria, giving reasons for why they are met or not met.
 Follow the schema exactly:
 - Use 1-based indices for criteria lists.
 - If none apply, return an empty list [] for any list field.
 - 'triggered_exclusion' and 'exclusion_reasons' must align in order and length.
 - 'rationale' should be a short paragraph (3-6 sentences) and must not exceed 1000 characters."""  # noqa: E501
+
+ABSTRACT_SCREENING_INSTRUCTIONS = """
+# Instructions
+We now assess whether the paper should be included in the systematic review by evaluating it against each and every predefined inclusion and exclusion criterion. First, we will reflect on how we will decide whether a paper should be included or excluded. Then, we will think step by step for each criteria, giving reasons for why they are met or not met.  Studies that may not fully align with the primary focus of our inclusion criteria but provide data or insights potentially relevant to our review deserve thoughtful consideration. Given the nature of abstracts as concise summaries of comprehensive research, some degree of interpretation is necessary.
+Our aim should be to inclusively screen abstracts, ensuring broad coverage of pertinent studies while filtering out those that are clearly irrelevant. Only vote "exclude" if the paper warrants exclusion, and vote "include" if inclusion is advised or uncertainty persists.
+"""  # noqa: E501
 
 ARTICLE_EXTRACTION_PROMPT = """ 
 You are an experienced research assistant supporting a systematic review of academic studies on children's screen time and its outcomes.

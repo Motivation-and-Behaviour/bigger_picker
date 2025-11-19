@@ -1,3 +1,5 @@
+from functools import wraps
+
 from pyairtable.api.types import RecordDict
 from rich.console import Console
 
@@ -10,13 +12,34 @@ from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
 
 
+def requires_services(*required_services):
+    """
+    Ensures all listed services are not None before running the method.
+    Usage: @requires_services("asana", "airtable")
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            missing = [s for s in required_services if getattr(self, s, None) is None]
+
+            if missing:
+                raise RuntimeError(f"Missing required services: {', '.join(missing)}")
+
+            return func(self, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 class IntegrationManager:
     def __init__(
         self,
-        asana_manager: AsanaManager,
-        rayyan_manager: RayyanManager,
-        airtable_manager: AirtableManager,
-        openai_manager: OpenAIManager,
+        asana_manager: AsanaManager | None = None,
+        rayyan_manager: RayyanManager | None = None,
+        airtable_manager: AirtableManager | None = None,
+        openai_manager: OpenAIManager | None = None,
         console: Console | None = None,
         debug: bool = False,
     ):
@@ -27,9 +50,11 @@ class IntegrationManager:
         self.console = console or Console()
         self.debug = debug
 
+    @requires_services("asana", "airtable")
     def sync_airtable_and_asana(
         self,
     ) -> None:
+        assert self.asana and self.airtable
         self._log("Getting Asana tasks")
         self.asana.get_tasks(refresh=True)
 
@@ -71,7 +96,10 @@ class IntegrationManager:
         self._log("Starting status sync")
         self.update_airtable_statuses()
 
+    @requires_services("asana", "airtable")
     def update_task_from_dataset(self, task: dict, dataset: RecordDict) -> dict:
+        assert self.asana and self.airtable
+
         dataset_vals = {
             "name": dataset["fields"].get("Dataset Name", None),
             "value": round(dataset["fields"]["Dataset Value"], 3)
@@ -113,7 +141,10 @@ class IntegrationManager:
 
         return self.asana.update_task(update_payload, task_gid)
 
+    @requires_services("asana", "airtable")
     def create_task_from_dataset(self, dataset: RecordDict) -> dict:
+        assert self.asana and self.airtable
+
         dataset_status = dataset["fields"].get("Status", None)
         if dataset_status is None:
             dataset_status = "Awaiting Triage"
@@ -161,7 +192,10 @@ class IntegrationManager:
 
         return updated_created_task
 
+    @requires_services("asana", "airtable")
     def update_airtable_statuses(self) -> None:
+        assert self.asana and self.airtable
+
         self._log("Getting Asana tasks")
         # Always force refresh since we need up-to-date statuses from Asana
         tasks = self.asana.get_tasks(refresh=True)
@@ -208,12 +242,15 @@ class IntegrationManager:
                 else:
                     self._log(f"No status change for dataset {dataset_bpipd}.")
 
+    @requires_services("airtable")
     def upload_extraction_to_airtable(
         self,
         llm_extraction: ArticleLLMExtract,
         article_metadata: dict,
         pdf_path: str | None = None,
     ) -> RecordDict:
+        assert self.airtable
+
         def _convert_to_title_case(value):
             if isinstance(value, str):
                 return value.title()
@@ -285,7 +322,10 @@ class IntegrationManager:
 
         return self.airtable.create_record("Datasets", dataset_payload)
 
+    @requires_services("airtable", "asana", "rayyan", "openai")
     def process_article(self, article: dict):
+        assert self.airtable and self.asana and self.rayyan and self.openai
+
         pdf_path = self.rayyan.download_pdf(article)
         if pdf_path is None:
             # This shouldn't happen, but just in case, we skip this article
@@ -305,7 +345,10 @@ class IntegrationManager:
         }
         self.rayyan.update_article_labels(article["id"], plan)
 
+    @requires_services("airtable")
     def updated_datasets_scores(self) -> bool:
+        assert self.airtable
+
         self._log("Scoring datasets...")
 
         datasets_included_statuses = ["Included", "Agreed & Awaiting Data"]
@@ -347,7 +390,10 @@ class IntegrationManager:
 
         return updated_any_datasets
 
+    @requires_services("airtable")
     def mark_duplicates(self, threshold=0.51):
+        assert self.airtable
+
         self._log("Marking duplicates...")
         datasets = self.airtable.tables["Datasets"].all()
         duplicates = utils.identify_duplicate_datasets(datasets, threshold=threshold)
@@ -367,7 +413,47 @@ class IntegrationManager:
                 payload = {"Possible Duplicates": dataset_duplicates}
                 self.airtable.update_record("Datasets", dataset_id, payload)
 
+    @requires_services("openai", "rayyan")
+    def screen_abstract(self, article: dict):
+        assert self.openai and self.rayyan
+
+        abstracts = article.get("abstracts", [])
+
+        if not abstracts:
+            # No abstract to screen
+            return
+
+        abstract = abstracts[0]
+
+        decision = self.openai.screen_record_abstract(abstract)
+        if decision is None:
+            # Something with the LLM failed
+            return
+
+        decision_dict = decision.model_dump()
+
+        if decision_dict["vote"] not in ["include", "exclude"]:
+            # Invalid vote, skip
+            return
+
+        if decision_dict["vote"] == "exclude":
+            plan = {config.RAYYAN_LABELS["abstract_excluded"]: 1}
+
+            # Only add rationale note for exclusions
+            rationale = decision_dict["rationale"]
+            if len(rationale) > 1000:
+                rationale = rationale[:996] + "..."
+            self.rayyan.create_article_note(
+                article["id"], f"LLM Reasoning: {rationale}"
+            )
+        else:
+            plan = {config.RAYYAN_LABELS["abstract_included"]: 1}
+        self.rayyan.update_article_labels(article["id"], plan)
+
+    @requires_services("openai", "rayyan")
     def screen_fulltext(self, article: dict):
+        assert self.openai and self.rayyan
+
         pdf_path = self.rayyan.download_pdf(article)
         if pdf_path is None:
             # This shouldn't happen, but you never know
@@ -403,6 +489,7 @@ class IntegrationManager:
 
         self.rayyan.create_article_note(article["id"], f"LLM Reasoning: {rationale}")
 
+    @requires_services("asana", "airtable")
     def sync(self):
         self.sync_airtable_and_asana()  # HACK: need to update status first
         any_datasets_updated = self.updated_datasets_scores()

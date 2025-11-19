@@ -1,12 +1,14 @@
 from openai import OpenAI
 from openai.types import FileObject
+from openai.types.responses.response_input_param import ResponseInputItemParam
 
 from bigger_picker.config import (
+    ABSTRACT_SCREENING_INSTRUCTIONS,
     ARTICLE_EXTRACTION_PROMPT,
     EXCLUSION_CRITERIA,
+    FULLTEXT_SCREENING_INSTRUCTIONS,
     INCLUSION_CRITERIA,
     INCLUSION_HEADER,
-    SCREENING_INSTRUCTIONS,
     STUDY_OBJECTIVES,
 )
 from bigger_picker.credentials import load_token
@@ -38,8 +40,15 @@ class OpenAIManager:
 
         return response.output_parsed
 
-    def screen_record_abstract(self):
-        pass
+    def screen_record_abstract(self, abstract: str):
+        inputs = self._build_abstract_prompt(abstract)
+
+        response = self.client.responses.parse(
+            model=self.model,
+            input=inputs,
+            text_format=ScreeningDecision,
+        )
+        return response.output_parsed
 
     def screen_record_fulltext(self, pdf_path: str):
         file = self._upload_file(pdf_path)
@@ -54,11 +63,7 @@ class OpenAIManager:
 
         return response.output_parsed
 
-    @staticmethod
-    def _build_abstract_prompt():
-        pass
-
-    def _build_fulltext_prompt(self, file_id: str):
+    def _build_abstract_prompt(self, abstract: str) -> list[ResponseInputItemParam]:
         prompt = (
             STUDY_OBJECTIVES
             + "\n"
@@ -70,7 +75,26 @@ class OpenAIManager:
             + "Exclusion criteria (any triggers exclusion):\n"
             + self._number_criteria(EXCLUSION_CRITERIA)
             + "\n"
-            + SCREENING_INSTRUCTIONS
+            + ABSTRACT_SCREENING_INSTRUCTIONS
+        )
+        return [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": f"Abstract:\n{abstract}"},
+        ]
+
+    def _build_fulltext_prompt(self, file_id: str) -> list[ResponseInputItemParam]:
+        prompt = (
+            STUDY_OBJECTIVES
+            + "\n"
+            + INCLUSION_HEADER
+            + "\n"
+            + "Inclusion criteria (all must be met):\n"
+            + self._number_criteria(INCLUSION_CRITERIA)
+            + "\n"
+            + "Exclusion criteria (any triggers exclusion):\n"
+            + self._number_criteria(EXCLUSION_CRITERIA)
+            + "\n"
+            + FULLTEXT_SCREENING_INSTRUCTIONS
         )
         return [
             {"role": "system", "content": prompt},

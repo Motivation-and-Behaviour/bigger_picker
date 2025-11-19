@@ -63,6 +63,8 @@ def process(
         debug=debug,
     )
 
+    assert integration.rayyan
+
     with console.status("Getting unextracted articles..."):
         articles = integration.rayyan.get_unextracted_articles()
         if max_articles is not None:
@@ -99,11 +101,6 @@ def sync(
     dotenv_path: str = typer.Option(None, help="Path to .env file with credentials"),
     airtable_api_key: str = typer.Option(None, help="Airtable API key"),
     asana_token: str = typer.Option(None, help="Asana API token"),
-    openai_api_key: str = typer.Option(None, help="OpenAI API key"),
-    openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
-    rayyan_creds_path: str = typer.Option(
-        None, help="Path to Rayyan credentials JSON file"
-    ),
     debug: bool = typer.Option(
         False, "--debug", help="Enable debug logging to console"
     ),
@@ -118,13 +115,9 @@ def sync(
 
     airtable = AirtableManager(airtable_api_key)
     asana = AsanaManager(asana_token)
-    openai = OpenAIManager(openai_api_key, openai_model)
-    rayyan = RayyanManager(rayyan_creds_path)
     integration = IntegrationManager(
         asana_manager=asana,
         airtable_manager=airtable,
-        openai_manager=openai,
-        rayyan_manager=rayyan,
         console=console,
         debug=debug,
     )
@@ -138,8 +131,6 @@ def sync(
 @app.command()
 def screenft(
     dotenv_path: str = typer.Option(None, help="Path to .env file with credentials"),
-    airtable_api_key: str = typer.Option(None, help="Airtable API key"),
-    asana_token: str = typer.Option(None, help="Asana API token"),
     openai_api_key: str = typer.Option(None, help="OpenAI API key"),
     openai_model: str = typer.Option("gpt-5.1", help="OpenAI model to use"),
     rayyan_creds_path: str = typer.Option(
@@ -160,18 +151,16 @@ def screenft(
 
     console = Console()
 
-    airtable = AirtableManager(airtable_api_key)
-    asana = AsanaManager(asana_token)
     openai = OpenAIManager(openai_api_key, openai_model)
     rayyan = RayyanManager(rayyan_creds_path)
     integration = IntegrationManager(
-        asana_manager=asana,
-        airtable_manager=airtable,
         openai_manager=openai,
         rayyan_manager=rayyan,
         console=console,
         debug=debug,
     )
+
+    assert integration.rayyan
 
     with console.status("Getting unscreened fulltexts..."):
         articles = integration.rayyan.get_unscreened_fulltext()
@@ -251,6 +240,8 @@ def monitor(
         console=console,
         debug=debug,
     )
+
+    assert integration.asana
 
     stats = {
         "status": "[green]Running[/green]",
