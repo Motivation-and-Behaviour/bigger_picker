@@ -1,4 +1,7 @@
+import json
+import time
 from functools import wraps
+from pathlib import Path
 
 from pyairtable.api.types import RecordDict
 from rich.console import Console
@@ -8,7 +11,7 @@ import bigger_picker.utils as utils
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
 from bigger_picker.batchtracker import BatchTracker
-from bigger_picker.datamodels import Article, ArticleLLMExtract
+from bigger_picker.datamodels import Article, ArticleLLMExtract, ScreeningDecision
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
 
@@ -435,23 +438,7 @@ class IntegrationManager:
 
         decision_dict = decision.model_dump()
 
-        if decision_dict["vote"] not in ["include", "exclude"]:
-            # Invalid vote, skip
-            return
-
-        if decision_dict["vote"] == "exclude":
-            plan = {config.RAYYAN_LABELS["abstract_excluded"]: 1}
-
-            # Only add rationale note for exclusions
-            rationale = decision_dict["rationale"]
-            if len(rationale) > 1000:
-                rationale = rationale[:996] + "..."
-            self.rayyan.create_article_note(
-                article["id"], f"LLM Reasoning: {rationale}"
-            )
-        else:
-            plan = {config.RAYYAN_LABELS["abstract_included"]: 1}
-        self.rayyan.update_article_labels(article["id"], plan)
+        self._action_screening_decision(decision_dict, article["id"], is_abstract=True)
 
     @requires_services("openai", "rayyan")
     def screen_fulltext(self, article: dict):
@@ -468,29 +455,7 @@ class IntegrationManager:
 
         decision_dict = decision.model_dump()
 
-        if decision_dict["vote"] not in ["include", "exclude"]:
-            # Invalid vote, skip
-            return
-
-        if decision_dict["vote"] == "exclude":
-            plan = {config.RAYYAN_LABELS["excluded"]: 1}
-            if decision_dict["triggered_exclusion"]:
-                excl_reason_idx = decision_dict["triggered_exclusion"][0]
-                excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
-                plan[excl_label] = 1
-            elif decision_dict["failed_inclusion"]:
-                excl_reason_idx = decision_dict["failed_inclusion"][0]
-                excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
-                plan[excl_label] = 1
-        else:
-            plan = {config.RAYYAN_LABELS["included"]: 1}
-            plan[config.RAYYAN_LABELS["unextracted"]] = 1
-        self.rayyan.update_article_labels(article["id"], plan)
-        rationale = decision_dict["rationale"]
-        if len(rationale) > 1000:
-            rationale = rationale[:996] + "..."
-
-        self.rayyan.create_article_note(article["id"], f"LLM Reasoning: {rationale}")
+        self._action_screening_decision(decision_dict, article["id"], is_abstract=False)
 
     @requires_services("asana", "airtable")
     def sync(self):
@@ -501,6 +466,326 @@ class IntegrationManager:
             self.sync_airtable_and_asana()
         else:
             self._log("No datasets updated, skipping second sync.")
+
+    @requires_services("openai", "rayyan", "tracker")
+    def create_abstract_screening_batch(self, articles: list[dict]):
+        assert self.openai and self.rayyan and self.tracker
+
+        self._log(f"Preparing abstract screening batch for {len(articles)} articles...")
+        requests = []
+
+        for article in articles:
+            abstracts = article.get("abstracts", [])
+            if not abstracts:
+                continue
+
+            custom_id = f"abstract-{article['id']}"
+            body = self.openai.prepare_abstract_body(abstracts[0])
+            request = {
+                "custom_id": custom_id,
+                "method": "POST",
+                "url": "/v1/chat/completions",
+                "body": body,
+            }
+            requests.append(request)
+            plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
+            self.rayyan.update_article_labels(article["id"], plan)
+
+        if requests:
+            self._submit_batch(requests, "abstract_screen")
+
+    @requires_services("openai", "rayyan", "tracker")
+    def create_fulltext_screening_batch(self, articles: list[dict]):
+        assert self.openai and self.rayyan and self.tracker
+
+        self._log(f"Preparing fulltext screening batch for {len(articles)} articles...")
+        requests = []
+
+        for article in articles:
+            pdf_path = self.rayyan.download_pdf(article)
+            if not pdf_path:
+                self._log(f"No PDF found for {article['id']}, skipping.")
+                continue
+
+            try:
+                file = self.openai.upload_file(pdf_path)
+            except Exception as e:
+                self._log(f"Failed to upload PDF for {article['id']}: {e}")
+                continue
+
+            # 3. Prepare Request
+            custom_id = f"fulltext-{article['id']}"
+            body = self.openai.prepare_fulltext_body(file.id)
+
+            request = {
+                "custom_id": custom_id,
+                "method": "POST",
+                "url": "/v1/chat/completions",
+                "body": body,
+            }
+            requests.append(request)
+            plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
+            self.rayyan.update_article_labels(article["id"], plan)
+
+        if requests:
+            self._submit_batch(requests, "fulltext_screen")
+
+    @requires_services("openai", "rayyan", "tracker")
+    def create_extraction_batch(self, articles: list[dict]):
+        assert self.openai and self.rayyan and self.tracker
+
+        self._log(f"Preparing extraction batch for {len(articles)} articles...")
+        requests = []
+
+        for article in articles:
+            pdf_path = self.rayyan.download_pdf(article)
+            if not pdf_path:
+                continue
+
+            try:
+                file = self.openai.upload_file(pdf_path)
+            except Exception as e:
+                self._log(f"Failed to upload PDF for {article['id']}: {e}")
+                continue
+
+            custom_id = f"extraction-{article['id']}"
+            body = self.openai.prepare_extraction_body(file.id)
+
+            request = {
+                "custom_id": custom_id,
+                "method": "POST",
+                "url": "/v1/chat/completions",
+                "body": body,
+            }
+            requests.append(request)
+            plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
+            self.rayyan.update_article_labels(article["id"], plan)
+
+        if requests:
+            self._submit_batch(requests, "extraction")
+
+    @requires_services("openai")
+    def process_pending_batches(self, pending: dict):
+        assert self.openai
+
+        for batch_id, info in pending.items():
+            self._log(f"Checking status for batch {batch_id} ({info['type']})...")
+            try:
+                batch = self.openai.retrieve_batch(batch_id)
+            except Exception as e:
+                self._log(f"Could not retrieve batch {batch_id}: {e}")
+                continue
+
+            if batch.status == "completed":
+                self._log("Batch completed! Downloading results...")
+                if batch.output_file_id:
+                    self._handle_completed_batch(
+                        batch.output_file_id, info["type"], batch_id
+                    )
+                else:
+                    self._log("Batch completed but has no output file ID.")
+                    if batch.error_file_id:
+                        self._log(f"Batch has errors. File ID: {batch.error_file_id}")
+
+            elif batch.status in ["failed", "expired", "cancelled"]:
+                self._log(f"Batch {batch_id} ended with status: {batch.status}")
+            else:
+                self._log(f"Batch {batch_id} is {batch.status}")
+
+    @requires_services("openai", "tracker")
+    def _handle_completed_batch(
+        self, output_file_id: str, batch_type: str, batch_id: str
+    ):
+        assert self.openai and self.tracker
+        file_response = self.openai.client.files.content(output_file_id)
+        content = file_response.text
+
+        results = []
+        for line in content.split("\n"):
+            if line.strip():
+                results.append(json.loads(line))
+
+        self._log(f"Processing {len(results)} results for {batch_type}...")
+
+        if batch_type == "abstract_screen":
+            self._process_abstract_results(results)
+        elif batch_type == "fulltext_screen":
+            self._process_fulltext_results(results)
+        elif batch_type == "extraction":
+            self._process_extraction_results(results)
+
+        self.tracker.mark_completed(batch_id)
+
+    @requires_services("rayyan")
+    def _action_screening_decision(
+        self, decision: dict, article_id: int, is_abstract: bool
+    ):
+        assert self.rayyan
+
+        if decision["vote"] not in ["include", "exclude"]:
+            # Invalid vote, skip
+            return
+
+        if decision["vote"] == "exclude":
+            if is_abstract:
+                plan = {config.RAYYAN_LABELS["abstract_excluded"]: 1}
+            else:
+                plan = {config.RAYYAN_LABELS["excluded"]: 1}
+                if decision.get("triggered_exclusion"):
+                    excl_reason_idx = decision["triggered_exclusion"][0]
+                    excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
+                    plan[excl_label] = 1
+                elif decision.get("failed_inclusion"):
+                    excl_reason_idx = decision["failed_inclusion"][0]
+                    excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
+                    plan[excl_label] = 1
+            rationale = decision["rationale"]
+            if len(rationale) > 1000:
+                rationale = rationale[:996] + "..."
+            self.rayyan.create_article_note(article_id, f"LLM Reasoning: {rationale}")
+        else:
+            if is_abstract:
+                plan = {config.RAYYAN_LABELS["abstract_included"]: 1}
+            else:
+                plan = {
+                    config.RAYYAN_LABELS["included"]: 1,
+                    config.RAYYAN_LABELS["unextracted"]: 1,
+                }
+
+        self.rayyan.update_article_labels(article_id, plan)
+
+    @requires_services("rayyan", "openai")
+    def _process_abstract_results(self, results: list):
+        assert self.rayyan and self.openai
+        for item in results:
+            try:
+                article_id = item["custom_id"].split("-")[-1]
+                response_body = item["response"]["body"]
+
+                if item["response"]["status_code"] != 200:
+                    self._log(
+                        f"Error in batch result for {article_id}: {response_body}"
+                    )
+                    plan = {config.RAYYAN_LABELS["batch_pending"]: -1}
+                    self.rayyan.update_article_labels(article_id, plan)
+                    continue
+
+                content_str = response_body["choices"][0]["message"]["content"]
+                decision = self.openai.parse_screening_decision(content_str)
+                decision_dict = decision.model_dump()
+
+                self._action_screening_decision(
+                    decision_dict, article_id, is_abstract=True
+                )
+
+            except Exception as e:
+                self._log(f"Failed to process abstract result: {e}")
+
+    @requires_services("rayyan", "openai")
+    def _process_fulltext_results(self, results: list):
+        assert self.rayyan and self.openai
+        for item in results:
+            try:
+                article_id = item["custom_id"].split("-")[-1]
+                response_body = item["response"]["body"]
+
+                if item["response"]["status_code"] != 200:
+                    self._log(
+                        f"Error in batch result for {article_id}: {response_body}"
+                    )
+                    plan = {config.RAYYAN_LABELS["batch_pending"]: -1}
+                    self.rayyan.update_article_labels(article_id, plan)
+                    continue
+
+                content_str = response_body["choices"][0]["message"]["content"]
+                decision = self.openai.parse_screening_decision(content_str)
+                decision_dict = decision.model_dump()
+
+                self._action_screening_decision(
+                    decision_dict, article_id, is_abstract=False
+                )
+
+            except Exception as e:
+                self._log(f"Failed to process fulltext result: {e}")
+
+    @requires_services("rayyan", "airtable", "asana", "openai")
+    def _process_extraction_results(self, results: list):
+        assert self.rayyan and self.airtable and self.asana and self.openai
+
+        for item in results:
+            try:
+                article_id = item["custom_id"].split("-")[-1]
+                response_body = item["response"]["body"]
+
+                if item["response"]["status_code"] != 200:
+                    self._log(
+                        f"Error in batch result for {article_id}: {response_body}"
+                    )
+                    plan = {config.RAYYAN_LABELS["batch_pending"]: -1}
+                    self.rayyan.update_article_labels(article_id, plan)
+                    continue
+
+                content_str = response_body["choices"][0]["message"]["content"]
+                llm_extraction = self.openai.parse_extraction_result(content_str)
+
+                # FETCH METADATA
+                # We need to get the article object again to extract authors/year etc.
+                # Assuming RayyanManager has a get_article method, or we search for it.
+                # If get_article doesn't exist, we assume we can just use the ID
+                # if we fetch the full list or handle it via Rayyan API.
+                # For now, let's assume we can fetch it by ID:
+
+                # TODO: Implement a method in RayyanManager to get article by ID using the filtering https://deepwiki.com/rayyansys/rayyan-api-docs/3.5-search-and-filtering
+                # Check that this bit makes sense
+
+                article = self.rayyan.get_article(article_id)
+                article_metadata = self.rayyan.extract_article_metadata(article)
+
+                # UPLOAD
+                # Note: pdf_path is None because we don't have the local file in the batch processing context
+                # unless we re-download it.
+
+                # TODO: No we need to redownload the pdf. Fix that.
+                dataset = self.upload_extraction_to_airtable(
+                    llm_extraction, article_metadata, pdf_path=None
+                )
+
+                self.create_task_from_dataset(dataset)
+
+                plan = {
+                    self.rayyan.unextracted_label: -1,
+                    self.rayyan.extracted_label: 1,
+                }
+                self.rayyan.update_article_labels(article_id, plan)
+                self._log(f"Successfully processed extraction for {article_id}")
+
+            except Exception as e:
+                self._log(f"Failed to process extraction result: {e}")
+
+    @requires_services("openai", "tracker")
+    def _submit_batch(self, requests: list, batch_type: str):
+        """Internal helper to write JSONL, upload, and create batch."""
+        assert self.openai and self.tracker
+
+        timestamp = int(time.time())
+        filename = f"batch_input_{batch_type}_{timestamp}.jsonl"
+
+        self._log(f"Writing {len(requests)} requests to {filename}...")
+        with open(filename, "w") as f:
+            for req in requests:
+                f.write(json.dumps(req) + "\n")
+
+        try:
+            self._log("Creating batch job...")
+            batch_job = self.openai.create_batch(filename, batch_type)
+            self.tracker.add_batch(batch_job.id, batch_type)
+            self._log(f"Batch {batch_job.id} submitted successfully.")
+
+        except Exception as e:
+            self._log(f"Error submitting batch: {e}")
+        finally:
+            if Path(filename).exists():
+                Path(filename).unlink()
 
     def _log(self, *args, **kwargs):
         if self.debug:

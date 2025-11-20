@@ -1,5 +1,5 @@
 from openai import OpenAI
-from openai.types import FileObject
+from openai.types import Batch, FileObject, FilePurpose
 from openai.types.responses.response_input_param import ResponseInputItemParam
 
 from bigger_picker.config import (
@@ -96,9 +96,23 @@ class OpenAIManager:
     def parse_extraction_result(self, json_content: str) -> ArticleLLMExtract:
         return ArticleLLMExtract.model_validate_json(json_content)
 
-    def upload_file(self, pdf_path: str) -> FileObject:
-        with open(pdf_path, "rb") as f:
-            return self.client.files.create(file=f, purpose="user_data")
+    def upload_file(
+        self, file_path: str, purpose: FilePurpose = "user_data"
+    ) -> FileObject:
+        with open(file_path, "rb") as f:
+            return self.client.files.create(file=f, purpose=purpose)
+
+    def create_batch(self, filename: str, batch_type: str) -> Batch:
+        batch_input_file = self.upload_file(filename, purpose="batch")
+        return self.client.batches.create(
+            input_file_id=batch_input_file.id,
+            endpoint="/v1/chat/completions",
+            completion_window="24h",
+            metadata={"description": batch_type},
+        )
+
+    def retrieve_batch(self, batch_id: str) -> Batch:
+        return self.client.batches.retrieve(batch_id)
 
     def _build_structured_payload(self, messages: list, pydantic_model) -> dict:
         """
