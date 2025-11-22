@@ -138,6 +138,20 @@ class RayyanManager:
 
         return priority + non_priority
 
+    def get_article_by_id(self, article_id: int) -> dict:
+        results_params = {"extra[article_ids][]": str(article_id)}
+
+        results = self._retry_on_auth_error(
+            lambda: self.review.results(self.review_id, results_params)  # type: ignore
+        )
+
+        articles = results["data"]  # type: ignore
+
+        if not articles:
+            raise ValueError(f"Article with ID {article_id} not found.")
+
+        return articles[0]  # type: ignore
+
     def update_article_labels(self, article_id: int, plan: dict) -> None:
         self._retry_on_auth_error(
             lambda: self.review.customize(self.review_id, article_id, plan)

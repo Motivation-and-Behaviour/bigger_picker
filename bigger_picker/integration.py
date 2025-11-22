@@ -11,7 +11,7 @@ import bigger_picker.utils as utils
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
 from bigger_picker.batchtracker import BatchTracker
-from bigger_picker.datamodels import Article, ArticleLLMExtract, ScreeningDecision
+from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
 
@@ -618,7 +618,7 @@ class IntegrationManager:
 
     @requires_services("rayyan")
     def _action_screening_decision(
-        self, decision: dict, article_id: int, is_abstract: bool
+        self, decision: dict, article_id: int, is_abstract: bool, is_batch: bool = False
     ):
         assert self.rayyan
 
@@ -652,6 +652,9 @@ class IntegrationManager:
                     config.RAYYAN_LABELS["unextracted"]: 1,
                 }
 
+        if is_batch:
+            plan[config.RAYYAN_LABELS["batch_pending"]] = -1
+
         self.rayyan.update_article_labels(article_id, plan)
 
     @requires_services("rayyan", "openai")
@@ -675,7 +678,7 @@ class IntegrationManager:
                 decision_dict = decision.model_dump()
 
                 self._action_screening_decision(
-                    decision_dict, article_id, is_abstract=True
+                    decision_dict, article_id, is_abstract=True, is_batch=True
                 )
 
             except Exception as e:
@@ -702,7 +705,7 @@ class IntegrationManager:
                 decision_dict = decision.model_dump()
 
                 self._action_screening_decision(
-                    decision_dict, article_id, is_abstract=False
+                    decision_dict, article_id, is_abstract=False, is_batch=True
                 )
 
             except Exception as e:
@@ -728,26 +731,12 @@ class IntegrationManager:
                 content_str = response_body["choices"][0]["message"]["content"]
                 llm_extraction = self.openai.parse_extraction_result(content_str)
 
-                # FETCH METADATA
-                # We need to get the article object again to extract authors/year etc.
-                # Assuming RayyanManager has a get_article method, or we search for it.
-                # If get_article doesn't exist, we assume we can just use the ID
-                # if we fetch the full list or handle it via Rayyan API.
-                # For now, let's assume we can fetch it by ID:
-
-                # TODO: Implement a method in RayyanManager to get article by ID using the filtering https://deepwiki.com/rayyansys/rayyan-api-docs/3.5-search-and-filtering
-                # Check that this bit makes sense
-
-                article = self.rayyan.get_article(article_id)
+                article = self.rayyan.get_article_by_id(article_id)
                 article_metadata = self.rayyan.extract_article_metadata(article)
+                pdf_path = self.rayyan.download_pdf(article)
 
-                # UPLOAD
-                # Note: pdf_path is None because we don't have the local file in the batch processing context
-                # unless we re-download it.
-
-                # TODO: No we need to redownload the pdf. Fix that.
                 dataset = self.upload_extraction_to_airtable(
-                    llm_extraction, article_metadata, pdf_path=None
+                    llm_extraction, article_metadata, pdf_path=pdf_path
                 )
 
                 self.create_task_from_dataset(dataset)
@@ -755,6 +744,7 @@ class IntegrationManager:
                 plan = {
                     self.rayyan.unextracted_label: -1,
                     self.rayyan.extracted_label: 1,
+                    config.RAYYAN_LABELS["batch_pending"]: -1,
                 }
                 self.rayyan.update_article_labels(article_id, plan)
                 self._log(f"Successfully processed extraction for {article_id}")
