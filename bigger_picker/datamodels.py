@@ -1,9 +1,11 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Population(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     age_lower_range: float | None = Field(None, alias="Age: Lower Range")
     age_upper_range: float | None = Field(None, alias="Age: Upper Range")
     age_mean: float | None = Field(None, alias="Age: Mean")
@@ -14,6 +16,8 @@ class Population(BaseModel):
 
 
 class ScreenTimeMeasure(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     type: Literal["Survey", "Time Use Diary", "Other"] | None = Field(
         None, alias="Screen Time Measure: Type"
     )
@@ -27,6 +31,8 @@ class ScreenTimeMeasure(BaseModel):
 
 
 class Outcome(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     outcome_group: (
         Literal[
             "Learning", "Cognition", "Mental Health", "Behaviour", "wellbeing", "Other"
@@ -38,6 +44,8 @@ class Outcome(BaseModel):
 
 
 class ArticleLLMExtract(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     corresponding_author: str | None = Field(None, alias="Corresponding Author")
     corresponding_author_email: str | None = Field(
         None, alias="Corresponding Author Email"
@@ -56,6 +64,8 @@ class ArticleLLMExtract(BaseModel):
 
 
 class Article(ArticleLLMExtract):
+    model_config = ConfigDict(extra="ignore")
+
     rayyan_id: int | None = Field(None, alias="Rayyan ID")
     article_title: str | None = Field(None, alias="Article Title")
     authors: str | None = Field(None, alias="Authors")
@@ -66,6 +76,8 @@ class Article(ArticleLLMExtract):
 
 
 class ScreeningDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     vote: Literal["include", "exclude"] = Field(
         description="Final decision. Choose exactly one."
     )

@@ -429,9 +429,11 @@ class IntegrationManager:
             # No abstract to screen
             return
 
-        abstract = abstracts[0]
+        abstract_text = abstracts[0].get("content", "")
+        if not abstract_text:
+            return
 
-        decision = self.openai.screen_record_abstract(abstract)
+        decision = self.openai.screen_record_abstract(abstract_text)
         if decision is None:
             # Something with the LLM failed
             return
@@ -479,8 +481,12 @@ class IntegrationManager:
             if not abstracts:
                 continue
 
+            abstract_text = abstracts[0].get("content", "")
+            if not abstract_text:
+                continue
+
             custom_id = f"abstract-{article['id']}"
-            body = self.openai.prepare_abstract_body(abstracts[0])
+            body = self.openai.prepare_abstract_body(abstract_text)
             request = {
                 "custom_id": custom_id,
                 "method": "POST",
@@ -586,6 +592,7 @@ class IntegrationManager:
                     self._log("Batch completed but has no output file ID.")
                     if batch.error_file_id:
                         self._log(f"Batch has errors. File ID: {batch.error_file_id}")
+                        # TODO: handle errors
 
             elif batch.status in ["failed", "expired", "cancelled"]:
                 self._log(f"Batch {batch_id} ended with status: {batch.status}")
