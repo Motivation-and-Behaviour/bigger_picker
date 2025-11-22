@@ -130,3 +130,220 @@ def test_download_pdf_success_and_no_url(monkeypatch, tmp_path):
     }
     with pytest.raises(ValueError, match="No URL found for the fulltext."):
         manager.download_pdf(article_no_url)
+
+
+@pytest.fixture
+def mock_manager(monkeypatch, tmp_path):
+    """Create a RayyanManager with mocked external dependencies."""
+    fake_path = tmp_path / "creds.json"
+    fake_path.write_text(
+        json.dumps({"refresh_token": "test", "access_token": "test_token"})
+    )
+    monkeypatch.setenv("RAYYAN_JSON_PATH", str(fake_path))
+
+    mock_rayyan = MagicMock()
+    mock_review = MagicMock()
+    mock_notes = MagicMock()
+    monkeypatch.setattr("bigger_picker.rayyan.Rayyan", lambda p: mock_rayyan)
+    monkeypatch.setattr("bigger_picker.rayyan.Review", lambda inst: mock_review)
+    monkeypatch.setattr("bigger_picker.rayyan.Notes", lambda inst: mock_notes)
+
+    manager = RayyanManager()
+    manager.rayyan_instance = mock_rayyan
+    manager.review = mock_review
+    manager.notes_instance = mock_notes
+    return manager
+
+
+class TestGetUnextractedArticles:
+    def test_returns_articles_with_unextracted_label(self, mock_manager):
+        mock_manager.review.results.return_value = {
+            "data": [
+                {"id": 1, "customizations": {"labels": {}}},
+                {"id": 2, "customizations": {"labels": {"SDQ": 1}}},
+            ]
+        }
+
+        articles = mock_manager.get_unextracted_articles()
+
+        # Priority articles (with search labels) should come first
+        assert len(articles) == 2
+        assert articles[0]["id"] == 2  # Has SDQ label (priority)
+        assert articles[1]["id"] == 1
+
+    def test_empty_results(self, mock_manager):
+        mock_manager.review.results.return_value = {"data": []}
+
+        articles = mock_manager.get_unextracted_articles()
+        assert articles == []
+
+
+class TestGetUnscreenedAbstracts:
+    def test_filters_already_labeled_articles(self, mock_manager):
+        mock_manager.review.results.side_effect = [
+            {"recordsFiltered": 3, "data": []},
+            {
+                "data": [
+                    {"id": 1, "customizations": {"labels": {}}},
+                    {
+                        "id": 2,
+                        "customizations": {
+                            "labels": {config.RAYYAN_LABELS["abstract_included"]: 1}
+                        },
+                    },
+                    {"id": 3, "customizations": {"labels": {"SDQ": 1}}},
+                ]
+            },
+        ]
+
+        articles = mock_manager.get_unscreened_abstracts(max_articles=10)
+
+        # Should include id 1 and 3 (priority), exclude id 2 (already labeled)
+        assert len(articles) == 2
+        assert articles[0]["id"] == 3  # Priority (SDQ)
+        assert articles[1]["id"] == 1
+
+    def test_respects_max_articles(self, mock_manager):
+        mock_manager.review.results.side_effect = [
+            {"recordsFiltered": 100, "data": []},
+            {
+                "data": [
+                    {"id": i, "customizations": {"labels": {}}} for i in range(50)
+                ]
+            },
+        ]
+
+        articles = mock_manager.get_unscreened_abstracts(max_articles=5)
+        assert len(articles) == 5
+
+
+class TestGetUnscreenedFulltexts:
+    def test_filters_articles_without_fulltext(self, mock_manager):
+        mock_manager.review.results.return_value = {
+            "data": [
+                {"id": 1, "customizations": {"labels": {}}, "fulltexts": []},
+                {
+                    "id": 2,
+                    "customizations": {"labels": {}},
+                    "fulltexts": [{"marked_as_deleted": False, "id": "ft1"}],
+                },
+            ]
+        }
+
+        articles = mock_manager.get_unscreened_fulltexts()
+
+        # Only article 2 has a valid fulltext
+        assert len(articles) == 1
+        assert articles[0]["id"] == 2
+
+    def test_respects_max_articles(self, mock_manager):
+        mock_manager.review.results.return_value = {
+            "data": [
+                {
+                    "id": i,
+                    "customizations": {"labels": {}},
+                    "fulltexts": [{"marked_as_deleted": False, "id": f"ft{i}"}],
+                }
+                for i in range(10)
+            ]
+        }
+
+        articles = mock_manager.get_unscreened_fulltexts(max_articles=3)
+        assert len(articles) == 3
+
+
+class TestGetArticleById:
+    def test_returns_article(self, mock_manager):
+        mock_manager.review.results.return_value = {
+            "data": [{"id": 123, "title": "Test Article"}]
+        }
+
+        article = mock_manager.get_article_by_id(123)
+        assert article["id"] == 123
+        assert article["title"] == "Test Article"
+
+    def test_raises_error_when_not_found(self, mock_manager):
+        mock_manager.review.results.return_value = {"data": []}
+
+        with pytest.raises(ValueError, match="Article with ID 999 not found"):
+            mock_manager.get_article_by_id(999)
+
+
+class TestUpdateArticleLabels:
+    def test_calls_customize(self, mock_manager):
+        plan = {"label1": 1, "label2": -1}
+        mock_manager.update_article_labels(123, plan)
+
+        mock_manager.review.customize.assert_called_once_with(
+            mock_manager.review_id, 123, plan
+        )
+
+
+class TestCreateArticleNote:
+    def test_calls_create_note(self, mock_manager):
+        mock_manager.create_article_note(123, "Test note content")
+
+        mock_manager.notes_instance.create_note.assert_called_once_with(
+            mock_manager.review_id, 123, "Test note content"
+        )
+
+
+class TestGetFulltextId:
+    def test_returns_first_valid_id(self):
+        article = {
+            "fulltexts": [
+                {"marked_as_deleted": True, "id": "deleted_id"},
+                {"marked_as_deleted": False, "id": "valid_id"},
+                {"marked_as_deleted": False, "id": "another_valid"},
+            ]
+        }
+        assert RayyanManager._get_fulltext_id(article) == "valid_id"
+
+    def test_returns_none_when_no_valid_fulltext(self):
+        article = {"fulltexts": [{"marked_as_deleted": True, "id": "deleted"}]}
+        assert RayyanManager._get_fulltext_id(article) is None
+
+    def test_returns_none_for_empty_fulltexts(self):
+        article = {"fulltexts": []}
+        assert RayyanManager._get_fulltext_id(article) is None
+
+
+class TestRetryOnAuthError:
+    def test_retries_on_401(self, mock_manager, monkeypatch):
+        call_count = {"count": 0}
+
+        def operation():
+            call_count["count"] += 1
+            if call_count["count"] < 3:
+                response = MagicMock()
+                response.status_code = 401
+                raise requests.HTTPError(response=response)
+            return "success"
+
+        # Mock token refresh
+        monkeypatch.setattr(
+            "bigger_picker.rayyan.requests.post",
+            lambda url, data: MagicMock(
+                ok=True, json=lambda: {"refresh_token": "new", "access_token": "new"}
+            ),
+        )
+
+        result = mock_manager._retry_on_auth_error(operation)
+        assert result == "success"
+        assert call_count["count"] == 3
+
+    def test_raises_after_max_retries(self, mock_manager, monkeypatch):
+        def always_fail():
+            response = MagicMock()
+            response.status_code = 401
+            raise requests.HTTPError(response=response)
+
+        monkeypatch.setattr(
+            "bigger_picker.rayyan.requests.post",
+            lambda url, data: MagicMock(
+                ok=True, json=lambda: {"refresh_token": "new", "access_token": "new"}
+            ),
+        )
+
+        with pytest.raises(requests.HTTPError):
+            mock_manager._retry_on_auth_error(always_fail, max_retries=3)
