@@ -536,3 +536,85 @@ def test_identify_duplicate_datasets_large_dataset():
     # Should find the duplicate
     assert datasets[0]["id"] in duplicates
     assert duplicate["id"] in duplicates
+
+
+def test_sanitize_text_basic():
+    # Test basic functionality
+    text = "Hello World"
+    result = utils.sanitize_text(text)
+    assert result == "Hello World"
+
+
+def test_sanitize_text_empty_string():
+    # Test with empty string
+    result = utils.sanitize_text("")
+    assert result == ""
+
+
+def test_sanitize_text_none():
+    # Test with None input
+    result = utils.sanitize_text(None)
+    assert result == ""
+
+
+def test_sanitize_text_unicode_quotes():
+    # Test replacement of unicode quotes
+    text = "He said \u2018hello\u2019 and she replied \u201cgoodbye\u201d"
+    result = utils.sanitize_text(text)
+    assert result == "He said 'hello' and she replied \"goodbye\""
+
+
+def test_sanitize_text_unicode_dashes():
+    # Test replacement of unicode dashes
+    text = "This is an en–dash and an em—dash"
+    result = utils.sanitize_text(text)
+    assert result == "This is an en-dash and an em-dash"
+
+
+def test_sanitize_text_ellipsis():
+    # Test replacement of ellipsis
+    text = "Wait for it… here it is"
+    result = utils.sanitize_text(text)
+    assert result == "Wait for it... here it is"
+
+
+def test_sanitize_text_newlines_and_carriage_returns():
+    # Test removal of newlines and carriage returns
+    text = "Line 1\nLine 2\r\nLine 3\rLine 4"
+    result = utils.sanitize_text(text)
+    assert result == "Line 1 Line 2 Line 3Line 4"
+
+
+def test_sanitize_text_multiple_whitespace():
+    # Test normalization of multiple whitespace
+    text = "Too     many    spaces"
+    result = utils.sanitize_text(text)
+    assert result == "Too many spaces"
+
+
+def test_sanitize_text_unicode_normalization():
+    # Test unicode normalization (NFKD)
+    text = "café"  # é as a single character
+    result = utils.sanitize_text(text)
+    assert result == "cafe"  # Should remove accents
+
+
+def test_sanitize_text_non_ascii_removal():
+    # Test removal of non-ASCII characters
+    text = "Hello 世界"
+    result = utils.sanitize_text(text)
+    assert result == "Hello"
+
+
+def test_sanitize_text_comprehensive():
+    # Test comprehensive functionality with multiple issues
+    text = "  \u2018Hello\u2019  world…\n\tThis is a \u201ctest\u201d—with many\r\n   issues  "
+    result = utils.sanitize_text(text)
+    assert result == "'Hello' world... This is a \"test\"-with many issues"
+
+
+def test_sanitize_text_leading_trailing_whitespace():
+    # Test removal of leading and trailing whitespace
+    text = "   Hello World   "
+    result = utils.sanitize_text(text)
+    assert result == "Hello World"

@@ -647,9 +647,15 @@ class IntegrationManager:
                     excl_label = config.RAYYAN_EXCLUSION_LABELS[excl_reason_idx - 1]
                     plan[excl_label] = 1
             rationale = decision["rationale"]
+            rationale = utils.sanitize_text(rationale)
             if len(rationale) > 1000:
-                rationale = rationale[:996] + "..."
-            self.rayyan.create_article_note(article_id, f"LLM Reasoning: {rationale}")
+                rationale = rationale[:981] + "..."
+            try:
+                self.rayyan.create_article_note(
+                    article_id, f"LLM Reasoning: {rationale}"
+                )
+            except Exception as e:
+                self._log(f"Failed to create note for article {article_id}: {e}")
         else:
             if is_abstract:
                 plan = {config.RAYYAN_LABELS["abstract_included"]: 1}

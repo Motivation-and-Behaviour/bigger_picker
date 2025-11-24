@@ -1,10 +1,33 @@
 import logging
 import math
+import unicodedata
 from collections import defaultdict
 
 import pandas as pd
 import recordlinkage
 from pyairtable.api.types import RecordDict
+
+
+def sanitize_text(text: str) -> str:
+    if not text:
+        return ""
+    replacements = {
+        "\u2018": "'",  # Left single quote
+        "\u2019": "'",  # Right single quote
+        "\u201c": '"',  # Left double quote
+        "\u201d": '"',  # Right double quote
+        "\u2013": "-",  # En-dash
+        "\u2014": "-",  # Em-dash
+        "…": "...",  # Ellipsis
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    text = unicodedata.normalize("NFKD", text)
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = text.replace("\n", " ").replace("\r", "")
+
+    return " ".join(text.split())
 
 
 def fix_age(dataset: RecordDict) -> RecordDict:
