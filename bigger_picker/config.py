@@ -7,6 +7,7 @@ RAYYAN_LABELS = {
     "excluded": "BP: Excluded",
     "abstract_included": "BP: Abstract Included",
     "abstract_excluded": "BP: Abstract Excluded",
+    "abstract_missing": "Missing Abstract",
     "batch_pending": "BP: Batch Pending",
 }
 RAYYAN_EXCLUSION_LABELS = [

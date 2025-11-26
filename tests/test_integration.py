@@ -1,6 +1,5 @@
 """Tests for IntegrationManager class."""
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -139,7 +138,9 @@ def integration_manager(
 
 
 class TestUpdateTaskFromDataset:
-    def test_skips_when_no_changes(self, integration_manager, mock_asana, mock_airtable):
+    def test_skips_when_no_changes(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
         task = {
             "gid": "task_1",
             "name": "Dataset A",
@@ -164,7 +165,7 @@ class TestUpdateTaskFromDataset:
 
         mock_airtable.make_url.return_value = "https://airtable.com/rec_1"
 
-        result = integration_manager.update_task_from_dataset(task, dataset)
+        _ = integration_manager.update_task_from_dataset(task, dataset)
         # Should return original task, no update called
         mock_asana.update_task.assert_not_called()
 
@@ -235,7 +236,7 @@ class TestCreateTaskFromDataset:
         }
         mock_asana.get_custom_field_value.return_value = "BP001"
 
-        result = integration_manager.create_task_from_dataset(dataset)
+        _ = integration_manager.create_task_from_dataset(dataset)
 
         mock_asana.create_task.assert_called_once()
         mock_airtable.update_record.assert_called()
@@ -263,9 +264,19 @@ class TestUploadExtractionToAirtable:
     def test_creates_article_and_related_records(
         self, integration_manager, mock_airtable
     ):
-        llm_extraction = ArticleLLMExtract(
-            corresponding_author="Dr. Smith",
-            total_sample_size=500,
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 500,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
         )
         article_metadata = {
             "Rayyan ID": 123,
@@ -279,7 +290,7 @@ class TestUploadExtractionToAirtable:
 
         mock_airtable.create_record.return_value = {"id": "rec_article_1"}
 
-        result = integration_manager.upload_extraction_to_airtable(
+        _ = integration_manager.upload_extraction_to_airtable(
             llm_extraction, article_metadata
         )
 
@@ -290,7 +301,20 @@ class TestUploadExtractionToAirtable:
         pdf_path = tmp_path / "test.pdf"
         pdf_path.write_bytes(b"PDF content")
 
-        llm_extraction = ArticleLLMExtract()
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 100,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
+        )
         article_metadata = {
             "Rayyan ID": 123,
             "Article Title": "Test",
@@ -318,7 +342,9 @@ class TestMarkDuplicates:
         ]
         mock_airtable.tables["Datasets"].all.return_value = datasets
 
-        with patch("bigger_picker.integration.utils.identify_duplicate_datasets") as mock_dup:
+        with patch(
+            "bigger_picker.integration.utils.identify_duplicate_datasets"
+        ) as mock_dup:
             mock_dup.return_value = {"rec_1": ["rec_2"], "rec_2": ["rec_1"]}
             integration_manager.mark_duplicates()
 
@@ -338,7 +364,9 @@ class TestMarkDuplicates:
         ]
         mock_airtable.tables["Datasets"].all.return_value = datasets
 
-        with patch("bigger_picker.integration.utils.identify_duplicate_datasets") as mock_dup:
+        with patch(
+            "bigger_picker.integration.utils.identify_duplicate_datasets"
+        ) as mock_dup:
             mock_dup.return_value = {"rec_1": ["rec_2"], "rec_2": ["rec_1"]}
             integration_manager.mark_duplicates()
 
@@ -350,10 +378,15 @@ class TestScreenAbstract:
     def test_screens_and_actions_decision(
         self, integration_manager, mock_openai, mock_rayyan
     ):
-        article = {"id": 123, "abstracts": ["This is the abstract text"]}
+        article = {"id": 123, "abstracts": [{"content": "This is the abstract text"}]}
 
         decision = ScreeningDecision(
-            vote="include", matched_inclusion=[1, 2], rationale="Meets criteria"
+            vote="include",
+            matched_inclusion=[1, 2],
+            failed_inclusion=None,
+            triggered_exclusion=None,
+            exclusion_reasons=None,
+            rationale="Meets criteria",
         )
         mock_openai.screen_record_abstract.return_value = decision
 
@@ -381,7 +414,12 @@ class TestScreenFulltext:
 
         mock_rayyan.download_pdf.return_value = pdf_path
         decision = ScreeningDecision(
-            vote="exclude", triggered_exclusion=[1], rationale="Wrong population"
+            vote="exclude",
+            matched_inclusion=None,
+            failed_inclusion=None,
+            triggered_exclusion=[1],
+            exclusion_reasons=None,
+            rationale="Wrong population",
         )
         mock_openai.screen_record_fulltext.return_value = decision
 
@@ -454,12 +492,12 @@ class TestCreateAbstractScreeningBatch:
         self, integration_manager, mock_openai, mock_rayyan, mock_tracker, tmp_path
     ):
         articles = [
-            {"id": 1, "abstracts": ["Abstract 1"]},
-            {"id": 2, "abstracts": ["Abstract 2"]},
+            {"id": 1, "abstracts": [{"content": "Abstract 1"}]},
+            {"id": 2, "abstracts": [{"content": "Abstract 2"}]},
             {"id": 3, "abstracts": []},  # Should be skipped
         ]
 
-        mock_openai.prepare_abstract_body.return_value = {"model": "test", "messages": []}
+        mock_openai.prepare_abstract_body.return_value = {"model": "test", "input": []}
 
         with patch.object(integration_manager, "_submit_batch") as mock_submit:
             integration_manager.create_abstract_screening_batch(articles)
@@ -479,7 +517,10 @@ class TestCreateFulltextScreeningBatch:
         mock_file = MagicMock()
         mock_file.id = "file_123"
         mock_openai.upload_file.return_value = mock_file
-        mock_openai.prepare_fulltext_body.return_value = {"model": "test", "messages": []}
+        mock_openai.prepare_fulltext_body.return_value = {
+            "model": "test",
+            "messages": [],
+        }
 
         with patch.object(integration_manager, "_submit_batch") as mock_submit:
             integration_manager.create_fulltext_screening_batch(articles)
@@ -574,15 +615,20 @@ class TestHandleCompletedBatch:
 
         # Mock file content response
         mock_content = MagicMock()
-        mock_content.text = '{"custom_id": "abstract-123", "response": {"status_code": 200, "body": {"choices": [{"message": {"content": "{\\"vote\\": \\"include\\", \\"rationale\\": \\"Good\\"}"}}]}}}'
+        mock_content.text = '{"custom_id": "abstract-123", "response": {"status_code": 200, "body": {"choices": [{"message": {"content": "{\\"vote\\": \\"include\\", \\"rationale\\": \\"Good\\"}"}}]}}}'  # noqa: E501
         mock_openai.client.files.content.return_value = mock_content
 
-        decision = ScreeningDecision(vote="include", rationale="Good")
+        decision = ScreeningDecision(
+            vote="include",
+            matched_inclusion=None,
+            failed_inclusion=None,
+            triggered_exclusion=None,
+            exclusion_reasons=None,
+            rationale="Good",
+        )
         mock_openai.parse_screening_decision.return_value = decision
 
-        with patch.object(
-            integration_manager, "_action_screening_decision"
-        ) as mock_action:
+        with patch.object(integration_manager, "_action_screening_decision"):
             integration_manager._handle_completed_batch(
                 output_file_id, batch_type, batch_id
             )
@@ -592,11 +638,10 @@ class TestHandleCompletedBatch:
 
 class TestSync:
     def test_calls_sync_methods(self, integration_manager):
-        with patch.object(
-            integration_manager, "sync_airtable_and_asana"
-        ) as mock_sync, patch.object(
-            integration_manager, "updated_datasets_scores"
-        ) as mock_scores:
+        with (
+            patch.object(integration_manager, "sync_airtable_and_asana") as mock_sync,
+            patch.object(integration_manager, "updated_datasets_scores") as mock_scores,
+        ):
             mock_scores.return_value = False
             integration_manager.sync()
 
@@ -604,11 +649,10 @@ class TestSync:
         mock_scores.assert_called_once()
 
     def test_syncs_again_when_datasets_updated(self, integration_manager):
-        with patch.object(
-            integration_manager, "sync_airtable_and_asana"
-        ) as mock_sync, patch.object(
-            integration_manager, "updated_datasets_scores"
-        ) as mock_scores:
+        with (
+            patch.object(integration_manager, "sync_airtable_and_asana") as mock_sync,
+            patch.object(integration_manager, "updated_datasets_scores") as mock_scores,
+        ):
             mock_scores.return_value = True
             integration_manager.sync()
 

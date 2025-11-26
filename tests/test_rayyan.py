@@ -206,11 +206,7 @@ class TestGetUnscreenedAbstracts:
     def test_respects_max_articles(self, mock_manager):
         mock_manager.review.results.side_effect = [
             {"recordsFiltered": 100, "data": []},
-            {
-                "data": [
-                    {"id": i, "customizations": {"labels": {}}} for i in range(50)
-                ]
-            },
+            {"data": [{"id": i, "customizations": {"labels": {}}} for i in range(50)]},
         ]
 
         articles = mock_manager.get_unscreened_abstracts(max_articles=5)

@@ -103,6 +103,7 @@ class RayyanManager:
         return unscreened
 
     def get_unscreened_fulltexts(self, max_articles: int | None = None) -> list[dict]:
+        # TODO: this should include batching like get_unscreened_abstracts
         results_params = {"extra[mode]": "included"}
         labels_to_check = (
             list(config.RAYYAN_LABELS.values()) + config.RAYYAN_EXCLUSION_LABELS

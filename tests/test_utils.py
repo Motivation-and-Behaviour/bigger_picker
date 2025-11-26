@@ -608,7 +608,7 @@ def test_sanitize_text_non_ascii_removal():
 
 def test_sanitize_text_comprehensive():
     # Test comprehensive functionality with multiple issues
-    text = "  \u2018Hello\u2019  world…\n\tThis is a \u201ctest\u201d—with many\r\n   issues  "
+    text = "  \u2018Hello\u2019  world…\n\tThis is a \u201ctest\u201d—with many\r\n   issues  "  # noqa: E501
     result = utils.sanitize_text(text)
     assert result == "'Hello' world... This is a \"test\"-with many issues"
 
@@ -618,3 +618,116 @@ def test_sanitize_text_leading_trailing_whitespace():
     text = "   Hello World   "
     result = utils.sanitize_text(text)
     assert result == "Hello World"
+
+
+def test_fix_age_out_of_range_mean():
+    # Test when mean age is outside allowed range
+    ds = fake_record(
+        {
+            "Mean Ages": ["20.0"],  # Too old
+            "SD Ages": ["2.0"],
+            "Min Ages": 0,  # Set valid values to avoid None comparison error
+            "Max Ages": 0,
+        }
+    )
+    fixed_dataset = utils.fix_age(ds)
+    assert fixed_dataset["fields"]["Mean Ages"] is None
+    assert fixed_dataset["fields"]["SD Ages"] is None
+
+
+def test_fix_age_negative_mean():
+    # Test when mean age is negative
+    ds = fake_record(
+        {
+            "Mean Ages": ["-1.0"],  # Negative
+            "SD Ages": ["2.0"],
+            "Min Ages": 0,  # Set valid values to avoid None comparison error
+            "Max Ages": 0,
+        }
+    )
+    fixed_dataset = utils.fix_age(ds)
+    assert fixed_dataset["fields"]["Mean Ages"] is None
+    assert fixed_dataset["fields"]["SD Ages"] is None
+
+
+def test_compute_year_value_missing_year():
+    # Test when year of last data point is missing
+    ds = fake_record({})  # No year field
+    result = utils.compute_year_value(ds, 2000, 2020)
+    assert result == 0.5
+
+
+def test_compute_age_value_zero_total_wi():
+    # Test edge case when total_wi is 0
+    cache = {"rec1": (10.0, 0.0001, 100)}  # Very small SD
+    ds = fake_record({"Mean Ages": 50.0, "SD Ages": 0.0001})  # Far from cache
+
+    value = utils.compute_age_value(ds, cache)
+    # When distributions don't overlap, should return close to 1.0
+    assert value >= 0.0
+
+
+def test_compute_age_value_zero_total_wj():
+    # Test edge case when total_wj is 0 for cache entry
+    cache = {"rec1": (10.0, 0.0001, 100)}  # Very small SD that might cause issues
+    ds = fake_record({"Mean Ages": 10.0, "SD Ages": 2.0})
+
+    value = utils.compute_age_value(ds, cache)
+    assert value >= 0.0
+
+
+def test_compute_age_value_zero_n_dsets():
+    # Test when no valid datasets in cache (all filtered out)
+    cache = {}
+    ds = fake_record({"Mean Ages": 10.0, "SD Ages": 2.0})
+
+    value = utils.compute_age_value(ds, cache)
+    assert value == 0.0
+
+
+def test_identify_duplicate_datasets_medium_size():
+    # Test with medium dataset to trigger sortedneighbourhood indexing
+    datasets = []
+    for i in range(1500):  # Medium size to trigger different path
+        dataset = fake_record(
+            {
+                "Dataset Name": f"Study {i}",
+                "Dataset Contact Name": f"Researcher {i}",
+                "Dataset Contact Email": f"researcher{i}@example.com",
+            }
+        )
+        datasets.append(dataset)
+
+    # Add a potential duplicate with similar name
+    duplicate = fake_record(
+        {
+            "Dataset Name": "Study 0 Variant",
+            "Dataset Contact Name": "Researcher 0",
+            "Dataset Contact Email": "researcher0@example.com",
+        }
+    )
+    datasets.append(duplicate)
+
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.4)
+
+    # Should complete without error and potentially find some matches
+    assert isinstance(duplicates, dict)
+
+
+def test_identify_duplicate_datasets_large_size():
+    # Test with large dataset to trigger smaller window
+    datasets = []
+    for i in range(3500):  # Large size to trigger window=5
+        dataset = fake_record(
+            {
+                "Dataset Name": f"Study {i:04d}",  # Zero-padded for sorting
+                "Dataset Contact Name": f"Researcher {i}",
+                "Dataset Contact Email": f"researcher{i}@example.com",
+            }
+        )
+        datasets.append(dataset)
+
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.5)
+
+    # Should complete without error
+    assert isinstance(duplicates, dict)

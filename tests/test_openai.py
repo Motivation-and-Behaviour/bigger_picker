@@ -150,9 +150,9 @@ class TestPrepareAbstractBody:
         body = mock_openai_manager.prepare_abstract_body("Test abstract content")
 
         assert "model" in body
-        assert "messages" in body
-        assert "response_format" in body
-        assert body["response_format"]["type"] == "json_schema"
+        assert "input" in body
+        assert "text" in body
+        assert body["text"]["format"]["type"] == "json_schema"
         assert body["model"] == mock_openai_manager.model
 
 
@@ -161,8 +161,8 @@ class TestPrepareFulltextBody:
         body = mock_openai_manager.prepare_fulltext_body("file_123")
 
         assert "model" in body
-        assert "messages" in body
-        assert "response_format" in body
+        assert "input" in body
+        assert "text" in body
 
 
 class TestPrepareExtractionBody:
@@ -170,14 +170,21 @@ class TestPrepareExtractionBody:
         body = mock_openai_manager.prepare_extraction_body("file_123")
 
         assert "model" in body
-        assert "messages" in body
-        assert "response_format" in body
-        assert "ArticleLLMExtract" in body["response_format"]["json_schema"]["name"]
+        assert "input" in body
+        assert "text" in body
+        assert body["text"]["format"]["name"] == "ArticleLLMExtract"
 
 
 class TestParseScreeningDecision:
     def test_parses_valid_json(self, mock_openai_manager):
-        json_str = '{"vote": "include", "rationale": "Meets all criteria"}'
+        json_str = """{
+            "vote": "include",
+            "matched_inclusion": null,
+            "failed_inclusion": null,
+            "triggered_exclusion": null,
+            "exclusion_reasons": null,
+            "rationale": "Meets all criteria"
+        }"""
         decision = mock_openai_manager.parse_screening_decision(json_str)
 
         assert decision.vote == "include"
@@ -186,7 +193,10 @@ class TestParseScreeningDecision:
     def test_parses_exclude_decision(self, mock_openai_manager):
         json_str = """{
             "vote": "exclude",
+            "matched_inclusion": null,
+            "failed_inclusion": null,
             "triggered_exclusion": [1],
+            "exclusion_reasons": null,
             "rationale": "Exclusion criterion 1 triggered"
         }"""
         decision = mock_openai_manager.parse_screening_decision(json_str)
@@ -199,8 +209,15 @@ class TestParseExtractionResult:
     def test_parses_valid_extraction(self, mock_openai_manager):
         json_str = """{
             "Corresponding Author": "Dr. Smith",
+            "Corresponding Author Email": null,
+            "Year of Last Data Point": null,
             "Total Sample Size": 500,
-            "Study Design": "Cross-sectional"
+            "Study Design": "Cross-sectional",
+            "Countries of Data": null,
+            "Dataset Name": null,
+            "populations": [],
+            "screen_time_measures": [],
+            "outcomes": []
         }"""
         result = mock_openai_manager.parse_extraction_result(json_str)
 

@@ -8,7 +8,7 @@ import recordlinkage
 from pyairtable.api.types import RecordDict
 
 
-def sanitize_text(text: str) -> str:
+def sanitize_text(text: str | None) -> str:
     if not text:
         return ""
     replacements = {

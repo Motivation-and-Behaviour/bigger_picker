@@ -106,7 +106,7 @@ class OpenAIManager:
         batch_input_file = self.upload_file(filename, purpose="batch")
         return self.client.batches.create(
             input_file_id=batch_input_file.id,
-            endpoint="/v1/chat/completions",
+            endpoint="/v1/responses",
             completion_window="24h",
             metadata={"description": batch_type},
         )
@@ -114,20 +114,27 @@ class OpenAIManager:
     def retrieve_batch(self, batch_id: str) -> Batch:
         return self.client.batches.retrieve(batch_id)
 
-    def _build_structured_payload(self, messages: list, pydantic_model) -> dict:
-        """
-        Constructs the chat completion payload with manual JSON schema.
-        """
+    def create_batch_row(
+        self, custom_id: str, body: dict, url: str = "/v1/responses"
+    ) -> dict:
+        return {
+            "custom_id": custom_id,
+            "method": "POST",
+            "url": url,
+            "body": body,
+        }
+
+    def _build_structured_payload(self, input: list, pydantic_model) -> dict:
         return {
             "model": self.model,
-            "messages": messages,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {
+            "input": input,
+            "text": {
+                "format": {
+                    "type": "json_schema",
                     "name": pydantic_model.__name__,
                     "schema": pydantic_model.model_json_schema(),
                     "strict": True,
-                },
+                }
             },
         }
 

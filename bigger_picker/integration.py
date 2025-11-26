@@ -479,26 +479,27 @@ class IntegrationManager:
         for article in articles:
             abstracts = article.get("abstracts", [])
             if not abstracts:
+                plan = {config.RAYYAN_LABELS["abstract_missing"]: 1}
+                self.rayyan.update_article_labels(article["id"], plan)
                 continue
 
             abstract_text = abstracts[0].get("content", "")
             if not abstract_text:
+                plan = {config.RAYYAN_LABELS["abstract_missing"]: 1}
+                self.rayyan.update_article_labels(article["id"], plan)
                 continue
 
             custom_id = f"abstract-{article['id']}"
             body = self.openai.prepare_abstract_body(abstract_text)
-            request = {
-                "custom_id": custom_id,
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": body,
-            }
+            request = self.openai.create_batch_row(custom_id, body)
             requests.append(request)
             plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
             self.rayyan.update_article_labels(article["id"], plan)
 
         if requests:
             self._submit_batch(requests, "abstract_screen")
+        else:
+            self._log("No requests to submit for abstract screening batch.")
 
     @requires_services("openai", "rayyan", "tracker")
     def create_fulltext_screening_batch(self, articles: list[dict]):
@@ -522,13 +523,7 @@ class IntegrationManager:
             # 3. Prepare Request
             custom_id = f"fulltext-{article['id']}"
             body = self.openai.prepare_fulltext_body(file.id)
-
-            request = {
-                "custom_id": custom_id,
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": body,
-            }
+            request = self.openai.create_batch_row(custom_id, body)
             requests.append(request)
             plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
             self.rayyan.update_article_labels(article["id"], plan)
@@ -556,13 +551,7 @@ class IntegrationManager:
 
             custom_id = f"extraction-{article['id']}"
             body = self.openai.prepare_extraction_body(file.id)
-
-            request = {
-                "custom_id": custom_id,
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": body,
-            }
+            request = self.openai.create_batch_row(custom_id, body)
             requests.append(request)
             plan = {config.RAYYAN_LABELS["batch_pending"]: 1}
             self.rayyan.update_article_labels(article["id"], plan)
@@ -686,7 +675,7 @@ class IntegrationManager:
                     self.rayyan.update_article_labels(article_id, plan)
                     continue
 
-                content_str = response_body["choices"][0]["message"]["content"]
+                content_str = response_body["output"][0]["content"][0]["text"]
                 decision = self.openai.parse_screening_decision(content_str)
                 decision_dict = decision.model_dump()
 
@@ -713,7 +702,7 @@ class IntegrationManager:
                     self.rayyan.update_article_labels(article_id, plan)
                     continue
 
-                content_str = response_body["choices"][0]["message"]["content"]
+                content_str = response_body["output"][0]["content"][0]["text"]
                 decision = self.openai.parse_screening_decision(content_str)
                 decision_dict = decision.model_dump()
 
@@ -741,7 +730,7 @@ class IntegrationManager:
                     self.rayyan.update_article_labels(article_id, plan)
                     continue
 
-                content_str = response_body["choices"][0]["message"]["content"]
+                content_str = response_body["output"][0]["content"][0]["text"]
                 llm_extraction = self.openai.parse_extraction_result(content_str)
 
                 article = self.rayyan.get_article_by_id(article_id)

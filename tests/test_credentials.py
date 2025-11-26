@@ -71,3 +71,19 @@ def test_load_rayyan_credentials_success(monkeypatch, tmp_path):
     # Should return the path unchanged
     result = creds.load_rayyan_credentials()
     assert result == str(good_file)
+
+
+def test_load_rayyan_credentials_from_json_env(monkeypatch):
+    # Test loading credentials from RAYYAN_CREDS_JSON env variable
+    monkeypatch.delenv("RAYYAN_JSON_PATH", raising=False)
+    test_json = '{"key": "value"}'
+    monkeypatch.setenv("RAYYAN_CREDS_JSON", test_json)
+
+    result = creds.load_rayyan_credentials()
+
+    # Should create temp file and return its path
+    assert result == "/tmp/rayyan_tokens.json"
+
+    # Verify the file was created with correct content
+    with open("/tmp/rayyan_tokens.json") as f:
+        assert f.read() == test_json
