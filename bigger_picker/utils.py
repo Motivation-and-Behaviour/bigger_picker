@@ -2,10 +2,28 @@ import logging
 import math
 import unicodedata
 from collections import defaultdict
+from logging.handlers import RotatingFileHandler
 
 import pandas as pd
 import recordlinkage
 from pyairtable.api.types import RecordDict
+
+
+def setup_logger(
+    name: str = "bigger_picker", log_file: str = "bigger_picker.log"
+) -> logging.Logger:
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+
+    if not logger.handlers:
+        handler = RotatingFileHandler(log_file, maxBytes=5 * 1024 * 1024, backupCount=3)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    return logger
 
 
 def sanitize_text(text: str | None) -> str:

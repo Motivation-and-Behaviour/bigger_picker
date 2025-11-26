@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from functools import wraps
 from pathlib import Path
@@ -55,6 +56,7 @@ class IntegrationManager:
         self.tracker = batch_tracker
         self.console = console or Console()
         self.debug = debug
+        self.logger = logging.getLogger("bigger_picker")
 
     @requires_services("asana", "airtable")
     def sync_airtable_and_asana(
@@ -89,7 +91,7 @@ class IntegrationManager:
                 )
             else:
                 # If the dataset does not have a matching task, create one
-                self._log("Creating task for dataset")
+                self._log(f"Creating task for {dataset_bpipd}")
                 updated_task = self.create_task_from_dataset(dataset)
 
                 # Update the Airtable records with the Asana task IDs
@@ -101,6 +103,7 @@ class IntegrationManager:
                 self.airtable.update_record("Datasets", dataset["id"], payload)
         self._log("Starting status sync")
         self.update_airtable_statuses()
+        self._log("Status sync complete")
 
     @requires_services("asana", "airtable")
     def update_task_from_dataset(self, task: dict, dataset: RecordDict) -> dict:
@@ -145,6 +148,10 @@ class IntegrationManager:
         if task_gid is None:
             raise ValueError("Task GID is missing in the provided task dictionary.")
 
+        self._log(
+            f"Updating task {task_gid} from dataset "
+            + f"{dataset['fields'].get('Dataset ID', 'Unknown')}"
+        )
         return self.asana.update_task(update_payload, task_gid)
 
     @requires_services("asana", "airtable")
@@ -779,6 +786,14 @@ class IntegrationManager:
             if Path(filename).exists():
                 Path(filename).unlink()
 
-    def _log(self, *args, **kwargs):
+    def _log(self, message: str | object, level: str = "info", **kwargs):
+        msg_str = str(message)
+        if level.lower() == "error":
+            self.logger.error(msg_str)
+        elif level.lower() == "warning":
+            self.logger.warning(msg_str)
+        else:
+            self.logger.info(msg_str)
+
         if self.debug:
-            self.console.log(*args, **kwargs)
+            self.console.log(message, **kwargs)
