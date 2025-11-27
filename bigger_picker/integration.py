@@ -85,7 +85,7 @@ class IntegrationManager:
             if dataset_bpipd in tasks:
                 # If the dataset has a matching task, update it
                 self._log(f"Updating task {dataset_bpipd}...")
-                updated_task = self.update_task_from_dataset(
+                self.update_task_from_dataset(
                     tasks[dataset_bpipd],
                     dataset,
                 )
@@ -671,7 +671,7 @@ class IntegrationManager:
         assert self.rayyan and self.openai
         for item in results:
             try:
-                article_id = item["custom_id"].split("-")[-1]
+                article_id = int(item["custom_id"].split("-")[-1])
                 response_body = item["response"]["body"]
 
                 if item["response"]["status_code"] != 200:
@@ -698,7 +698,7 @@ class IntegrationManager:
         assert self.rayyan and self.openai
         for item in results:
             try:
-                article_id = item["custom_id"].split("-")[-1]
+                article_id = int(item["custom_id"].split("-")[-1])
                 response_body = item["response"]["body"]
 
                 if item["response"]["status_code"] != 200:
@@ -726,7 +726,7 @@ class IntegrationManager:
 
         for item in results:
             try:
-                article_id = item["custom_id"].split("-")[-1]
+                article_id = int(item["custom_id"].split("-")[-1])
                 response_body = item["response"]["body"]
 
                 if item["response"]["status_code"] != 200:

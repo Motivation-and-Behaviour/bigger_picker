@@ -21,7 +21,7 @@ from bigger_picker.asana import AsanaManager
 from bigger_picker.integration import IntegrationManager
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
-from bigger_picker.utils import setup_logger
+from bigger_picker.utils import create_stats_table, setup_logger
 
 app = typer.Typer()
 
@@ -272,50 +272,6 @@ def monitor(
         False, "--debug", help="Enable debug logging to console"
     ),
 ):
-    def create_stats_table(stats: dict) -> Table:
-        def make_subtable(table: Table, subgroups: dict, substats: dict) -> Table:
-            platform_table = Table(show_header=False, show_edge=False)
-            for key, value in subgroups.items():
-                platform_table.add_row(value, substats[key])
-            return platform_table
-
-        # Main table
-        table = Table(
-            show_header=True,
-            header_style="bold magenta",
-            show_lines=True,
-            title="Bigger Picker Status",
-        )
-        table.add_column("Metric", style="cyan", vertical="middle")
-        table.add_column("Value", style="green", vertical="middle", justify="center")
-        uptime = str(datetime.now() - stats["start_time"]).split(".")[0]
-        table.add_row("Status", stats["status"])
-        table.add_row("Uptime", uptime)
-        table.add_row("Platforms", stats["platforms"])
-
-        # Subtables
-        platforms_dict = {"asana": "Asana", "rayyan": "Rayyan", "openai": "OpenAI"}
-        last_check_table = make_subtable(table, platforms_dict, stats["last_check"])
-        table.add_row("Last Check", last_check_table)
-        last_sync_table = make_subtable(table, platforms_dict, stats["last_sync"])
-        table.add_row("Last Sync", last_sync_table)
-        total_syncs_table = make_subtable(table, platforms_dict, stats["total_syncs"])
-        table.add_row("Total Syncs", total_syncs_table)
-        total_polls_table = make_subtable(table, platforms_dict, stats["total_polls"])
-        table.add_row("Total Polls", total_polls_table)
-        pending_batches_table = make_subtable(
-            table,
-            {
-                "abstracts": "Abstracts",
-                "fulltexts": "Fulltexts",
-                "extractions": "Extractions",
-            },
-            stats["pending_batches"],
-        )
-        table.add_row("Pending Batches", pending_batches_table)
-
-        return table
-
     setup_logger()
 
     if dotenv_path:
@@ -350,7 +306,39 @@ def monitor(
         "total_polls": {"asana": 0, "rayyan": 0, "openai": 0},
         "pending_batches": {"abstracts": 0, "fulltexts": 0, "extractions": 0},
         "start_time": datetime.now(),
+        "consecutive_errors": {"asana": 0, "rayyan": 0, "openai": 0},
     }
+
+    def monitor_asana(live, stats):
+        assert integration.asana
+        try:
+            stats["status"] = "[cyan]Checking Asana...[/cyan]"
+            stats["total_polls"]["asana"] += 1
+            live.update(create_stats_table(stats))
+
+            events = integration.asana.get_events()
+            stats["last_check"]["asana"] = datetime.now().strftime("%H:%M:%S")
+
+            if events or stats["total_syncs"]["asana"] == 0:
+                stats["consecutive_errors"]["asana"] = 0
+                stats["status"] = "[yellow]Syncing Asana...[/yellow]"
+                live.update(create_stats_table(stats))
+
+                integration.sync()
+                stats["total_syncs"]["asana"] += 1
+                integration.asana.get_events()  # Clear events after sync
+                stats["status"] = "[green]✓ Asana sync complete[/green]"
+                stats["last_sync"]["asana"] = datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            else:
+                stats["status"] = "[green]Idle[/green]"
+                live.update(create_stats_table(stats))
+
+        except Exception as e:
+            stats["consecutive_errors"]["asana"] += 1
+            stats["status"] = f"[red]Asana Error: {e}[/red]"
+            live.update(create_stats_table(stats))
 
     try:
         with Live(
@@ -358,6 +346,9 @@ def monitor(
         ) as live:
             while True:
                 # TODO: method for asana, rayyan, openai
+
+                monitor_asana(live, stats)
+
                 try:
                     stats["status"] = "[cyan]Checking...[/cyan]"
                     stats["total_polls"] += 1

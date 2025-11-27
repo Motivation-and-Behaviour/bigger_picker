@@ -2,11 +2,13 @@ import logging
 import math
 import unicodedata
 from collections import defaultdict
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 import pandas as pd
 import recordlinkage
 from pyairtable.api.types import RecordDict
+from rich.table import Table
 
 
 def setup_logger(
@@ -338,3 +340,48 @@ def identify_duplicate_datasets(
             results[df_clean.loc[idx2, "id"]].append(df_clean.loc[idx1, "id"])
 
     return results
+
+
+def create_stats_table(stats: dict) -> Table:
+    def make_subtable(table: Table, subgroups: dict, substats: dict) -> Table:
+        platform_table = Table(show_header=False, show_edge=False)
+        for key, value in subgroups.items():
+            platform_table.add_row(value, substats[key])
+        return platform_table
+
+    # Main table
+    table = Table(
+        show_header=True,
+        header_style="bold magenta",
+        show_lines=True,
+        title="Bigger Picker Status",
+    )
+    table.add_column("Metric", style="cyan", vertical="middle")
+    table.add_column("Value", style="green", vertical="middle", justify="center")
+    uptime = str(datetime.now() - stats["start_time"]).split(".")[0]
+    table.add_row("Status", stats["status"])
+    table.add_row("Uptime", uptime)
+    table.add_row("Platforms", stats["platforms"])
+
+    # Subtables
+    platforms_dict = {"asana": "Asana", "rayyan": "Rayyan", "openai": "OpenAI"}
+    last_check_table = make_subtable(table, platforms_dict, stats["last_check"])
+    table.add_row("Last Check", last_check_table)
+    last_sync_table = make_subtable(table, platforms_dict, stats["last_sync"])
+    table.add_row("Last Sync", last_sync_table)
+    total_syncs_table = make_subtable(table, platforms_dict, stats["total_syncs"])
+    table.add_row("Total Syncs", total_syncs_table)
+    total_polls_table = make_subtable(table, platforms_dict, stats["total_polls"])
+    table.add_row("Total Polls", total_polls_table)
+    pending_batches_table = make_subtable(
+        table,
+        {
+            "abstracts": "Abstracts",
+            "fulltexts": "Fulltexts",
+            "extractions": "Extractions",
+        },
+        stats["pending_batches"],
+    )
+    table.add_row("Pending Batches", pending_batches_table)
+
+    return table
