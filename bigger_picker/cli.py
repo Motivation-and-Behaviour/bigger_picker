@@ -47,7 +47,7 @@ def process(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -112,7 +112,7 @@ def sync(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -152,7 +152,7 @@ def screenft(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -209,7 +209,7 @@ def screenabstract(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -276,7 +276,7 @@ def monitor(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
