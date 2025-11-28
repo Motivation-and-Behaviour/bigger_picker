@@ -343,10 +343,10 @@ def identify_duplicate_datasets(
 
 
 def create_stats_table(stats: dict) -> Table:
-    def make_subtable(table: Table, subgroups: dict, substats: dict) -> Table:
+    def make_subtable(subgroups: dict, substats: dict) -> Table:
         platform_table = Table(show_header=False, show_edge=False)
         for key, value in subgroups.items():
-            platform_table.add_row(value, substats[key])
+            platform_table.add_row(value, str(substats[key]))
         return platform_table
 
     # Main table
@@ -365,16 +365,15 @@ def create_stats_table(stats: dict) -> Table:
 
     # Subtables
     platforms_dict = {"asana": "Asana", "rayyan": "Rayyan", "openai": "OpenAI"}
-    last_check_table = make_subtable(table, platforms_dict, stats["last_check"])
+    last_check_table = make_subtable(platforms_dict, stats["last_check"])
     table.add_row("Last Check", last_check_table)
-    last_sync_table = make_subtable(table, platforms_dict, stats["last_sync"])
+    last_sync_table = make_subtable(platforms_dict, stats["last_sync"])
     table.add_row("Last Sync", last_sync_table)
-    total_syncs_table = make_subtable(table, platforms_dict, stats["total_syncs"])
+    total_syncs_table = make_subtable(platforms_dict, stats["total_syncs"])
     table.add_row("Total Syncs", total_syncs_table)
-    total_polls_table = make_subtable(table, platforms_dict, stats["total_polls"])
+    total_polls_table = make_subtable(platforms_dict, stats["total_polls"])
     table.add_row("Total Polls", total_polls_table)
     pending_batches_table = make_subtable(
-        table,
         {
             "abstracts": "Abstracts",
             "fulltexts": "Fulltexts",

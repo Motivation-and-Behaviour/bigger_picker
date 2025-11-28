@@ -14,7 +14,6 @@ from rich.progress import (
     TimeElapsedColumn,
     TimeRemainingColumn,
 )
-from rich.table import Table
 
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
@@ -294,8 +293,13 @@ def monitor(
         console=console,
         debug=debug,
     )
-
-    assert integration.asana
+    assert (
+        integration.rayyan
+        and integration.openai
+        and integration.asana
+        and integration.airtable
+        and integration.tracker
+    )
 
     stats = {
         "status": "[green]Running[/green]",
@@ -309,37 +313,6 @@ def monitor(
         "consecutive_errors": {"asana": 0, "rayyan": 0, "openai": 0},
     }
 
-    def monitor_asana(live, stats):
-        assert integration.asana
-        try:
-            stats["status"] = "[cyan]Checking Asana...[/cyan]"
-            stats["total_polls"]["asana"] += 1
-            live.update(create_stats_table(stats))
-
-            events = integration.asana.get_events()
-            stats["last_check"]["asana"] = datetime.now().strftime("%H:%M:%S")
-
-            if events or stats["total_syncs"]["asana"] == 0:
-                stats["consecutive_errors"]["asana"] = 0
-                stats["status"] = "[yellow]Syncing Asana...[/yellow]"
-                live.update(create_stats_table(stats))
-
-                integration.sync()
-                stats["total_syncs"]["asana"] += 1
-                integration.asana.get_events()  # Clear events after sync
-                stats["status"] = "[green]✓ Asana sync complete[/green]"
-                stats["last_sync"]["asana"] = datetime.now().strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
-            else:
-                stats["status"] = "[green]Idle[/green]"
-                live.update(create_stats_table(stats))
-
-        except Exception as e:
-            stats["consecutive_errors"]["asana"] += 1
-            stats["status"] = f"[red]Asana Error: {e}[/red]"
-            live.update(create_stats_table(stats))
-
     try:
         with Live(
             create_stats_table(stats), refresh_per_second=1, console=console
@@ -347,44 +320,46 @@ def monitor(
             while True:
                 # TODO: method for asana, rayyan, openai
 
-                monitor_asana(live, stats)
+                pending = integration.tracker.get_pending_batches()
+                stats = integration.update_stats_pending_batches(live, stats, pending)
 
-                try:
-                    stats["status"] = "[cyan]Checking...[/cyan]"
-                    stats["total_polls"] += 1
+                stats = integration.monitor_asana(live, stats)
+
+                if not sync_only:
+                    (
+                        unscreened_abstracts,
+                        unscreened_fulltexts,
+                        unextracted_articles,
+                        stats,
+                    ) = integration.monitor_rayyan(live, stats)
+
+                    stats = integration.create_batches(
+                        live,
+                        stats,
+                        unscreened_abstracts,
+                        unscreened_fulltexts,
+                        unextracted_articles,
+                    )
+                    pending = integration.tracker.get_pending_batches()
+                    stats = integration.update_stats_pending_batches(
+                        live, stats, pending
+                    )
+
+                    stats = integration.process_pending_batches_cli(
+                        live, stats, pending
+                    )
+
+                    if (
+                        stats["consecutive_errors"]["rayyan"] >= max_errors
+                        or stats["consecutive_errors"]["openai"] >= max_errors
+                    ):
+                        sync_only = True
+                        stats["platforms"] = "Asana only"
+
+                if stats["consecutive_errors"]["asana"] >= max_errors:
+                    stats["status"] = "[bold red]Stopped (too many errors)[/bold red]"
                     live.update(create_stats_table(stats))
-
-                    events = integration.asana.get_events()
-                    stats["last_check"] = datetime.now().strftime("%H:%M:%S")
-
-                    if events or stats["total_syncs"] == 0:
-                        stats["consecutive_errors"] = 0
-                        stats["status"] = "[yellow]Syncing...[/yellow]"
-                        live.update(create_stats_table(stats))
-
-                        integration.sync()
-                        stats["total_syncs"] += 1
-                        integration.asana.get_events()  # Clear events after sync
-                        stats["status"] = "[green]✓ Sync complete[/green]"
-                        stats["last_sync"] = datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
-                    else:
-                        stats["status"] = "[green]Idle[/green]"
-
-                    live.update(create_stats_table(stats))
-
-                except Exception as e:
-                    stats["consecutive_errors"] += 1
-                    stats["status"] = f"[red]Error: {e}[/red]"
-                    live.update(create_stats_table(stats))
-
-                    if stats["consecutive_errors"] >= max_errors:
-                        stats["status"] = (
-                            "[bold red]Stopped (too many errors)[/bold red]"
-                        )
-                        live.update(create_stats_table(stats))
-                        break
+                    break
 
                 for t in range(interval):
                     time_to_sync = interval - t
