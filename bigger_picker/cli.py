@@ -17,6 +17,7 @@ from rich.progress import (
 
 from bigger_picker.airtable import AirtableManager
 from bigger_picker.asana import AsanaManager
+from bigger_picker.batchtracker import BatchTracker
 from bigger_picker.integration import IntegrationManager
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
@@ -47,7 +48,7 @@ def process(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -112,7 +113,7 @@ def sync(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -152,7 +153,7 @@ def screenft(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -209,7 +210,7 @@ def screenabstract(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
@@ -276,23 +277,21 @@ def monitor(
     if dotenv_path:
         load_dotenv(dotenv_path)
     else:
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         load_dotenv(os.path.join(BASE_DIR, ".env"))
 
     console = Console()
 
-    airtable = AirtableManager(airtable_api_key)
-    asana = AsanaManager(asana_token)
-    openai = OpenAIManager(openai_api_key, openai_model)
-    rayyan = RayyanManager(rayyan_creds_path)
     integration = IntegrationManager(
-        asana_manager=asana,
-        airtable_manager=airtable,
-        openai_manager=openai,
-        rayyan_manager=rayyan,
+        asana_manager=AsanaManager(asana_token),
+        airtable_manager=AirtableManager(airtable_api_key),
+        openai_manager=OpenAIManager(openai_api_key, openai_model),
+        rayyan_manager=RayyanManager(rayyan_creds_path),
+        batch_tracker=BatchTracker(),
         console=console,
         debug=debug,
     )
+
     assert (
         integration.rayyan
         and integration.openai
