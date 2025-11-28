@@ -676,3 +676,861 @@ class TestLog:
         integration_manager._log("Test message")
 
         integration_manager.console.log.assert_not_called()
+
+
+class TestSyncAirtableAndAsana:
+    def test_syncs_tasks_and_datasets(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        # Setup mock tasks
+        task1 = {"gid": "task_1", "custom_fields": []}
+        mock_asana.tasks = [task1]
+        mock_asana.get_custom_field_value.return_value = "BP001"
+        mock_asana.get_tasks.return_value = [task1]
+
+        # Setup mock datasets
+        dataset1 = {
+            "id": "rec_1",
+            "fields": {
+                "Dataset ID": "BP001",
+                "Dataset Name": "Test Dataset",
+                "Dataset Value": 0.5,
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset1]
+        mock_airtable.make_url.return_value = "https://airtable.com/rec_1"
+
+        with patch.object(integration_manager, "update_airtable_statuses"):
+            integration_manager.sync_airtable_and_asana()
+
+        mock_asana.get_tasks.assert_called()
+        mock_airtable.tables["Datasets"].all.assert_called()
+
+    def test_creates_task_for_new_dataset(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        # No existing tasks
+        mock_asana.tasks = []
+        mock_asana.get_tasks.return_value = []
+
+        # Dataset without matching task
+        dataset = {
+            "id": "rec_new",
+            "fields": {
+                "Dataset Name": "New Dataset",
+                "Dataset ID": None,
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset]
+        mock_airtable.make_url.return_value = "https://airtable.com/rec_new"
+        mock_asana.create_task.return_value = {"gid": "new_task"}
+        mock_asana.fetch_task_with_custom_field.return_value = {
+            "gid": "new_task",
+            "custom_fields": [],
+        }
+        mock_asana.get_custom_field_value.return_value = "BP002"
+
+        with patch.object(integration_manager, "update_airtable_statuses"):
+            integration_manager.sync_airtable_and_asana()
+
+        mock_asana.create_task.assert_called_once()
+        assert mock_airtable.update_record.call_count >= 1
+
+
+class TestUpdateAirtableStatuses:
+    def test_updates_dataset_status_from_asana(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        task = {
+            "gid": "task_1",
+            "custom_fields": [],
+        }
+        mock_asana.get_tasks.return_value = [task]
+
+        # Mock status retrieval
+        def get_field_value(t, field_id):
+            if field_id == config.ASANA_CUSTOM_FIELD_IDS["Status"]:
+                return {"name": "Validated"}
+            elif field_id == config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]:
+                return "BP001"
+            return None
+
+        mock_asana.get_custom_field_value.side_effect = get_field_value
+
+        dataset = {
+            "id": "rec_1",
+            "fields": {
+                "Dataset ID": "BP001",
+                "Status": "Awaiting Triage",
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset]
+
+        integration_manager.update_airtable_statuses()
+
+        mock_airtable.update_record.assert_called_once()
+
+    def test_skips_when_status_matches(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        task = {"gid": "task_1", "custom_fields": []}
+        mock_asana.get_tasks.return_value = [task]
+
+        def get_field_value(t, field_id):
+            if field_id == config.ASANA_CUSTOM_FIELD_IDS["Status"]:
+                return {"name": "Validated"}
+            elif field_id == config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]:
+                return "BP001"
+            return None
+
+        mock_asana.get_custom_field_value.side_effect = get_field_value
+
+        dataset = {
+            "id": "rec_1",
+            "fields": {
+                "Dataset ID": "BP001",
+                "Status": "Validated",
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset]
+
+        integration_manager.update_airtable_statuses()
+
+        mock_airtable.update_record.assert_not_called()
+
+    def test_skips_dataset_without_bpipd(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        mock_asana.get_tasks.return_value = []
+
+        dataset = {
+            "id": "rec_1",
+            "fields": {
+                "Dataset Name": "Test",
+                "Dataset ID": None,
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset]
+
+        integration_manager.update_airtable_statuses()
+
+        mock_airtable.update_record.assert_not_called()
+
+    def test_skips_task_without_status(
+        self, integration_manager, mock_asana, mock_airtable
+    ):
+        task = {"gid": "task_1", "custom_fields": []}
+        mock_asana.get_tasks.return_value = [task]
+
+        def get_field_value(t, field_id):
+            if field_id == config.ASANA_CUSTOM_FIELD_IDS["Status"]:
+                return None  # No status
+            elif field_id == config.ASANA_CUSTOM_FIELD_IDS["BPIPD"]:
+                return "BP001"
+            return None
+
+        mock_asana.get_custom_field_value.side_effect = get_field_value
+
+        dataset = {
+            "id": "rec_1",
+            "fields": {
+                "Dataset ID": "BP001",
+                "Status": "Validated",
+            },
+        }
+        mock_airtable.tables["Datasets"].all.return_value = [dataset]
+
+        integration_manager.update_airtable_statuses()
+
+        mock_airtable.update_record.assert_not_called()
+
+
+class TestUpdatedDatasetsScores:
+    def test_updates_dataset_scores(self, integration_manager, mock_airtable):
+        datasets = [
+            {
+                "id": "rec_1",
+                "fields": {
+                    "Dataset Name": "Dataset 1",
+                    "Status": "Validated",
+                    "Dataset Value": 0.5,
+                },
+            }
+        ]
+        mock_airtable.tables["Datasets"].all.return_value = datasets
+
+        with (
+            patch("bigger_picker.integration.utils.fix_dataset") as mock_fix,
+            patch(
+                "bigger_picker.integration.utils.compute_year_range"
+            ) as mock_year,
+            patch(
+                "bigger_picker.integration.utils.compute_age_cache"
+            ) as mock_cache,
+            patch(
+                "bigger_picker.integration.utils.compute_dataset_value"
+            ) as mock_value,
+        ):
+            mock_fix.return_value = datasets[0]
+            mock_year.return_value = (2015, 2020)
+            mock_cache.return_value = {}
+            mock_value.return_value = 0.75
+
+            result = integration_manager.updated_datasets_scores()
+
+        assert result is True
+        mock_airtable.update_record.assert_called_once()
+
+    def test_returns_false_when_no_updates(self, integration_manager, mock_airtable):
+        datasets = [
+            {
+                "id": "rec_1",
+                "fields": {
+                    "Dataset Name": "Dataset 1",
+                    "Status": "Validated",
+                    "Dataset Value": 0.75,
+                },
+            }
+        ]
+        mock_airtable.tables["Datasets"].all.return_value = datasets
+
+        with (
+            patch("bigger_picker.integration.utils.fix_dataset") as mock_fix,
+            patch(
+                "bigger_picker.integration.utils.compute_year_range"
+            ) as mock_year,
+            patch(
+                "bigger_picker.integration.utils.compute_age_cache"
+            ) as mock_cache,
+            patch(
+                "bigger_picker.integration.utils.compute_dataset_value"
+            ) as mock_value,
+        ):
+            mock_fix.return_value = datasets[0]
+            mock_year.return_value = (2015, 2020)
+            mock_cache.return_value = {}
+            mock_value.return_value = 0.75
+
+            result = integration_manager.updated_datasets_scores()
+
+        assert result is False
+        mock_airtable.update_record.assert_not_called()
+
+
+class TestProcessArticle:
+    def test_processes_article_successfully(
+        self, integration_manager, mock_rayyan, mock_openai, mock_airtable, mock_asana
+    ):
+        article = {"id": 123}
+
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+        mock_rayyan.extract_article_metadata.return_value = {
+            "Rayyan ID": 123,
+            "Article Title": "Test",
+            "Authors": "Smith",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 100,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
+        )
+        mock_openai.extract_article_info.return_value = llm_extraction
+
+        mock_airtable.create_record.return_value = {
+            "id": "rec_1",
+            "fields": {"Dataset Name": "Smith 2020"},
+        }
+        mock_airtable.make_url.return_value = "https://airtable.com/rec_1"
+        mock_asana.create_task.return_value = {"gid": "task_1"}
+        mock_asana.fetch_task_with_custom_field.return_value = {
+            "gid": "task_1",
+            "custom_fields": [],
+        }
+        mock_asana.get_custom_field_value.return_value = "BP001"
+
+        integration_manager.process_article(article)
+
+        mock_rayyan.download_pdf.assert_called_once_with(article)
+        mock_openai.extract_article_info.assert_called_once()
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_skips_when_no_pdf(self, integration_manager, mock_rayyan, mock_openai):
+        article = {"id": 123}
+        mock_rayyan.download_pdf.return_value = None
+
+        integration_manager.process_article(article)
+
+        mock_openai.extract_article_info.assert_not_called()
+
+    def test_skips_when_extraction_fails(
+        self, integration_manager, mock_rayyan, mock_openai
+    ):
+        article = {"id": 123}
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+        mock_rayyan.extract_article_metadata.return_value = {}
+        mock_openai.extract_article_info.return_value = None
+
+        integration_manager.process_article(article)
+
+        mock_rayyan.update_article_labels.assert_not_called()
+
+
+class TestUploadExtractionWithNestedObjects:
+    def test_creates_populations_records(self, integration_manager, mock_airtable):
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 500,
+                "Dataset Name": "Smith 2020",
+                "populations": [
+                    {
+                        "Age: Lower Range": 18.0,
+                        "Age: Upper Range": 25.0,
+                        "Age: Mean": 21.5,
+                        "Age: Standard Deviation": 2.0,
+                        "Sample Size: Total N": 250,
+                        "Sample Size: N Girls": 125,
+                        "Sample Size: % Girls": 50.0,
+                    }
+                ],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
+        )
+        article_metadata = {
+            "Rayyan ID": 123,
+            "Article Title": "Test",
+            "Authors": "Smith",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+
+        mock_airtable.create_record.return_value = {"id": "rec_1"}
+
+        integration_manager.upload_extraction_to_airtable(
+            llm_extraction, article_metadata
+        )
+
+        # Should create Article + 1 Population + Dataset
+        assert mock_airtable.create_record.call_count >= 3
+
+    def test_creates_screen_time_measures(self, integration_manager, mock_airtable):
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 500,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [
+                    {
+                        "Screen Time Measure: Type": "Survey",
+                        "Screen Time Measure: Name": "TV Watching Survey",
+                        "Types of Screen Time Measured": ["Television"],
+                        "Locations of Screen Time Measured": ["Home"],
+                    }
+                ],
+                "outcomes": [],
+            }
+        )
+        article_metadata = {
+            "Rayyan ID": 123,
+            "Article Title": "Test",
+            "Authors": "Smith",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+
+        mock_airtable.create_record.return_value = {"id": "rec_1"}
+
+        integration_manager.upload_extraction_to_airtable(
+            llm_extraction, article_metadata
+        )
+
+        # Verify screen time measure was created
+        assert mock_airtable.create_record.call_count >= 3
+
+    def test_creates_outcomes(self, integration_manager, mock_airtable):
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 500,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [
+                    {
+                        "Outcome Group": "Mental Health",
+                        "Outcome": "depression",
+                        "Outcome Measure": "PHQ-9",
+                    }
+                ],
+            }
+        )
+        article_metadata = {
+            "Rayyan ID": 123,
+            "Article Title": "Test",
+            "Authors": "Smith",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+
+        mock_airtable.create_record.return_value = {"id": "rec_1"}
+
+        integration_manager.upload_extraction_to_airtable(
+            llm_extraction, article_metadata
+        )
+
+        # Verify outcome was created
+        assert mock_airtable.create_record.call_count >= 3
+
+    def test_generates_dataset_name_from_metadata(
+        self, integration_manager, mock_airtable
+    ):
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 500,
+                "Dataset Name": None,
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
+        )
+        article_metadata = {
+            "Rayyan ID": 123,
+            "Article Title": "Test",
+            "Authors": "Smith, Jones",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+
+        mock_airtable.create_record.return_value = {"id": "rec_1"}
+
+        integration_manager.upload_extraction_to_airtable(
+            llm_extraction, article_metadata
+        )
+
+        # Check that dataset was created with generated name
+        calls = mock_airtable.create_record.call_args_list
+        dataset_call = [c for c in calls if c[0][0] == "Datasets"][0]
+        assert "Smith, 2020" in dataset_call[0][1]["Dataset Name"]
+
+
+class TestCreateExtractionBatch:
+    def test_prepares_extraction_batch(
+        self, integration_manager, mock_openai, mock_rayyan, mock_tracker
+    ):
+        articles = [{"id": 1}, {"id": 2}]
+
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+        mock_file = MagicMock()
+        mock_file.id = "file_123"
+        mock_openai.upload_file.return_value = mock_file
+        mock_openai.prepare_extraction_body.return_value = {
+            "model": "test",
+            "messages": [],
+        }
+
+        with patch.object(integration_manager, "_submit_batch") as mock_submit:
+            integration_manager.create_extraction_batch(articles)
+
+        assert mock_openai.upload_file.call_count == 2
+        mock_submit.assert_called_once()
+
+    def test_skips_articles_without_pdf(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        articles = [{"id": 1}]
+        mock_rayyan.download_pdf.return_value = None
+
+        with patch.object(integration_manager, "_submit_batch") as mock_submit:
+            integration_manager.create_extraction_batch(articles)
+
+        mock_openai.upload_file.assert_not_called()
+        mock_submit.assert_not_called()
+
+    def test_handles_upload_errors(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        articles = [{"id": 1}, {"id": 2}]
+
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+        mock_openai.upload_file.side_effect = [
+            Exception("Upload failed"),
+            MagicMock(id="file_2"),
+        ]
+        mock_openai.prepare_extraction_body.return_value = {}
+
+        with patch.object(integration_manager, "_submit_batch"):
+            integration_manager.create_extraction_batch(articles)
+
+        # Should have created only 1 request (second article)
+        assert mock_openai.prepare_extraction_body.call_count == 1
+
+
+class TestProcessAbstractResults:
+    def test_processes_successful_results(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        results = [
+            {
+                "custom_id": "abstract-123",
+                "response": {
+                    "status_code": 200,
+                    "body": {
+                        "output": [
+                            {
+                                "content": [
+                                    {"text": '{"vote": "include", "rationale": "Good"}'}
+                                ]
+                            }
+                        ]
+                    },
+                },
+            }
+        ]
+
+        decision = ScreeningDecision(
+            vote="include",
+            matched_inclusion=None,
+            failed_inclusion=None,
+            triggered_exclusion=None,
+            exclusion_reasons=None,
+            rationale="Good",
+        )
+        mock_openai.parse_screening_decision.return_value = decision
+
+        integration_manager._process_abstract_results(results)
+
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_handles_error_results(self, integration_manager, mock_openai, mock_rayyan):
+        results = [
+            {
+                "custom_id": "abstract-123",
+                "response": {
+                    "status_code": 500,
+                    "body": {"error": "Internal error"},
+                },
+            }
+        ]
+
+        integration_manager._process_abstract_results(results)
+
+        # Should update labels to remove batch_pending
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_handles_parsing_errors(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        results = [
+            {
+                "custom_id": "abstract-123",
+                "response": {
+                    "status_code": 200,
+                    "body": {
+                        "output": [
+                            {
+                                "content": [
+                                    {
+                                        "text": "invalid json"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                },
+            }
+        ]
+
+        mock_openai.parse_screening_decision.side_effect = Exception("Parse error")
+
+        # Should not raise, just log
+        integration_manager._process_abstract_results(results)
+
+
+class TestProcessFulltextResults:
+    def test_processes_successful_fulltext_results(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        results = [
+            {
+                "custom_id": "fulltext-456",
+                "response": {
+                    "status_code": 200,
+                    "body": {
+                        "output": [
+                            {
+                                "content": [
+                                    {
+                                        "text": (
+                                            '{"vote": "exclude", '
+                                            '"triggered_exclusion": [1], '
+                                            '"rationale": "Wrong"}'
+                                        )
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                },
+            }
+        ]
+
+        decision = ScreeningDecision(
+            vote="exclude",
+            matched_inclusion=None,
+            failed_inclusion=None,
+            triggered_exclusion=[1],
+            exclusion_reasons=None,
+            rationale="Wrong",
+        )
+        mock_openai.parse_screening_decision.return_value = decision
+
+        integration_manager._process_fulltext_results(results)
+
+        mock_rayyan.update_article_labels.assert_called_once()
+
+
+class TestProcessExtractionResults:
+    def test_processes_extraction_results(
+        self, integration_manager, mock_openai, mock_rayyan, mock_airtable, mock_asana
+    ):
+        results = [
+            {
+                "custom_id": "extraction-789",
+                "response": {
+                    "status_code": 200,
+                    "body": {
+                        "output": [
+                            {
+                                "content": [
+                                    {
+                                        "text": '{"Corresponding Author": "Smith"}'
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                },
+            }
+        ]
+
+        llm_extraction = ArticleLLMExtract.model_validate(
+            {
+                "Corresponding Author": "Dr. Smith",
+                "Corresponding Author Email": "smith@uni.edu",
+                "Year of Last Data Point": 2020,
+                "Study Design": "Cross-sectional",
+                "Countries of Data": ["USA"],
+                "Total Sample Size": 100,
+                "Dataset Name": "Smith 2020",
+                "populations": [],
+                "screen_time_measures": [],
+                "outcomes": [],
+            }
+        )
+        mock_openai.parse_extraction_result.return_value = llm_extraction
+
+        article = {"id": 789}
+        mock_rayyan.get_article_by_id.return_value = article
+        mock_rayyan.extract_article_metadata.return_value = {
+            "Rayyan ID": 789,
+            "Article Title": "Test",
+            "Authors": "Smith",
+            "Journal": "Journal",
+            "DOI": "",
+            "Year": 2020,
+            "Search": [],
+        }
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+
+        mock_airtable.create_record.return_value = {
+            "id": "rec_1",
+            "fields": {"Dataset Name": "Test"},
+        }
+        mock_airtable.make_url.return_value = "https://airtable.com/rec_1"
+        mock_asana.create_task.return_value = {"gid": "task_1"}
+        mock_asana.fetch_task_with_custom_field.return_value = {
+            "gid": "task_1",
+            "custom_fields": [],
+        }
+        mock_asana.get_custom_field_value.return_value = "BP001"
+
+        integration_manager._process_extraction_results(results)
+
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_handles_extraction_errors(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        results = [
+            {
+                "custom_id": "extraction-789",
+                "response": {
+                    "status_code": 500,
+                    "body": {"error": "Failed"},
+                },
+            }
+        ]
+
+        integration_manager._process_extraction_results(results)
+
+        mock_rayyan.update_article_labels.assert_called_once()
+
+
+class TestActionScreeningDecisionEdgeCases:
+    def test_exclude_with_failed_inclusion(self, integration_manager, mock_rayyan):
+        decision = {
+            "vote": "exclude",
+            "failed_inclusion": [2],
+            "rationale": "Failed inclusion criteria",
+        }
+
+        integration_manager._action_screening_decision(
+            decision, article_id=123, is_abstract=False
+        )
+
+        mock_rayyan.create_article_note.assert_called_once()
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_long_rationale_truncated(self, integration_manager, mock_rayyan):
+        decision = {
+            "vote": "exclude",
+            "triggered_exclusion": [1],
+            "rationale": "x" * 1500,  # Very long rationale
+        }
+
+        integration_manager._action_screening_decision(
+            decision, article_id=123, is_abstract=False
+        )
+
+        # Should truncate to ~1000 chars
+        call_args = mock_rayyan.create_article_note.call_args
+        note_text = call_args[0][1]
+        assert len(note_text) <= 1020
+        assert "..." in note_text
+
+    def test_note_creation_failure(self, integration_manager, mock_rayyan):
+        decision = {
+            "vote": "exclude",
+            "triggered_exclusion": [1],
+            "rationale": "Excluded",
+        }
+
+        mock_rayyan.create_article_note.side_effect = Exception("Note failed")
+
+        # Should not raise
+        integration_manager._action_screening_decision(
+            decision, article_id=123, is_abstract=False
+        )
+
+        mock_rayyan.update_article_labels.assert_called_once()
+
+    def test_include_fulltext_adds_unextracted(self, integration_manager, mock_rayyan):
+        decision = {
+            "vote": "include",
+            "rationale": "Good",
+        }
+
+        integration_manager._action_screening_decision(
+            decision, article_id=123, is_abstract=False
+        )
+
+        call_args = mock_rayyan.update_article_labels.call_args
+        plan = call_args[0][1]
+        assert config.RAYYAN_LABELS["included"] in plan
+        assert config.RAYYAN_LABELS["unextracted"] in plan
+
+
+class TestScreenAbstractEdgeCases:
+    def test_skips_empty_abstract_content(self, integration_manager, mock_openai):
+        article = {"id": 123, "abstracts": [{"content": ""}]}
+
+        integration_manager.screen_abstract(article)
+
+        mock_openai.screen_record_abstract.assert_not_called()
+
+    def test_handles_llm_failure(self, integration_manager, mock_openai, mock_rayyan):
+        article = {"id": 123, "abstracts": [{"content": "Test abstract"}]}
+        mock_openai.screen_record_abstract.return_value = None
+
+        integration_manager.screen_abstract(article)
+
+        mock_rayyan.update_article_labels.assert_not_called()
+
+
+class TestScreenFulltextEdgeCases:
+    def test_handles_llm_failure_fulltext(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        article = {"id": 123}
+        mock_rayyan.download_pdf.return_value = "/path/to/pdf"
+        mock_openai.screen_record_fulltext.return_value = None
+
+        integration_manager.screen_fulltext(article)
+
+        mock_rayyan.update_article_labels.assert_not_called()
+
+
+class TestCreateAbstractBatchEdgeCases:
+    def test_marks_missing_abstracts(
+        self, integration_manager, mock_openai, mock_rayyan
+    ):
+        articles = [
+            {"id": 1, "abstracts": []},
+            {"id": 2, "abstracts": [{"content": ""}]},
+        ]
+
+        with patch.object(integration_manager, "_submit_batch") as mock_submit:
+            integration_manager.create_abstract_screening_batch(articles)
+
+        # Should update labels for both articles with missing abstract
+        assert mock_rayyan.update_article_labels.call_count == 2
+        mock_submit.assert_not_called()
+
+    def test_submits_batch_when_no_requests(self, integration_manager):
+        articles = []
+
+        with patch.object(integration_manager, "_submit_batch") as mock_submit:
+            integration_manager.create_abstract_screening_batch(articles)
+
+        mock_submit.assert_not_called()
