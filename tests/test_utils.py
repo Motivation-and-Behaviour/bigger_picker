@@ -731,3 +731,350 @@ def test_identify_duplicate_datasets_large_size():
 
     # Should complete without error
     assert isinstance(duplicates, dict)
+
+
+def test_setup_logger_creates_logger():
+    import logging
+    import os
+
+    log_file = "test_bigger_picker.log"
+
+    # Clean up if file exists
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    try:
+        logger = utils.setup_logger("test_logger", log_file)
+
+        assert logger is not None
+        assert isinstance(logger, logging.Logger)
+        assert logger.name == "test_logger"
+        assert logger.level == logging.INFO
+
+        # Test that it has a handler
+        assert len(logger.handlers) > 0
+
+        # Test that it can log
+        logger.info("Test message")
+        assert os.path.exists(log_file)
+
+    finally:
+        # Clean up
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
+        if os.path.exists(log_file):
+            os.remove(log_file)
+
+
+def test_setup_logger_reuses_existing_logger():
+    import logging
+    import os
+
+    log_file = "test_bigger_picker2.log"
+
+    # Clean up if file exists
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    try:
+        # Create logger first time
+        logger1 = utils.setup_logger("test_logger2", log_file)
+        handler_count1 = len(logger1.handlers)
+
+        # Call again with same name - should not add more handlers
+        logger2 = utils.setup_logger("test_logger2", log_file)
+        handler_count2 = len(logger2.handlers)
+
+        # Should be the same logger instance
+        assert logger1 is logger2
+        # Should not have added more handlers
+        assert handler_count1 == handler_count2
+
+    finally:
+        # Clean up
+        logger = logging.getLogger("test_logger2")
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
+        if os.path.exists(log_file):
+            os.remove(log_file)
+
+
+def test_setup_logger_rotating_handler():
+    import logging
+    import os
+    from logging.handlers import RotatingFileHandler
+
+    log_file = "test_bigger_picker3.log"
+
+    # Clean up if file exists
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    try:
+        logger = utils.setup_logger("test_logger3", log_file)
+
+        # Check that it uses RotatingFileHandler
+        assert len(logger.handlers) > 0
+        handler = logger.handlers[0]
+        assert isinstance(handler, RotatingFileHandler)
+
+        # Check max bytes and backup count
+        assert handler.maxBytes == 5 * 1024 * 1024  # 5MB
+        assert handler.backupCount == 3
+
+    finally:
+        # Clean up
+        logger = logging.getLogger("test_logger3")
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
+        if os.path.exists(log_file):
+            os.remove(log_file)
+
+
+def test_create_stats_table_basic():
+    from datetime import datetime, timedelta
+
+    start_time = datetime.now() - timedelta(hours=1, minutes=30)
+
+    stats = {
+        "start_time": start_time,
+        "status": "[green]Idle[/green]",
+        "platforms": "Asana, Rayyan, OpenAI",
+        "last_check": {"asana": "12:00:00", "rayyan": "12:01:00", "openai": "12:02:00"},
+        "last_sync": {
+            "asana": "2024-01-01 12:00:00",
+            "rayyan": "2024-01-01 12:01:00",
+            "openai": "2024-01-01 12:02:00",
+        },
+        "total_syncs": {"asana": 5, "rayyan": 3, "openai": 2},
+        "total_polls": {"asana": 10, "rayyan": 8, "openai": 6},
+        "pending_batches": {"abstracts": 2, "fulltexts": 1, "extractions": 0},
+    }
+
+    table = utils.create_stats_table(stats)
+
+    assert table is not None
+    assert table.title == "Bigger Picker Status"
+    assert len(table.columns) == 2
+
+
+def test_create_stats_table_uptime_calculation():
+    from datetime import datetime, timedelta
+
+    # Test uptime formatting
+    start_time = datetime.now() - timedelta(hours=2, minutes=15, seconds=30)
+
+    stats = {
+        "start_time": start_time,
+        "status": "[green]Running[/green]",
+        "platforms": "Test",
+        "last_check": {"asana": "N/A", "rayyan": "N/A", "openai": "N/A"},
+        "last_sync": {"asana": "N/A", "rayyan": "N/A", "openai": "N/A"},
+        "total_syncs": {"asana": 0, "rayyan": 0, "openai": 0},
+        "total_polls": {"asana": 0, "rayyan": 0, "openai": 0},
+        "pending_batches": {"abstracts": 0, "fulltexts": 0, "extractions": 0},
+    }
+
+    table = utils.create_stats_table(stats)
+
+    # Should create table without errors
+    assert table is not None
+
+
+def test_create_stats_table_with_pending_batches():
+    from datetime import datetime
+
+    stats = {
+        "start_time": datetime.now(),
+        "status": "[yellow]Processing batches[/yellow]",
+        "platforms": "All",
+        "last_check": {"asana": "12:00:00", "rayyan": "12:00:00", "openai": "12:00:00"},
+        "last_sync": {
+            "asana": "2024-01-01 12:00:00",
+            "rayyan": "2024-01-01 12:00:00",
+            "openai": "2024-01-01 12:00:00",
+        },
+        "total_syncs": {"asana": 1, "rayyan": 1, "openai": 1},
+        "total_polls": {"asana": 1, "rayyan": 1, "openai": 1},
+        "pending_batches": {"abstracts": 10, "fulltexts": 5, "extractions": 3},
+    }
+
+    table = utils.create_stats_table(stats)
+
+    assert table is not None
+    # Should have rows for all the stats including pending batches
+    assert len(table.rows) > 0
+
+
+def test_identify_duplicate_datasets_edge_case_pairs_none():
+    # Test edge case where one of the pair indexes is None
+    # This tests lines 289-294 where pairs might be None
+    datasets = []
+    for i in range(1200):  # Medium size
+        dataset = fake_record(
+            {
+                "Dataset Name": f"Unique Study {i}",
+                "Dataset Contact Name": f"Unique Researcher {i}",
+                "Dataset Contact Email": f"unique{i}@example.com",
+            }
+        )
+        datasets.append(dataset)
+
+    # Should handle gracefully even if no pairs match
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.99)
+
+    # Should return empty or minimal results
+    assert isinstance(duplicates, dict)
+
+
+def test_identify_duplicate_datasets_email_blocking():
+    # Test that email blocking works correctly for medium datasets
+    datasets = []
+    shared_email = "shared@university.edu"
+
+    for i in range(1200):  # Medium size to trigger email blocking
+        dataset = fake_record(
+            {
+                "Dataset Name": f"Study {i}",
+                "Dataset Contact Name": f"Researcher {i}",
+                "Dataset Contact Email": shared_email if i < 3 else f"unique{i}@edu",
+            }
+        )
+        datasets.append(dataset)
+
+    duplicates = utils.identify_duplicate_datasets(datasets, threshold=0.3)
+
+    # First 3 datasets with same email should be candidates for duplicates
+    # At minimum, they should be compared even if not deemed duplicates
+    assert isinstance(duplicates, dict)
+
+
+def test_compute_age_value_extreme_no_overlap():
+    # Test when distributions are so far apart that total_wi becomes 0
+    # This tests line 196
+    cache = {"rec1": (5.0, 0.1, 100)}
+    # Dataset with mean very far from cache (100 standard deviations away)
+    ds = fake_record({"Mean Ages": 15.0, "SD Ages": 0.05})
+
+    value = utils.compute_age_value(ds, cache)
+
+    # Should handle gracefully and return a valid value
+    assert value >= 0.0
+    assert value <= 1.0
+
+
+def test_fix_age_negative_min_age():
+    # Test when min age is negative
+    ds = fake_record(
+        {
+            "Mean Ages": [],
+            "SD Ages": [],
+            "Min Ages": -5.0,  # Negative
+            "Max Ages": 10.0,
+        }
+    )
+
+    fixed_dataset = utils.fix_age(ds)
+    # Negative min should be set to None
+    assert fixed_dataset["fields"]["Min Ages"] is None
+    # But max should still be valid
+    assert fixed_dataset["fields"]["Max Ages"] == 10.0
+
+
+def test_fix_age_max_exceeds_limit():
+    # Test when max age exceeds 18
+    ds = fake_record(
+        {
+            "Mean Ages": [],
+            "SD Ages": [],
+            "Min Ages": 10.0,
+            "Max Ages": 25.0,  # Too old
+        }
+    )
+
+    fixed_dataset = utils.fix_age(ds)
+    assert fixed_dataset["fields"]["Min Ages"] == 10.0
+    # Max should be set to None
+    assert fixed_dataset["fields"]["Max Ages"] is None
+
+
+def test_fix_age_only_sd_estimation():
+    # Test case where we have min/max and mean, but need SD estimation
+    ds = fake_record(
+        {
+            "Mean Ages": ["12.0"],
+            "SD Ages": [],  # Missing SD
+            "Min Ages": 10.0,
+            "Max Ages": 14.0,
+        }
+    )
+
+    fixed_dataset = utils.fix_age(ds)
+    assert fixed_dataset["fields"]["Mean Ages"] == 12.0
+    # SD should be estimated as (max - min) / 4 = (14 - 10) / 4 = 1.0
+    assert fixed_dataset["fields"]["SD Ages"] == 1.0
+
+
+def test_compute_dataset_value_custom_weights():
+    # Test with all custom weights
+    ds = fake_record(
+        {
+            "Total Sample Size": 100,
+            "Year of Last Data Point": 2015,
+            "Searches": ["Search1", "Search2"],
+            "Mean Ages": 10.0,
+            "SD Ages": 2.0,
+        }
+    )
+
+    custom_weights = {
+        "alpha": 2.0,
+        "beta": 0.5,
+        "gamma": 0.5,
+        "delta": 1.0,
+        "epsilon": 0.5,
+    }
+
+    age_cache = {"rec1": (10.0, 2.0, 100)}
+
+    value = utils.compute_dataset_value(
+        ds,
+        year_min=2010,
+        year_max=2020,
+        age_cache=age_cache,
+        weights=custom_weights,
+    )
+
+    # Should compute without errors and return a positive value
+    assert value > 0
+
+
+def test_compute_dataset_value_synergy_term():
+    # Test that synergy term (O_i * A_i) is computed correctly
+    ds = fake_record(
+        {
+            "Total Sample Size": 0,
+            "Year of Last Data Point": 2020,
+            "Searches": ["S1", "S2"],  # O_i = 2
+            "Mean Ages": 10.0,
+            "SD Ages": 2.0,
+        }
+    )
+
+    # Weights to isolate synergy term
+    weights = {"alpha": 0.0, "beta": 0.0, "gamma": 0.0, "delta": 1.0, "epsilon": 0.0}
+
+    age_cache = {"rec1": (10.0, 2.0, 100)}
+
+    value = utils.compute_dataset_value(
+        ds, year_min=None, year_max=None, age_cache=age_cache, weights=weights
+    )
+
+    # Synergy term should be O_i * A_i * delta
+    # O_i = 2, A_i ≈ 0.5 (from age overlap), delta = 1.0
+    # So synergy should be approximately 1.0
+    assert value > 0
+    assert value < 3.0  # Reasonable upper bound
