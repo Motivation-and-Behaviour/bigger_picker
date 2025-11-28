@@ -88,3 +88,205 @@ def test_extract_article_info_file_open_error(monkeypatch):
     mgr = openai.OpenAIManager(api_key="provided_key")
     with pytest.raises(FileNotFoundError):
         mgr.extract_article_info("nope.pdf")
+
+
+class DummyBatch:
+    """Mock batch object for testing."""
+
+    def __init__(self, batch_id, status="completed", output_file_id=None):
+        self.id = batch_id
+        self.status = status
+        self.output_file_id = output_file_id
+        self.error_file_id = None
+
+
+@pytest.fixture
+def mock_openai_manager(monkeypatch):
+    """Create an OpenAIManager with a fully mocked client."""
+    monkeypatch.setenv("OPENAI_TOKEN", "test_key")
+
+    class MockFiles:
+        def create(self, file, purpose):
+            return DummyFile("mock_file_id")
+
+    class MockResponses:
+        def parse(self, model, input, text_format):
+            return DummyResponse("mocked_parse_result")
+
+    class MockBatches:
+        def create(self, input_file_id, endpoint, completion_window, metadata):
+            return DummyBatch("batch_123")
+
+        def retrieve(self, batch_id):
+            return DummyBatch(batch_id, status="completed", output_file_id="output_123")
+
+    class FakeClient:
+        def __init__(self, api_key):
+            self.files = MockFiles()
+            self.responses = MockResponses()
+            self.batches = MockBatches()
+
+    monkeypatch.setattr(openai, "OpenAI", FakeClient)
+    return openai.OpenAIManager(api_key="test_key")
+
+
+class TestScreenRecordAbstract:
+    def test_returns_parsed_output(self, mock_openai_manager):
+        result = mock_openai_manager.screen_record_abstract("This is an abstract")
+        assert result == "mocked_parse_result"
+
+
+class TestScreenRecordFulltext:
+    def test_returns_parsed_output(self, mock_openai_manager, tmp_path):
+        pdf = tmp_path / "test.pdf"
+        pdf.write_bytes(b"%PDF-1.4 dummy content")
+
+        result = mock_openai_manager.screen_record_fulltext(str(pdf))
+        assert result == "mocked_parse_result"
+
+
+class TestPrepareAbstractBody:
+    def test_returns_structured_payload(self, mock_openai_manager):
+        body = mock_openai_manager.prepare_abstract_body("Test abstract content")
+
+        assert "model" in body
+        assert "input" in body
+        assert "text" in body
+        assert body["text"]["format"]["type"] == "json_schema"
+        assert body["model"] == mock_openai_manager.model
+
+
+class TestPrepareFulltextBody:
+    def test_returns_structured_payload(self, mock_openai_manager):
+        body = mock_openai_manager.prepare_fulltext_body("file_123")
+
+        assert "model" in body
+        assert "input" in body
+        assert "text" in body
+
+
+class TestPrepareExtractionBody:
+    def test_returns_structured_payload(self, mock_openai_manager):
+        body = mock_openai_manager.prepare_extraction_body("file_123")
+
+        assert "model" in body
+        assert "input" in body
+        assert "text" in body
+        assert body["text"]["format"]["name"] == "ArticleLLMExtract"
+
+
+class TestParseScreeningDecision:
+    def test_parses_valid_json(self, mock_openai_manager):
+        json_str = """{
+            "vote": "include",
+            "matched_inclusion": null,
+            "failed_inclusion": null,
+            "triggered_exclusion": null,
+            "exclusion_reasons": null,
+            "rationale": "Meets all criteria"
+        }"""
+        decision = mock_openai_manager.parse_screening_decision(json_str)
+
+        assert decision.vote == "include"
+        assert decision.rationale == "Meets all criteria"
+
+    def test_parses_exclude_decision(self, mock_openai_manager):
+        json_str = """{
+            "vote": "exclude",
+            "matched_inclusion": null,
+            "failed_inclusion": null,
+            "triggered_exclusion": [1],
+            "exclusion_reasons": null,
+            "rationale": "Exclusion criterion 1 triggered"
+        }"""
+        decision = mock_openai_manager.parse_screening_decision(json_str)
+
+        assert decision.vote == "exclude"
+        assert decision.triggered_exclusion == [1]
+
+
+class TestParseExtractionResult:
+    def test_parses_valid_extraction(self, mock_openai_manager):
+        json_str = """{
+            "Corresponding Author": "Dr. Smith",
+            "Corresponding Author Email": null,
+            "Year of Last Data Point": null,
+            "Total Sample Size": 500,
+            "Study Design": "Cross-sectional",
+            "Countries of Data": null,
+            "Dataset Name": null,
+            "populations": [],
+            "screen_time_measures": [],
+            "outcomes": []
+        }"""
+        result = mock_openai_manager.parse_extraction_result(json_str)
+
+        assert result.corresponding_author == "Dr. Smith"
+        assert result.total_sample_size == 500
+        assert result.study_design == "Cross-sectional"
+
+
+class TestUploadFile:
+    def test_returns_file_object(self, mock_openai_manager, tmp_path):
+        test_file = tmp_path / "test.pdf"
+        test_file.write_bytes(b"test content")
+
+        result = mock_openai_manager.upload_file(str(test_file))
+        assert result.id == "mock_file_id"
+
+
+class TestCreateBatch:
+    def test_creates_batch_job(self, mock_openai_manager, tmp_path):
+        # Create a dummy JSONL file
+        jsonl_file = tmp_path / "batch.jsonl"
+        jsonl_file.write_text('{"custom_id": "1", "method": "POST"}\n')
+
+        result = mock_openai_manager.create_batch(str(jsonl_file), "abstract_screen")
+        assert result.id == "batch_123"
+
+
+class TestRetrieveBatch:
+    def test_retrieves_batch_status(self, mock_openai_manager):
+        result = mock_openai_manager.retrieve_batch("batch_456")
+
+        assert result.id == "batch_456"
+        assert result.status == "completed"
+
+
+class TestBuildAbstractPrompt:
+    def test_includes_criteria(self, mock_openai_manager):
+        messages = mock_openai_manager._build_abstract_prompt("Test abstract")
+
+        assert len(messages) == 2
+        assert messages[0]["role"] == "system"
+        assert messages[1]["role"] == "user"
+        assert "Test abstract" in messages[1]["content"]
+        assert "Inclusion criteria" in messages[0]["content"]
+        assert "Exclusion criteria" in messages[0]["content"]
+
+
+class TestBuildFulltextPrompt:
+    def test_includes_file_reference(self, mock_openai_manager):
+        messages = mock_openai_manager._build_fulltext_prompt("file_abc")
+
+        # Should have 3 messages (system, user with file, system again)
+        assert len(messages) == 3
+        assert messages[0]["role"] == "system"
+        assert messages[1]["role"] == "user"
+        # User message should contain file reference
+        assert messages[1]["content"][0]["type"] == "input_file"
+        assert messages[1]["content"][0]["file_id"] == "file_abc"
+
+
+class TestNumberCriteria:
+    def test_numbers_criteria_list(self):
+        criteria = ["First criterion", "Second criterion", "Third criterion"]
+        result = openai.OpenAIManager._number_criteria(criteria)
+
+        assert "1. First criterion" in result
+        assert "2. Second criterion" in result
+        assert "3. Third criterion" in result
+
+    def test_empty_list(self):
+        result = openai.OpenAIManager._number_criteria([])
+        assert result == ""

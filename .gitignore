@@ -207,3 +207,6 @@ scratch*
 
 # MacOS
 .DS_Store
+
+# OpenAI Batchs
+batches.json
