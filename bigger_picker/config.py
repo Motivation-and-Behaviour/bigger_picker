@@ -85,7 +85,7 @@ EXCLUSION_CRITERIA = [
 
 FULLTEXT_SCREENING_INSTRUCTIONS = """
 # Instructions
-We now assess whether the paper should be included from the systematic review by evaluating it against each and every predefined inclusion and exclusion criterion. First, we will reflect on how we will decide whether a paper should be included or excluded. Then, we will think step by step for each criteria, giving reasons for why they are met or not met.
+We now assess whether the paper should be included from the systematic review by evaluating it against each and every predefined inclusion and exclusion criterion. First, we will reflect on how we will decide whether a paper should be included or excluded. Then, we will think step by step for each criterion, giving reasons for why they are met or not met.
 Follow the schema exactly:
 - Use 1-based indices for criteria lists.
 - If none apply, return an empty list [] for any list field.

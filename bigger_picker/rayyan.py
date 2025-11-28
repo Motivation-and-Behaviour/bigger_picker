@@ -136,8 +136,12 @@ class RayyanManager:
             if max_articles is not None:
                 if len(priority) + len(non_priority) >= max_articles:
                     break
+        unscreened = priority + non_priority
 
-        return priority + non_priority
+        if max_articles is not None:
+            unscreened = unscreened[:max_articles]
+
+        return unscreened
 
     def get_article_by_id(self, article_id: int) -> dict:
         results_params = {"extra[article_ids][]": str(article_id)}

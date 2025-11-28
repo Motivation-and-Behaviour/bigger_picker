@@ -18,7 +18,6 @@ from bigger_picker.batchtracker import BatchTracker
 from bigger_picker.datamodels import Article, ArticleLLMExtract
 from bigger_picker.openai import OpenAIManager
 from bigger_picker.rayyan import RayyanManager
-from bigger_picker.utils import create_stats_table
 
 
 def requires_services(*required_services):
@@ -607,7 +606,7 @@ class IntegrationManager:
         try:
             stats["status"] = "[cyan]Checking Asana...[/cyan]"
             stats["total_polls"]["asana"] += 1
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
 
             self._log("Checking Asana events...")
             events = self.asana.get_events()
@@ -616,7 +615,7 @@ class IntegrationManager:
             if events or stats["total_syncs"]["asana"] == 0:
                 stats["consecutive_errors"]["asana"] = 0
                 stats["status"] = "[yellow]Syncing Asana...[/yellow]"
-                live.update(create_stats_table(stats))
+                live.update(utils.create_stats_table(stats))
 
                 self._log("Changes detected in Asana, syncing...")
                 self.sync()
@@ -629,13 +628,13 @@ class IntegrationManager:
                 )
             else:
                 stats["status"] = "[green]Idle[/green]"
-                live.update(create_stats_table(stats))
+                live.update(utils.create_stats_table(stats))
 
         except Exception as e:
             stats["consecutive_errors"]["asana"] += 1
             stats["status"] = f"[red]Asana Error: {e}[/red]"
             self._log(f"Asana monitoring error: {e}", "error")
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
 
         return stats
 
@@ -644,17 +643,17 @@ class IntegrationManager:
         assert self.rayyan
         try:
             stats["status"] = "[cyan]Checking Rayyan for unscreened abstracts...[/cyan]"
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             self._log("Checking Rayyan for unscreened abstracts...")
             unscreened_abstracts = self.rayyan.get_unscreened_abstracts()
 
             stats["status"] = "[cyan]Checking Rayyan for unscreened fulltexts...[/cyan]"
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             self._log("Checking Rayyan for unscreened fulltexts...")
             unscreened_fulltexts = self.rayyan.get_unscreened_fulltexts()
 
             stats["status"] = "[cyan]Checking Rayyan for unextracted articles...[/cyan]"
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             self._log("Checking Rayyan for unextracted articles...")
             unextracted_articles = self.rayyan.get_unextracted_articles()
 
@@ -664,7 +663,7 @@ class IntegrationManager:
             stats["total_polls"]["rayyan"] += 1
             stats["total_syncs"]["rayyan"] += 1
 
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             self._log("All Rayyan checks complete.")
             return (
                 unscreened_abstracts,
@@ -677,7 +676,7 @@ class IntegrationManager:
             stats["consecutive_errors"]["rayyan"] += 1
             stats["status"] = f"[red]Rayyan Error: {e}[/red]"
             self._log(f"Rayyan monitoring error: {e}", "error")
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             return None, None, None, stats
 
     @requires_services("openai", "tracker")
@@ -697,38 +696,38 @@ class IntegrationManager:
                 stats["status"] = (
                     "[yellow]Creating abstract screening batches...[/yellow]"
                 )
-                live.update(create_stats_table(stats))
+                live.update(utils.create_stats_table(stats))
                 self._log(
                     f"Creating batches for {len(unscreened_abstracts)} abstracts..."
                 )
                 for batch in batched(unscreened_abstracts, max_batch_abs):
                     self.create_abstract_screening_batch(list(batch))
                     stats["pending_batches"]["abstracts"] += 1
-                    live.update(create_stats_table(stats))
+                    live.update(utils.create_stats_table(stats))
 
             if unscreened_fulltexts:
                 stats["status"] = (
                     "[yellow]Creating fulltext screening batches...[/yellow]"
                 )
-                live.update(create_stats_table(stats))
+                live.update(utils.create_stats_table(stats))
                 self._log(
                     f"Creating batches for {len(unscreened_fulltexts)} fulltexts..."
                 )
                 for batch in batched(unscreened_fulltexts, max_batch_ft):
                     self.create_fulltext_screening_batch(list(batch))
                     stats["pending_batches"]["fulltexts"] += 1
-                    live.update(create_stats_table(stats))
+                    live.update(utils.create_stats_table(stats))
 
             if unextracted_articles:
                 stats["status"] = "[yellow]Creating extraction batches...[/yellow]"
-                live.update(create_stats_table(stats))
+                live.update(utils.create_stats_table(stats))
                 self._log(
                     f"Creating batches for {len(unextracted_articles)} extractions..."
                 )
                 for batch in batched(unextracted_articles, max_batch_ext):
                     self.create_extraction_batch(list(batch))
                     stats["pending_batches"]["extractions"] += 1
-                    live.update(create_stats_table(stats))
+                    live.update(utils.create_stats_table(stats))
 
             stats["consecutive_errors"]["openai"] = 0
 
@@ -736,7 +735,7 @@ class IntegrationManager:
             stats["consecutive_errors"]["openai"] += 1
             stats["status"] = f"[red]Batch Creation Error: {e}[/red]"
             self._log(f"Batch creation error: {e}", "error")
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
 
         return stats
 
@@ -748,7 +747,7 @@ class IntegrationManager:
             stats["status"] = "[cyan]Checking batch status...[/cyan]"
             stats["last_check"]["openai"] = datetime.now().strftime("%H:%M:%S")
             stats["total_polls"]["openai"] += 1
-            live.update(create_stats_table(stats))
+            live.update(utils.create_stats_table(stats))
             self._log(f"Checking status for batch {batch_id} ({info['type']})...")
             try:
                 batch = self.openai.retrieve_batch(batch_id)
@@ -766,7 +765,7 @@ class IntegrationManager:
                     stats["last_sync"]["openai"] = datetime.now().strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
-                    live.update(create_stats_table(stats))
+                    live.update(utils.create_stats_table(stats))
                     self._handle_completed_batch(
                         batch.output_file_id, info["type"], batch_id
                     )
@@ -774,7 +773,7 @@ class IntegrationManager:
                     stats["last_sync"]["openai"] = datetime.now().strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
-                    live.update(create_stats_table(stats))
+                    live.update(utils.create_stats_table(stats))
                 else:
                     self._log("Batch completed but has no output file ID.")
                     if batch.error_file_id:
@@ -792,13 +791,17 @@ class IntegrationManager:
         self, live: Live, stats: dict, pending: dict
     ) -> dict:
         stats["pending_batches"] = {
-            "abstracts": sum(1 for b in pending.values() if b["type"] == "abstract"),
-            "fulltexts": sum(1 for b in pending.values() if b["type"] == "fulltext"),
+            "abstracts": sum(
+                1 for b in pending.values() if b["type"] == "abstract_screen"
+            ),
+            "fulltexts": sum(
+                1 for b in pending.values() if b["type"] == "fulltext_screen"
+            ),
             "extractions": sum(
                 1 for b in pending.values() if b["type"] == "extraction"
             ),
         }
-        live.update(create_stats_table(stats))
+        live.update(utils.create_stats_table(stats))
         return stats
 
     @requires_services("openai", "tracker")
