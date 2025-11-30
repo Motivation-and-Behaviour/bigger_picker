@@ -760,9 +760,6 @@ class IntegrationManager:
 
         batch_count = 0
         for batch_id, info in pending.items():
-            if batch_count >= max_batches:
-                self._log("Reached max number of batches for this cycle.")
-                break
             stats["status"] = "[cyan]Checking batch status...[/cyan]"
             stats["last_check"]["openai"] = datetime.now().strftime("%H:%M:%S")
             stats["total_polls"]["openai"] += 1
@@ -775,6 +772,9 @@ class IntegrationManager:
                 continue
 
             if batch.status == "completed":
+                if batch_count >= max_batches:
+                    self._log("Reached max number of batches for this cycle.")
+                    break
                 self._log("Batch completed! Downloading results...")
                 if batch.output_file_id:
                     stats["status"] = (
