@@ -704,6 +704,7 @@ class IntegrationManager:
                 batch_count = 0
                 for batch in batched(unscreened_abstracts, max_batch_size_abs):
                     if batch_count >= max_num_batches:
+                        self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_abstract_screening_batch(list(batch))
                     stats["pending_batches"]["abstract_screen"] += 1
@@ -720,6 +721,7 @@ class IntegrationManager:
                 batch_count = 0
                 for batch in batched(unscreened_fulltexts, max_batch_size_ft):
                     if batch_count >= max_num_batches:
+                        self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_fulltext_screening_batch(list(batch))
                     stats["pending_batches"]["fulltext_screen"] += 1
@@ -734,6 +736,7 @@ class IntegrationManager:
                 batch_count = 0
                 for batch in batched(unextracted_articles, max_batch_size_ext):
                     if batch_count >= max_num_batches:
+                        self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_extraction_batch(list(batch))
                     stats["pending_batches"]["extraction"] += 1
@@ -758,6 +761,7 @@ class IntegrationManager:
         batch_count = 0
         for batch_id, info in pending.items():
             if batch_count >= max_batches:
+                self._log("Reached max number of batches for this cycle.")
                 break
             stats["status"] = "[cyan]Checking batch status...[/cyan]"
             stats["last_check"]["openai"] = datetime.now().strftime("%H:%M:%S")
