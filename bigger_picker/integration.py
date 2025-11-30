@@ -702,7 +702,7 @@ class IntegrationManager:
                 )
                 for batch in batched(unscreened_abstracts, max_batch_abs):
                     self.create_abstract_screening_batch(list(batch))
-                    stats["pending_batches"]["abstracts"] += 1
+                    stats["pending_batches"]["abstract_screen"] += 1
                     live.update(utils.create_stats_table(stats))
 
             if unscreened_fulltexts:
@@ -715,7 +715,7 @@ class IntegrationManager:
                 )
                 for batch in batched(unscreened_fulltexts, max_batch_ft):
                     self.create_fulltext_screening_batch(list(batch))
-                    stats["pending_batches"]["fulltexts"] += 1
+                    stats["pending_batches"]["fulltext_screen"] += 1
                     live.update(utils.create_stats_table(stats))
 
             if unextracted_articles:
@@ -726,7 +726,7 @@ class IntegrationManager:
                 )
                 for batch in batched(unextracted_articles, max_batch_ext):
                     self.create_extraction_batch(list(batch))
-                    stats["pending_batches"]["extractions"] += 1
+                    stats["pending_batches"]["extraction"] += 1
                     live.update(utils.create_stats_table(stats))
 
             stats["consecutive_errors"]["openai"] = 0
@@ -791,15 +791,13 @@ class IntegrationManager:
         self, live: Live, stats: dict, pending: dict
     ) -> dict:
         stats["pending_batches"] = {
-            "abstracts": sum(
+            "abstract_screen": sum(
                 1 for b in pending.values() if b["type"] == "abstract_screen"
             ),
-            "fulltexts": sum(
+            "fulltext_screen": sum(
                 1 for b in pending.values() if b["type"] == "fulltext_screen"
             ),
-            "extractions": sum(
-                1 for b in pending.values() if b["type"] == "extraction"
-            ),
+            "extraction": sum(1 for b in pending.values() if b["type"] == "extraction"),
         }
         live.update(utils.create_stats_table(stats))
         return stats

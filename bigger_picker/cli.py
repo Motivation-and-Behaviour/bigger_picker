@@ -307,7 +307,11 @@ def monitor(
         "last_sync": {"asana": "Never", "rayyan": "Never", "openai": "Never"},
         "total_syncs": {"asana": 0, "rayyan": 0, "openai": 0},
         "total_polls": {"asana": 0, "rayyan": 0, "openai": 0},
-        "pending_batches": {"abstracts": 0, "fulltexts": 0, "extractions": 0},
+        "pending_batches": {
+            "abstract_screen": 0,
+            "fulltext_screen": 0,
+            "extraction": 0,
+        },
         "start_time": datetime.now(),
         "consecutive_errors": {"asana": 0, "rayyan": 0, "openai": 0},
     }
