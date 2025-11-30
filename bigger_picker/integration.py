@@ -769,7 +769,7 @@ class IntegrationManager:
                     self._handle_completed_batch(
                         batch.output_file_id, info["type"], batch_id
                     )
-                    stats["pending_batches"][info["type"] + "s"] -= 1
+                    stats["pending_batches"][info["type"]] -= 1
                     stats["last_sync"]["openai"] = datetime.now().strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
