@@ -268,6 +268,7 @@ def monitor(
         False,
         help="Sync Asana and Airtable without checking Rayyan to screen/extract",
     ),
+    full_frequency: int = typer.Option(5, help="Frequency of full syncs (in cycles)"),
     debug: bool = typer.Option(
         False, "--debug", help="Enable debug logging to console"
     ),
@@ -320,6 +321,7 @@ def monitor(
         with Live(
             create_stats_table(stats), refresh_per_second=1, console=console
         ) as live:
+            cycle_count = 0
             while True:
                 # TODO: method for asana, rayyan, openai
 
@@ -328,13 +330,15 @@ def monitor(
 
                 stats = integration.monitor_asana(live, stats)
 
-                if not sync_only:
+                if not sync_only and cycle_count % full_frequency == 0:
                     (
                         unscreened_abstracts,
                         unscreened_fulltexts,
                         unextracted_articles,
                         stats,
                     ) = integration.monitor_rayyan(live, stats)
+
+                    stats = integration.monitor_asana(live, stats)
 
                     stats = integration.create_batches(
                         live,
@@ -348,9 +352,13 @@ def monitor(
                         live, stats, pending
                     )
 
+                    stats = integration.monitor_asana(live, stats)
+
                     stats = integration.process_pending_batches_cli(
                         live, stats, pending
                     )
+
+                    stats = integration.monitor_asana(live, stats)
 
                     if (
                         stats["consecutive_errors"]["rayyan"] >= max_errors
@@ -371,6 +379,8 @@ def monitor(
                     )
                     live.update(create_stats_table(stats))
                     time.sleep(1)
+
+                cycle_count += 1
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Monitor stopped by user[/yellow]")
