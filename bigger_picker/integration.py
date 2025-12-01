@@ -87,7 +87,6 @@ class IntegrationManager:
 
             if dataset_bpipd in tasks:
                 # If the dataset has a matching task, update it
-                self._log(f"Updating task {dataset_bpipd}...")
                 self.update_task_from_dataset(
                     tasks[dataset_bpipd],
                     dataset,
@@ -131,7 +130,7 @@ class IntegrationManager:
 
         if dataset_vals == task_vals:
             self._log(
-                f"No changes detected in {dataset['fields']['Dataset ID']}, skipping update."  # noqa: E501
+                f"No changes in {dataset['fields']['Dataset ID']}, skipping update."  # noqa: E501
             )
             return task
 
