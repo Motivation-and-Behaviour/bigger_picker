@@ -43,6 +43,9 @@ class RayyanManager:
         priority = []
 
         for article in included_results["data"]:  # type: ignore
+            if not article.get("fulltexts", []):
+                # Missing fulltext. Shouldn't happen, but skip just in case.
+                continue
             article_labels = article.get("customizations", {}).get("labels", {})  # type: ignore
             if any(
                 label in config.ASANA_SEARCHES_ENUM_VALUES for label in article_labels
