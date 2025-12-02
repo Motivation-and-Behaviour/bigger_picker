@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bigger_picker"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple set of tools to link Rayyan, Airtable, Asana, and OpenAI for supporting the Bigger Picture project."
 authors = [{ name = "Taren Sanders", email = "taren.sanders@acu.edu.au" }]
 readme = "README.md"
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["jupyter", "pytest", "pytest-cov", "ruff"]
+dev = ["jupyter", "pytest", "pytest-cov", "rispy", "ruff"]
 
 docs = [
     "mkdocs",
