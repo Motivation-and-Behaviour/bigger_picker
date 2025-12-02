@@ -323,8 +323,6 @@ def monitor(
         ) as live:
             cycle_count = 0
             while True:
-                # TODO: method for asana, rayyan, openai
-
                 pending = integration.tracker.get_pending_batches()
                 stats = integration.update_stats_pending_batches(live, stats, pending)
 

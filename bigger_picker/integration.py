@@ -130,7 +130,7 @@ class IntegrationManager:
 
         if dataset_vals == task_vals:
             self._log(
-                f"No changes in {dataset['fields']['Dataset ID']}, skipping update."  # noqa: E501
+                f"No changes in {dataset['fields']['Dataset ID']}, skipping update."
             )
             return task
 
