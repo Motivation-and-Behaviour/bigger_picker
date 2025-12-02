@@ -616,7 +616,10 @@ class IntegrationManager:
                 stats["status"] = "[yellow]Syncing Asana...[/yellow]"
                 live.update(utils.create_stats_table(stats))
 
-                self._log("Changes detected in Asana, syncing...")
+                if events:
+                    self._log("Changes detected in Asana, syncing...")
+                if stats["total_syncs"]["asana"] == 0:
+                    self._log("Performing initial Asana sync...")
                 self.sync()
                 stats["total_syncs"]["asana"] += 1
                 self._log("Sync complete. Clearing Asana events...")
