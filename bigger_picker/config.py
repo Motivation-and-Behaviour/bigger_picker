@@ -57,6 +57,10 @@ ASANA_STATUS_ENUM_VALUES = {
 }
 ASANA_SEARCHES_ENUM_VALUES = {
     "SDQ": "1211763557587635",
+    "Academic achievement": "1212248779269219",
+    "Cognition": "1212248779269220",
+    "Mental health": "1212248779269221",
+    "Wellbeing": "1212248779269222",
 }
 # _______OPENAI_________
 STUDY_OBJECTIVES = """
