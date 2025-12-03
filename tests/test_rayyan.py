@@ -159,8 +159,16 @@ class TestGetUnextractedArticles:
     def test_returns_articles_with_unextracted_label(self, mock_manager):
         mock_manager.review.results.return_value = {
             "data": [
-                {"id": 1, "customizations": {"labels": {}}},
-                {"id": 2, "customizations": {"labels": {"SDQ": 1}}},
+                {
+                    "id": 1,
+                    "fulltexts": [{"test_fulltext": "value"}],
+                    "customizations": {"labels": {}},
+                },
+                {
+                    "id": 2,
+                    "fulltexts": [{"test_fulltext": "value"}],
+                    "customizations": {"labels": {"SDQ": 1}},
+                },
             ]
         }
 

@@ -87,7 +87,6 @@ class IntegrationManager:
 
             if dataset_bpipd in tasks:
                 # If the dataset has a matching task, update it
-                self._log(f"Updating task {dataset_bpipd}...")
                 self.update_task_from_dataset(
                     tasks[dataset_bpipd],
                     dataset,
@@ -131,7 +130,7 @@ class IntegrationManager:
 
         if dataset_vals == task_vals:
             self._log(
-                f"No changes detected in {dataset['fields']['Dataset ID']}, skipping update."  # noqa: E501
+                f"No changes in {dataset['fields']['Dataset ID']}, skipping update."
             )
             return task
 
@@ -617,7 +616,10 @@ class IntegrationManager:
                 stats["status"] = "[yellow]Syncing Asana...[/yellow]"
                 live.update(utils.create_stats_table(stats))
 
-                self._log("Changes detected in Asana, syncing...")
+                if events:
+                    self._log("Changes detected in Asana, syncing...")
+                if stats["total_syncs"]["asana"] == 0:
+                    self._log("Performing initial Asana sync...")
                 self.sync()
                 stats["total_syncs"]["asana"] += 1
                 self._log("Sync complete. Clearing Asana events...")
@@ -687,9 +689,10 @@ class IntegrationManager:
         unscreened_abstracts: list | None,
         unscreened_fulltexts: list | None,
         unextracted_articles: list | None,
-        max_batch_abs: int = 1000,
-        max_batch_ft: int = 100,
-        max_batch_ext: int = 100,
+        max_batch_size_abs: int = 1000,
+        max_batch_size_ft: int = 100,
+        max_batch_size_ext: int = 100,
+        max_num_batches_per_type: int = 3,
     ):
         try:
             if unscreened_abstracts:
@@ -700,11 +703,15 @@ class IntegrationManager:
                 self._log(
                     f"Creating batches for {len(unscreened_abstracts)} abstracts..."
                 )
-                for batch in batched(unscreened_abstracts, max_batch_abs):
+                batch_count = 0
+                for batch in batched(unscreened_abstracts, max_batch_size_abs):
+                    if batch_count >= max_num_batches_per_type:
+                        self._log("Reached max number of batches for this cycle.")
+                        break
                     self.create_abstract_screening_batch(list(batch))
-                    stats["pending_batches"]["abstracts"] += 1
+                    stats["pending_batches"]["abstract_screen"] += 1
                     live.update(utils.create_stats_table(stats))
-
+                    batch_count += 1
             if unscreened_fulltexts:
                 stats["status"] = (
                     "[yellow]Creating fulltext screening batches...[/yellow]"
@@ -713,22 +720,30 @@ class IntegrationManager:
                 self._log(
                     f"Creating batches for {len(unscreened_fulltexts)} fulltexts..."
                 )
-                for batch in batched(unscreened_fulltexts, max_batch_ft):
+                batch_count = 0
+                for batch in batched(unscreened_fulltexts, max_batch_size_ft):
+                    if batch_count >= max_num_batches_per_type:
+                        self._log("Reached max number of batches for this cycle.")
+                        break
                     self.create_fulltext_screening_batch(list(batch))
-                    stats["pending_batches"]["fulltexts"] += 1
+                    stats["pending_batches"]["fulltext_screen"] += 1
                     live.update(utils.create_stats_table(stats))
-
+                    batch_count += 1
             if unextracted_articles:
                 stats["status"] = "[yellow]Creating extraction batches...[/yellow]"
                 live.update(utils.create_stats_table(stats))
                 self._log(
                     f"Creating batches for {len(unextracted_articles)} extractions..."
                 )
-                for batch in batched(unextracted_articles, max_batch_ext):
+                batch_count = 0
+                for batch in batched(unextracted_articles, max_batch_size_ext):
+                    if batch_count >= max_num_batches_per_type:
+                        self._log("Reached max number of batches for this cycle.")
+                        break
                     self.create_extraction_batch(list(batch))
-                    stats["pending_batches"]["extractions"] += 1
+                    stats["pending_batches"]["extraction"] += 1
                     live.update(utils.create_stats_table(stats))
-
+                    batch_count += 1
             stats["consecutive_errors"]["openai"] = 0
 
         except Exception as e:
@@ -740,10 +755,16 @@ class IntegrationManager:
         return stats
 
     @requires_services("openai")
-    def process_pending_batches_cli(self, live: Live, stats: dict, pending: dict):
+    def process_pending_batches_cli(
+        self, live: Live, stats: dict, pending: dict, max_batches: int = 5
+    ) -> dict:
         assert self.openai
 
+        batch_count = 0
         for batch_id, info in pending.items():
+            if batch_count > max_batches:
+                self._log("Reached max number of batches for this cycle.")
+                break
             stats["status"] = "[cyan]Checking batch status...[/cyan]"
             stats["last_check"]["openai"] = datetime.now().strftime("%H:%M:%S")
             stats["total_polls"]["openai"] += 1
@@ -769,11 +790,12 @@ class IntegrationManager:
                     self._handle_completed_batch(
                         batch.output_file_id, info["type"], batch_id
                     )
-                    stats["pending_batches"][info["type"] + "s"] -= 1
+                    stats["pending_batches"][info["type"]] -= 1
                     stats["last_sync"]["openai"] = datetime.now().strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
                     live.update(utils.create_stats_table(stats))
+                    batch_count += 1
                 else:
                     self._log("Batch completed but has no output file ID.")
                     if batch.error_file_id:
@@ -791,15 +813,13 @@ class IntegrationManager:
         self, live: Live, stats: dict, pending: dict
     ) -> dict:
         stats["pending_batches"] = {
-            "abstracts": sum(
+            "abstract_screen": sum(
                 1 for b in pending.values() if b["type"] == "abstract_screen"
             ),
-            "fulltexts": sum(
+            "fulltext_screen": sum(
                 1 for b in pending.values() if b["type"] == "fulltext_screen"
             ),
-            "extractions": sum(
-                1 for b in pending.values() if b["type"] == "extraction"
-            ),
+            "extraction": sum(1 for b in pending.values() if b["type"] == "extraction"),
         }
         live.update(utils.create_stats_table(stats))
         return stats

@@ -851,7 +851,11 @@ def test_create_stats_table_basic():
         },
         "total_syncs": {"asana": 5, "rayyan": 3, "openai": 2},
         "total_polls": {"asana": 10, "rayyan": 8, "openai": 6},
-        "pending_batches": {"abstracts": 2, "fulltexts": 1, "extractions": 0},
+        "pending_batches": {
+            "abstract_screen": 2,
+            "fulltext_screen": 1,
+            "extraction": 0,
+        },
     }
 
     table = utils.create_stats_table(stats)
@@ -875,7 +879,11 @@ def test_create_stats_table_uptime_calculation():
         "last_sync": {"asana": "N/A", "rayyan": "N/A", "openai": "N/A"},
         "total_syncs": {"asana": 0, "rayyan": 0, "openai": 0},
         "total_polls": {"asana": 0, "rayyan": 0, "openai": 0},
-        "pending_batches": {"abstracts": 0, "fulltexts": 0, "extractions": 0},
+        "pending_batches": {
+            "abstract_screen": 0,
+            "fulltext_screen": 0,
+            "extraction": 0,
+        },
     }
 
     table = utils.create_stats_table(stats)
@@ -899,7 +907,11 @@ def test_create_stats_table_with_pending_batches():
         },
         "total_syncs": {"asana": 1, "rayyan": 1, "openai": 1},
         "total_polls": {"asana": 1, "rayyan": 1, "openai": 1},
-        "pending_batches": {"abstracts": 10, "fulltexts": 5, "extractions": 3},
+        "pending_batches": {
+            "abstract_screen": 10,
+            "fulltext_screen": 5,
+            "extraction": 3,
+        },
     }
 
     table = utils.create_stats_table(stats)

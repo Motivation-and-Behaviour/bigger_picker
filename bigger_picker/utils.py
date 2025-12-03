@@ -375,9 +375,9 @@ def create_stats_table(stats: dict) -> Table:
     table.add_row("Total Polls", total_polls_table)
     pending_batches_table = make_subtable(
         {
-            "abstracts": "Abstracts",
-            "fulltexts": "Fulltexts",
-            "extractions": "Extractions",
+            "abstract_screen": "Abstracts",
+            "fulltext_screen": "Fulltexts",
+            "extraction": "Extractions",
         },
         stats["pending_batches"],
     )
