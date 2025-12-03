@@ -692,7 +692,7 @@ class IntegrationManager:
         max_batch_size_abs: int = 1000,
         max_batch_size_ft: int = 100,
         max_batch_size_ext: int = 100,
-        max_num_batches: int = 3,
+        max_num_batches_per_type: int = 3,
     ):
         try:
             if unscreened_abstracts:
@@ -705,7 +705,7 @@ class IntegrationManager:
                 )
                 batch_count = 0
                 for batch in batched(unscreened_abstracts, max_batch_size_abs):
-                    if batch_count >= max_num_batches:
+                    if batch_count >= max_num_batches_per_type:
                         self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_abstract_screening_batch(list(batch))
@@ -722,7 +722,7 @@ class IntegrationManager:
                 )
                 batch_count = 0
                 for batch in batched(unscreened_fulltexts, max_batch_size_ft):
-                    if batch_count >= max_num_batches:
+                    if batch_count >= max_num_batches_per_type:
                         self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_fulltext_screening_batch(list(batch))
@@ -737,7 +737,7 @@ class IntegrationManager:
                 )
                 batch_count = 0
                 for batch in batched(unextracted_articles, max_batch_size_ext):
-                    if batch_count >= max_num_batches:
+                    if batch_count >= max_num_batches_per_type:
                         self._log("Reached max number of batches for this cycle.")
                         break
                     self.create_extraction_batch(list(batch))
@@ -762,6 +762,9 @@ class IntegrationManager:
 
         batch_count = 0
         for batch_id, info in pending.items():
+            if batch_count > max_batches:
+                self._log("Reached max number of batches for this cycle.")
+                break
             stats["status"] = "[cyan]Checking batch status...[/cyan]"
             stats["last_check"]["openai"] = datetime.now().strftime("%H:%M:%S")
             stats["total_polls"]["openai"] += 1
@@ -774,9 +777,6 @@ class IntegrationManager:
                 continue
 
             if batch.status == "completed":
-                if batch_count >= max_batches:
-                    self._log("Reached max number of batches for this cycle.")
-                    break
                 self._log("Batch completed! Downloading results...")
                 if batch.output_file_id:
                     stats["status"] = (
