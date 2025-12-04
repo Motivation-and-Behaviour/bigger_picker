@@ -148,10 +148,14 @@ class IntegrationManager:
                         "value"
                     ],
                     config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: dataset_vals["url"],
-                    config.ASANA_CUSTOM_FIELD_IDS["Searches"]: dataset_searches,
                 },
             }
         }
+
+        if dataset_searches:
+            update_payload["data"]["custom_fields"][
+                config.ASANA_CUSTOM_FIELD_IDS["Searches"]
+            ] = dataset_searches
 
         task_gid = task.get("gid", None)
         if task_gid is None:
