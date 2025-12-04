@@ -134,10 +134,17 @@ class IntegrationManager:
             )
             return task
 
+        searches = set()
+        for search_str in dataset["fields"].get("Searches", []):
+            if not search_str:
+                continue
+            labels = search_str.split(",")
+            for label in labels:
+                label = label.strip()
+                searches.add(label)
+
         dataset_searches = [
-            config.ASANA_SEARCHES_ENUM_VALUES.get(search)
-            for search in dataset["fields"].get("Searches", [])
-            if search is not None
+            config.ASANA_SEARCHES_ENUM_VALUES.get(search) for search in searches
         ]
 
         update_payload = {
@@ -148,14 +155,10 @@ class IntegrationManager:
                         "value"
                     ],
                     config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: dataset_vals["url"],
+                    config.ASANA_CUSTOM_FIELD_IDS["Searches"]: dataset_searches,
                 },
             }
         }
-
-        if dataset_searches:
-            update_payload["data"]["custom_fields"][
-                config.ASANA_CUSTOM_FIELD_IDS["Searches"]
-            ] = dataset_searches
 
         task_gid = task.get("gid", None)
         if task_gid is None:
@@ -178,10 +181,18 @@ class IntegrationManager:
         dataset_value = dataset["fields"].get("Dataset Value", None)
         airtable_url = self.airtable.make_url(dataset["id"])
         dataset_status_id = config.ASANA_STATUS_ENUM_VALUES.get(dataset_status, None)
+
+        searches = set()
+        for search_str in dataset["fields"].get("Searches", []):
+            if not search_str:
+                continue
+            labels = search_str.split(",")
+            for label in labels:
+                label = label.strip()
+                searches.add(label)
+
         dataset_searches = [
-            config.ASANA_SEARCHES_ENUM_VALUES.get(search)
-            for search in dataset["fields"].get("Searches", [])
-            if search is not None
+            config.ASANA_SEARCHES_ENUM_VALUES.get(search) for search in searches
         ]
 
         task_payload = {
