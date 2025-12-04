@@ -134,6 +134,12 @@ class IntegrationManager:
             )
             return task
 
+        dataset_searches = [
+            config.ASANA_SEARCHES_ENUM_VALUES.get(search)
+            for search in dataset["fields"].get("Searches", [])
+            if search is not None
+        ]
+
         update_payload = {
             "data": {
                 "name": dataset_vals["name"],
@@ -142,6 +148,7 @@ class IntegrationManager:
                         "value"
                     ],
                     config.ASANA_CUSTOM_FIELD_IDS["Airtable Data"]: dataset_vals["url"],
+                    config.ASANA_CUSTOM_FIELD_IDS["Searches"]: dataset_searches,
                 },
             }
         }
