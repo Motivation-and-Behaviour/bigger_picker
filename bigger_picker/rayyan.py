@@ -116,6 +116,7 @@ class RayyanManager:
             list(config.RAYYAN_LABELS.values()) + config.RAYYAN_EXCLUSION_LABELS
         )
         labels_to_check.remove(config.RAYYAN_LABELS["abstract_included"])
+        labels_to_check.remove(config.RAYYAN_LABELS["abstract_excluded"])
 
         results = self._retry_on_auth_error(
             lambda: self.review.results(self.review_id, results_params)  # type: ignore
