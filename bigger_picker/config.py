@@ -48,12 +48,14 @@ ASANA_CUSTOM_FIELD_IDS = {
 ASANA_STATUS_ENUM_VALUES = {
     "Awaiting Triage": "1210433819516836",
     "Validated": "1210528062577747",
-    "Non-priority": "1210433819516837",
     "Mail Merge": "1211763557587633",
     "Contacting Authors": "1210433819516838",
     "Agreed & Awaiting Data": "1210468704477552",
     "Included": "1210433819516839",
+    "Non-priority": "1210433819516837",
     "Declined": "1210468704477553",
+    "Non-response": "1213621473078184",
+    "Cannot Access": "1213621473078185",
 }
 ASANA_SEARCHES_ENUM_VALUES = {
     "SDQ": "1211763557587635",
